@@ -81,7 +81,11 @@ R.lights = {};
   // feux ronds, simples : phares blancs devant, feux rouges derrière (avec un petit feu de recul blanc)
   const ring = plastic(0x9aa2a8,{metalness:0.6, roughness:0.3});
   const lamp = (r, m) => { const g = new THREE.Group(); g.add(cylX(r, 0.05, m)); const t = new THREE.Mesh(new THREE.TorusGeometry(r, 0.012, 8, 28), ring); t.rotation.y = Math.PI/2; t.position.x = 0.026; g.add(t); return g; };
+  R.lights.ind = {};
   [1,-1].forEach(sg=>{
+    const ind = new THREE.MeshStandardMaterial({color:0xd98a1a, emissive:0xff9a1a, emissiveIntensity:0.05, roughness:0.3}); R.lights.ind[sg>0?'L':'R'] = ind;
+    put(at(new THREE.Mesh(new THREE.SphereGeometry(0.035, 12, 8), ind), 2.07, 0.57, sg*0.7), 'headlight', C);   // clignotants
+    put(at(new THREE.Mesh(new THREE.SphereGeometry(0.03, 12, 8), ind), -2.07, 0.78, sg*0.62), 'taillight', C);
     const h = lamp(0.075, headM); at(h, 2.075, 0.66, sg*0.56); h.rotation.y = sg*0.12; put(h,'headlight',C);
     const t = lamp(0.06, tailM); at(t, -2.075, 0.9, sg*0.6); t.rotation.y = Math.PI - sg*0.1; put(t,'taillight',C);
     const r = lamp(0.035, revM); at(r, -2.075, 0.9, sg*0.46); r.rotation.y = Math.PI; put(r,'taillight',C);
@@ -147,6 +151,17 @@ LEAVES.filter(o=>o.isMesh && (o.material===BODY.paint || o.material===BODY.glass
   l.visible = false; l.raycast = ()=>{}; m.add(l); BODY.wires.push(l);
 });
 
+// Une autre voiture, générique et volontairement simple (4,20 × 1,74 m, centre à l'origine, avant vers +x)
+function genericCar(col){
+  const g = new THREE.Group(), body = plastic(col,{roughness:0.45}), dark = plastic(0x1d2226,{roughness:0.9}), win = plastic(0x27333d,{roughness:0.15});
+  g.add(at(box(4.2, 0.6, 1.74, body), 0, 0.58, 0));
+  g.add(at(box(2.2, 0.46, 1.58, win), -0.3, 1.1, 0));
+  g.add(at(box(2.0, 0.06, 1.5, body), -0.35, 1.35, 0));
+  [[1.28,1],[1.28,-1],[-1.3,1],[-1.3,-1]].forEach(([wx,sg]) => g.add(at(cylZ(0.31, 0.2, dark), wx, 0.31, sg*0.78)));
+  [1,-1].forEach(sg => { g.add(at(box(0.04, 0.1, 0.3, plastic(0xf3f6f8)), 2.1, 0.7, sg*0.6)); g.add(at(box(0.04, 0.12, 0.26, plastic(0x8d1010)), -2.1, 0.78, sg*0.6)); });
+  return g;
+}
+
 /* ---------------- Rue des vidéos « se garer » (fixe dans le monde, visible seulement pendant ces vidéos) ----------------
    Créneau : la voiture part de l'origine, cap +x, à côté de la voiture garée A, et finit garée derrière elle.
    Bataille : plus loin dans la rue (x ≈ 27-40), 5 places perpendiculaires au trottoir, en retrait.
@@ -185,12 +200,7 @@ const PARK_OBST = [];        // obstacles (rectangles vus de dessus : centre, de
     at(lamp, -26 + i*12, 0.12, KERB_Z - 0.5); add(lamp); }
   // voitures garées : génériques, volontairement simples (x, z = centre ; rot = cap)
   function parkedCar(x, z, col, rot=0){
-    const g = new THREE.Group(), body = plastic(col,{roughness:0.45}), dark = plastic(0x1d2226,{roughness:0.9}), win = plastic(0x27333d,{roughness:0.15});
-    g.add(at(box(4.2, 0.6, 1.74, body), 0, 0.58, 0));
-    g.add(at(box(2.2, 0.46, 1.58, win), -0.3, 1.1, 0));
-    g.add(at(box(2.0, 0.06, 1.5, body), -0.35, 1.35, 0));
-    [[1.28,1],[1.28,-1],[-1.3,1],[-1.3,-1]].forEach(([wx,sg]) => g.add(at(cylZ(0.31, 0.2, dark), wx, 0.31, sg*0.78)));
-    [1,-1].forEach(sg => { g.add(at(box(0.04, 0.1, 0.3, plastic(0xf3f6f8)), 2.1, 0.7, sg*0.6)); g.add(at(box(0.04, 0.12, 0.26, plastic(0x8d1010)), -2.1, 0.78, sg*0.6)); });
+    const g = genericCar(col);
     at(g, x, 0, z); g.rotation.y = rot; add(g);
     PARK_OBST.push({x, z, hx:2.1, hz:0.87, th:-rot});
   }
@@ -204,4 +214,79 @@ const PARK_OBST = [];        // obstacles (rectangles vus de dessus : centre, de
   const bayZ = BAY_KERB + 0.3 + 2.1;        // bataille : nez à 30 cm de la bordure
   parkedCar(BAY_X - BAY_W, bayZ, 0x7a2a2e, Math.PI/2);   // à droite de la place libre
   parkedCar(BAY_X + BAY_W, bayZ, 0x8d969c, Math.PI/2);   // à gauche
+})();
+
+/* ---------------- Autoroute (vidéo « changer de voie ») ----------------
+   Notre voiture reste vers x = 0 : c'est la route qui défile (traits, arbres), comme sur la route normale.
+   3 voies de 3,5 m : la nôtre (droite) en z = 0, celle du milieu en z = 3,5, celle de gauche en z = 7. */
+const HWY = { on:false, zones:false, ins:false, v:30.6, z:0, rel:-45, t:0, dist:0, insX:290, movers:[], traffic:[] };
+const LANE_W = 3.5;
+const HWYG = new THREE.Group(); scene.add(HWYG);
+const OTHER = genericCar(0xe2ddd2);
+(function motorway(){
+  const K='hwyscene', C='road', add = o => put(o, K, C, undefined, HWYG);
+  const asph = new THREE.MeshStandardMaterial({color:0x4a4f53, roughness:1}), paint = new THREE.MeshBasicMaterial({color:0xe8e4d4});
+  const plane = (w, d, x, z, m) => { const o = new THREE.Mesh(new THREE.PlaneGeometry(w, d).rotateX(-Math.PI/2), m); o.position.set(x, -0.002, z); add(o); return o; };
+  plane(240, 13.5, 0, 3.6, asph);                                                       // 3 voies + bande d'arrêt d'urgence
+  plane(240, 30, 0, -18.2, plastic(0x6c8556,{roughness:1})).position.y = -0.04; plane(240, 30, 0, 26, plastic(0x6c8556,{roughness:1})).position.y = -0.04;
+  // le côté droit (bande d'arrêt d'urgence, glissière) est caché pendant la vidéo « s'insérer », qui a sa propre bretelle
+  const addR = o => put(o, 'hwyright', C, undefined, HWYG);
+  [-1.75, 8.75].forEach(z => { const l = new THREE.Mesh(new THREE.PlaneGeometry(240, 0.15).rotateX(-Math.PI/2), paint); l.position.set(0, 0.002, z); (z < 0 ? addR : add)(l); });
+  const rail = plastic(0x9aa1a5,{metalness:0.5, roughness:0.4});
+  [-3.4, 10.1].forEach(z => { const a = z < 0 ? addR : add; a(at(box(240, 0.3, 0.06, rail), 0, 0.6, z));
+    for(let i=0;i<60;i++){ const p = at(box(0.1, 0.6, 0.1, rail), -120 + i*4, 0.3, z); a(p); } });
+  // ce qui défile : traits des voies, arbres au loin (boucle de 120 m)
+  for(let i=0;i<10;i++) [1.75, 5.25].forEach(z => { const d = new THREE.Mesh(new THREE.PlaneGeometry(6, 0.15).rotateX(-Math.PI/2), paint); d.position.set(-60 + i*12, 0.003, z); add(d); HWY.movers.push(d); });
+  for(let i=0;i<14;i++){ const t = tree(1 + (i%3)*0.3); t.position.set(-60 + i*8.6, 0, i%2 ? -7 - (i%4) : 15 + (i%5)); add(t); HWY.movers.push(t); }
+  put(OTHER, K, C, undefined, HWYG); OTHER.position.set(-45, 0, LANE_W);
+  // la circulation autour : deux voitures plus rapides qui doublent au début, une plus lente devant nous (la raison de changer de voie)
+  [[2*LANE_W, -30, 7, 0x2f4a5c], [LANE_W, -30, 6, 0x7a2a2e], [0, 14, -0.06, 0x8d969c]].forEach(([z, rel0, vrel, col])=>{
+    const car = genericCar(col); car.position.set(rel0, 0, z); put(car, K, C, undefined, HWYG); HWY.traffic.push({car, z, rel0, vrel}); });
+})();
+// Ce que montrent les rétroviseurs (vert) et l'angle mort (rouge), peints au sol autour de notre voiture
+(function zones(){
+  const flat = (pts, col, op) => { const sh = new THREE.Shape(pts.map(([x,z])=>new THREE.Vector2(x, -z)));
+    const m = new THREE.Mesh(new THREE.ShapeGeometry(sh).rotateX(-Math.PI/2), new THREE.MeshBasicMaterial({color:col, transparent:true, opacity:op, depthWrite:false, side:THREE.DoubleSide}));
+    m.position.y = 0.02; put(m, 'hwyzone', 'road'); };
+  const cone = (x0, z0, a1, a2, L) => [[x0, z0], [x0 - L*Math.cos(a1*DEG), z0 + L*Math.sin(a1*DEG)], [x0 - L*Math.cos(a2*DEG), z0 + L*Math.sin(a2*DEG)]];
+  const G = 0x3cc46a, RED = 0xe0402a;
+  flat(cone(0.78, 0.98, 4, 18, 32), G, 0.3);                                 // rétro gauche (plan)
+  flat(cone(0.78, -0.98, -4, -25, 32), G, 0.3);                              // rétro droit (bombé : plus large)
+  flat([[-2.1, 0.5], [-2.1 - 32*Math.cos(9*DEG), 0.5 + 32*Math.sin(9*DEG)], [-2.1 - 32*Math.cos(9*DEG), -0.5 - 32*Math.sin(9*DEG)], [-2.1, -0.5]], G, 0.22);   // rétro intérieur
+  // angle mort : à côté de toi, entre ton épaule et le bord de ce que montre le rétro
+  const blind = (sg, a) => { const t = Math.tan(a*DEG), x1 = 0.78 - (4.2 - 0.98)/t;
+    return [[0.3, sg*(0.98 + 0.48*t)], [0.3, sg*4.2], [x1, sg*4.2]]; };
+  flat(blind(1, 18), RED, 0.45); flat(blind(-1, 25), RED, 0.45);
+})();
+
+
+/* ---------------- Voie d'insertion (vidéo « rejoindre l'autoroute ») ----------------
+   À droite de la voie de droite : 300 m de voie droite (z = -3,5), puis un biseau de 80 m. Le groupe glisse vers
+   l'arrière à mesure qu'on avance (INSG.x = HWY.insX - HWY.dist) ; la fin de la voie est en x local = 0. */
+const INSG = new THREE.Group(); HWYG.add(INSG);
+// la bretelle d'accès arrive de la droite et rejoint le début de la voie d'insertion (x local -310) : z = -3,5 - 18,5·t², t = (-310 - x)/70
+const RAMP = { x0:-380, x1:-310, dz:18.5 };
+const rampZ = x => -3.5 - RAMP.dz*((RAMP.x1 - x)/(RAMP.x1 - RAMP.x0))**2;
+const rampSlope = x => 2*RAMP.dz*(RAMP.x1 - x)/(RAMP.x1 - RAMP.x0)**2;
+(function slipRoad(){
+  const K='insscene', C='road', add = o => put(o, K, C, undefined, INSG);
+  const asph = new THREE.MeshStandardMaterial({color:0x4a4f53, roughness:1}), paint = new THREE.MeshBasicMaterial({color:0xe8e4d4});
+  const rail = plastic(0x9aa1a5,{metalness:0.5, roughness:0.4});
+  const strip = new THREE.Mesh(new THREE.PlaneGeometry(310, 3.5).rotateX(-Math.PI/2), asph); strip.position.set(-155, 0.012, -3.5); add(strip);
+  // bretelle : un ruban de 4 m le long de la courbe, avec une glissière de chaque côté
+  const pos = [], idx = [], N = 40;
+  for(let i=0;i<=N;i++){ const x = RAMP.x0 - 30 + (RAMP.x1 - RAMP.x0 + 32)*i/N, xc = Math.max(RAMP.x0, Math.min(RAMP.x1, x)), z = x < RAMP.x0 ? rampZ(RAMP.x0) - rampSlope(RAMP.x0)*(RAMP.x0 - x) : rampZ(xc);
+    const s = x < RAMP.x0 ? rampSlope(RAMP.x0) : rampSlope(xc), n = Math.hypot(1, s), nx = -s/n*2, nz = 1/n*2;
+    pos.push(x + nx, 0.012, z + nz, x - nx, 0.012, z - nz); if(i < N){ const a = 2*i; idx.push(a, a+2, a+1, a+1, a+2, a+3); }
+    if(i % 2 === 0 && x < RAMP.x1 - 4) [1,-1].forEach(sg=>add(at(box(0.1, 0.6, 0.1, rail), x - sg*nx*1.4, 0.3, z - sg*nz*1.4))); }
+  const rg = new THREE.BufferGeometry(); rg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); rg.setIndex(idx); rg.computeVertexNormals();
+  add(new THREE.Mesh(rg, new THREE.MeshStandardMaterial({color:0x4a4f53, roughness:1, side:THREE.DoubleSide})));
+  const sh = new THREE.Shape([new THREE.Vector2(0, 1.75), new THREE.Vector2(0, 5.25), new THREE.Vector2(80, 1.75)]);   // biseau (y = -z)
+  const taper = new THREE.Mesh(new THREE.ShapeGeometry(sh).rotateX(-Math.PI/2), asph); taper.position.y = 0.012; add(taper);
+  for(let x=-310; x<80; x+=6){ const d = new THREE.Mesh(new THREE.PlaneGeometry(3, 0.3).rotateX(-Math.PI/2), paint); d.position.set(x + 1.5, 0.02, -1.75); add(d); }   // ligne de séparation
+  const line = new THREE.Mesh(new THREE.PlaneGeometry(330, 0.15).rotateX(-Math.PI/2), paint); line.position.set(245, 0.02, -1.75); add(line);           // bande d'arrêt d'urgence après
+  add(at(box(310, 0.3, 0.06, rail), -155, 0.6, -5.6));
+  const diag = at(box(80.1, 0.3, 0.06, rail), 40, 0.6, -4.5); diag.rotation.y = -Math.atan2(2.2, 80); add(diag);
+  add(at(box(330, 0.3, 0.06, rail), 245, 0.6, -3.4));
+  for(let x=-308; x<400; x+=8){ const z = x < 0 ? -5.6 : x < 80 ? -5.6 + 2.2*x/80 : -3.4; add(at(box(0.1, 0.6, 0.1, rail), x, 0.3, z)); }
 })();

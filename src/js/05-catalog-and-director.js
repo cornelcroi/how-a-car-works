@@ -124,7 +124,9 @@ function refreshVis(){
     if(u.cat==='body' && bodyMode==='off') v = false;
     if(iso) v = iso.has(u.part) && (!u.mode || u.mode===S.mode);
     if(S.mode==='ev' && iceOnly(u)) v = false;
-    if(u.part==='parkscene') v = v && PARK.on; else if(u.cat==='road' && PARK.on) v = false;
+    if(u.part==='parkscene') v = v && PARK.on; else if(u.part==='hwyscene') v = v && HWY.on; else if(u.part==='hwyzone') v = HWY.on && HWY.zones;
+    else if(u.part==='hwyright') v = v && HWY.on && !HWY.ins; else if(u.part==='insscene') v = v && HWY.on && HWY.ins;
+    else if(u.cat==='road' && (PARK.on || HWY.on)) v = false;
     o.visible = v;
   });
 }
@@ -175,7 +177,7 @@ function placeTags(){
     const near = camera.position.distanceTo(t.p);
     const show = !off && partVisible[k] && (iso ? iso.has(k) : (t.l===1 ? near < 7 : near < 1.1));
     t.el.style.display = show ? '' : 'none';
-    if(show) t.el.style.transform = `translate(${(tmpV.x+1)/2*w}px, ${(1-tmpV.y)/2*h - 10}px)`;
+    if(show) t.el.style.transform = `translate(${(1-tmpV.x)/2*w}px, ${(1-tmpV.y)/2*h - 10}px)`;   // x retourné : image retournée
   }
 }
 let infoKey = null;
@@ -191,7 +193,7 @@ canvas.addEventListener('pointerdown', e=>{ downAt=[e.clientX,e.clientY]; });
 canvas.addEventListener('pointerup', e=>{
   if(!downAt || Math.hypot(e.clientX-downAt[0], e.clientY-downAt[1])>6) return;
   const r = canvas.getBoundingClientRect();
-  ptr.set(((e.clientX-r.left)/r.width)*2-1, -((e.clientY-r.top)/r.height)*2+1);
+  ptr.set(mirrorNdcX(e.clientX, r), -((e.clientY-r.top)/r.height)*2+1);
   ray.setFromCamera(ptr, camera); ray.params.Points = {threshold:0.004};
   const hits = ray.intersectObjects(LEAVES.filter(o=>o.visible && !o.isLine && !o.isPoints), false);
   if(!hits.length){ $('info').hidden=true; return; }
@@ -300,14 +302,14 @@ function stopTour(){
   if(!tour) return; const sv = tour.saved; tour=null;
   S.slow = sv.slow; bodyMode = sv.body; Object.assign(catOn, sv.cats); simple = sv.simple; applyBodyMode();
   controls.enabled = true; stage.classList.remove('reeling'); reelEl.hidden=true; explodeTarget=0;
-  parkOff(); iso=null; isoKey=null; $('isobar').hidden=true; refreshVis();
+  parkOff(); hwyOff(); iso=null; isoKey=null; $('isobar').hidden=true; refreshVis();
 }
 function nextShot(){
   tour.i++; tour.t=0;
   if(tour.i >= tour.shots.length){ stopTour(); goView('car'); return; }
   const s = tour.shots[tour.i];
   if(s.act) s.act(); if(s.at) s.at.forEach(a=>a.done=false);
-  parkShot(s);
+  parkShot(s); hwyShot(s);
   S.slow = s.slow || 0.05;
   if(s.body){ bodyMode = s.body; applyBodyMode(); }
   iso = s.iso ? new Set(s.iso) : null; explodeTarget = s.explode ? 1 : 0; refreshVis();
@@ -334,7 +336,7 @@ function tourTick(dt){
   if(s.cam){
     const P = v => s.cam.car ? ROOT.localToWorld(new THREE.Vector3(...v)) : new THREE.Vector3(...v);
     want = P(s.cam.p2 ? s.cam.p.map((x,i)=>lerp(x, s.cam.p2[i], ease(p))) : s.cam.p);
-    if(s.cam.t) look = P(s.cam.t);
+    if(s.cam.t) look = P(s.cam.t2 ? s.cam.t.map((x,i)=>lerp(x, s.cam.t2[i], ease(p))) : s.cam.t);
   } else {
     const ang = (s.orbit||0)*(p-0.5), ca=Math.cos(ang), sa=Math.sin(ang);
     const d = new THREE.Vector3(s._dir.x*ca + s._dir.z*sa, s._dir.y, -s._dir.x*sa + s._dir.z*ca).normalize().applyAxisAngle(UP_Y, ROOT.rotation.y);
@@ -347,7 +349,7 @@ function tourTick(dt){
   const ring=$('ptrRing'), line=$('ptrLine'), tag=$('reelTag');
   if(s.focus && k>0.6){
     tmpV.copy(s._c).project(camera); const w=canvas.clientWidth, h=canvas.clientHeight;
-    const x=(tmpV.x+1)/2*w, y=(1-tmpV.y)/2*h, r=16+4*Math.sin(performance.now()/180);
+    const x=(1-tmpV.x)/2*w, y=(1-tmpV.y)/2*h, r=16+4*Math.sin(performance.now()/180);
     ring.setAttribute('cx',x); ring.setAttribute('cy',y); ring.setAttribute('r',r); ring.style.opacity=1;
     const tx = clamp(x + (x < w*0.6 ? 60 : -60), 70, w-70), ty = clamp(y - 70, 60, h*0.6);
     line.setAttribute('x1',x); line.setAttribute('y1',y-r); line.setAttribute('x2',tx); line.setAttribute('y2',ty+14); line.style.opacity=1;
@@ -407,6 +409,8 @@ const SCENARIOS = {
     {id:'tour', t:tr('Tout le chemin de la force','The whole path of the force'), d:tr('La grande visite, du piston à la route','The big tour, from piston to road'), shots:()=>reelShots()},
     {id:'parking', t:tr('Le créneau','Parallel parking'), d:tr('Se garer entre deux voitures, sous tous les angles','Parking between two cars, from every angle'), shots:()=>parkShots()},
     {id:'bay', t:tr('Se garer en bataille','Bay parking'), d:tr('Nez vers le trottoir, en deux manœuvres','Nose-in, in two moves'), shots:()=>bayShots()},
+    {id:'merge', t:tr('Rejoindre l\'autoroute','Joining the motorway'), d:tr('La voie d\'insertion, sans s\'arrêter','The slip road, without stopping'), shots:()=>mergeShots()},
+    {id:'lanechange', t:tr('Changer de voie sur l\'autoroute','Changing lanes on the motorway'), d:tr('Les rétros et l\'angle mort','Mirrors and the blind spot'), shots:()=>laneShots()},
   ],
   auto: [
     {id:'prnd', t:'P, R, N, D', d:tr('Moteur allumé, que se passe-t-il dans la boîte ?','Engine on: what happens in the gearbox?'), shots:()=>[
@@ -426,6 +430,8 @@ const SCENARIOS = {
     {id:'tour', t:tr('Tout le chemin de la force','The whole path of the force'), d:tr('La grande visite, du piston à la route','The big tour, from piston to road'), shots:()=>reelShots()},
     {id:'parking', t:tr('Le créneau','Parallel parking'), d:tr('Se garer entre deux voitures, sous tous les angles','Parking between two cars, from every angle'), shots:()=>parkShots()},
     {id:'bay', t:tr('Se garer en bataille','Bay parking'), d:tr('Nez vers le trottoir, en deux manœuvres','Nose-in, in two moves'), shots:()=>bayShots()},
+    {id:'merge', t:tr('Rejoindre l\'autoroute','Joining the motorway'), d:tr('La voie d\'insertion, sans s\'arrêter','The slip road, without stopping'), shots:()=>mergeShots()},
+    {id:'lanechange', t:tr('Changer de voie sur l\'autoroute','Changing lanes on the motorway'), d:tr('Les rétros et l\'angle mort','Mirrors and the blind spot'), shots:()=>laneShots()},
   ],
   ev: [
     {id:'evtour', t:tr('Comment avance une voiture électrique','How an electric car moves'), d:tr('De la batterie aux roues','From the battery to the wheels'), shots:()=>[
@@ -455,6 +461,8 @@ const SCENARIOS = {
     ]},
     {id:'parking', t:tr('Le créneau','Parallel parking'), d:tr('Se garer entre deux voitures, sous tous les angles','Parking between two cars, from every angle'), shots:()=>parkShots()},
     {id:'bay', t:tr('Se garer en bataille','Bay parking'), d:tr('Nez vers le trottoir, en deux manœuvres','Nose-in, in two moves'), shots:()=>bayShots()},
+    {id:'merge', t:tr('Rejoindre l\'autoroute','Joining the motorway'), d:tr('La voie d\'insertion, sans s\'arrêter','The slip road, without stopping'), shots:()=>mergeShots()},
+    {id:'lanechange', t:tr('Changer de voie sur l\'autoroute','Changing lanes on the motorway'), d:tr('Les rétros et l\'angle mort','Mirrors and the blind spot'), shots:()=>laneShots()},
   ],
 };
 function strokeShots(){
@@ -468,9 +476,12 @@ function strokeShots(){
     {focus:'crank', iso:iso1, dir:[0.9,0.25,-0.6], zoom:[1.3,1.0], orbit:0.4, dur:5, cap:tr('Les 4 pistons sont *décalés*','The 4 pistons are *staggered*'), sub:tr('Il y a toujours un piston qui pousse : ordre 1-3-4-2','There\'s always one piston pushing: order 1-3-4-2')},
   ];
 }
+const DRIVE_VIDEOS = ['parking','bay','merge','lanechange'];          // dans l'onglet « Conduire », les autres dans « Découvrir »
 function renderScenarios(){
-  $('scList').innerHTML = SCENARIOS[S.mode].map(sc=>`<button class="sc" data-sc="${sc.id}"><b>▶ ${sc.t}</b><span>${sc.d}</span></button>`).join('');
-  document.querySelectorAll('#scList .sc').forEach(b=> b.onclick = ()=>{ const sc = SCENARIOS[S.mode].find(x=>x.id===b.dataset.sc); startTour(sc.shots(), sc.t); });
+  const card = sc => `<button class="sc" data-sc="${sc.id}"><b>▶ ${sc.t}</b><span>${sc.d}</span></button>`, all = SCENARIOS[S.mode];
+  $('scList').innerHTML = all.filter(sc=>!DRIVE_VIDEOS.includes(sc.id)).map(card).join('');
+  $('parkList').innerHTML = all.filter(sc=>DRIVE_VIDEOS.includes(sc.id)).map(card).join('');
+  document.querySelectorAll('#scList .sc, #parkList .sc').forEach(b=> b.onclick = ()=>{ const sc = all.find(x=>x.id===b.dataset.sc); startTour(sc.shots(), sc.t); });
 }
 
 /* ======================================================================
@@ -713,4 +724,105 @@ function drawGuides(st){
       pts.push(toWorld(o, -2.08, G.sg*0.88)); }
     G.r.set(pts);
   });
+}
+
+/* ---- Autoroute : changer de voie, rétroviseurs et angle mort ----
+   La route défile sous notre voiture (110 km/h). Un plan règle :
+   hwy:{rel:[x0,x1]} la position de l'autre voiture par rapport à nous (m, + = devant), pendant le plan ;
+   hwy:{lane:[z0,z1]} notre voiture glisse d'une voie à l'autre ; zones:true peint rétros et angle mort ;
+   blink:'L' le clignotant gauche ; mirrors:true les 3 rétroviseurs à l'écran. */
+function hwyShot(s){
+  if(!s.hwy) return;
+  if(!HWY.on){ HWY.on = true; scene.fog.near = 40; scene.fog.far = 160; }
+  HWY.zones = !!s.zones; if(s.hwy.insAt !== undefined) HWY.dist = HWY.insX - s.hwy.insAt;
+  refreshVis();
+}
+function hwyTick(dt){
+  if(!HWY.on || !tour) return;
+  const s = tour.shots[tour.i]; if(!s || !s.hwy) return;
+  const h = s.hwy, u = clamp(tour.t/s.dur, 0, 1);
+  if(h.v) HWY.v = lerp(h.v[0], h.v[1], u);
+  const v = HWY.v; S.v = v; const d = tour.paused ? 0 : v*dt*S.slow;
+  HWY.movers.forEach(m=>{ m.position.x -= d; if(m.position.x < -60) m.position.x += 120; });
+  HWY.dist += d; INSG.position.x = HWY.insX - HWY.dist;
+  if(h.rel) HWY.rel = lerp(h.rel[0], h.rel[1], u);
+  let yaw = 0, delta = 0;
+  const xl = HWY.dist - HWY.insX;                 // notre position le long de la voie d'insertion (x local)
+  if(HWY.ins && xl < RAMP.x1){ const x = Math.max(xl, RAMP.x0);      // sur la bretelle : on suit la courbe
+    HWY.z = rampZ(x); yaw = Math.atan(rampSlope(x)); delta = Math.atan(PARK_WB*(-2*RAMP.dz/(RAMP.x1 - RAMP.x0)**2)); }
+  else if(h.lane){ const T = s.dur*S.slow, dz = h.lane[1]-h.lane[0];
+    HWY.z = h.lane[0] + dz*sEase(u);
+    const slope = dz*Math.PI/2*Math.sin(Math.PI*u)/(T*v), curv = dz*Math.PI*Math.PI/2*Math.cos(Math.PI*u)/(T*T*v*v);
+    yaw = Math.atan(slope); delta = Math.atan(PARK_WB*curv); }
+  ROOT.position.set(0, 0, HWY.z); ROOT.rotation.y = -yaw; ROOT.updateMatrixWorld(true);
+  PARK.delta = delta;
+  if(h.cars){                                   // positions écrites plan par plan : [voie z, x au début, x à la fin]
+    [OTHER, ...HWY.traffic.map(c=>c.car)].forEach((car, i)=>{ const c = h.cars[i];
+      if(!c){ car.position.y = -100; return; } car.position.set(lerp(c[1], c[2], u), 0, c[0]); });
+  } else {
+    OTHER.position.set(HWY.rel, 0, LANE_W);
+    if(!tour.paused) HWY.t += dt;
+    HWY.traffic.forEach(c=>{ const x = c.rel0 + c.vrel*HWY.t; c.car.position.set(x, Math.abs(x) > 90 ? -100 : 0, c.z); });
+  }
+  const blink = s.blink && (performance.now() % 800) < 420;
+  R.lights.ind.L.emissiveIntensity = blink && s.blink==='L' ? 2.2 : 0.05;
+  R.lights.ind.R.emissiveIntensity = blink && s.blink==='R' ? 2.2 : 0.05;
+}
+function hwyOff(){
+  if(!HWY.on) return;
+  HWY.on = false; HWY.zones = false; HWY.z = 0; PARK.delta = 0; S.v = 0;
+  ROOT.position.set(0,0,0); ROOT.rotation.y = 0; ROOT.updateMatrixWorld(true);
+  R.lights.ind.L.emissiveIntensity = R.lights.ind.R.emissiveIntensity = 0.05;
+  scene.fog.near = 10; scene.fog.far = 26; refreshVis();
+}
+function laneShots(){
+  const man = S.mode==='manual', W = 'wire', L = LANE_W;
+  const TOP = {p:[1,34,-0.5], t:[1,0,2.5]}, TOP_IN = {p:[-5,22,-1], t:[-5,0,2]};    // voie de gauche en haut
+  const AHEAD = {p:[6,24,-0.5], t:[6,0,2.5]};                                        // nous et la voiture lente devant
+  const DRIVER = {car:true, p:[-0.3,1.25,0.37], t:[8,0.85,0.37]};
+  const SHOULDER = {car:true, p:[-0.3,1.25,0.37], t:[8,0.85,0.37], t2:[-7,1.0,3.6]};
+  const CHASE = {p:[-15,3.4,-1.2], t:[6,0.9,2.2]};
+  HWY.v = 30.6;
+  const setup = ()=>{ setupState(man ? {engineOn:true, gear:'5', v:HWY.v, we:HWY.v/WH.r*RATIO_M[5]*FD, gas:0.35} : {engineOn:true, sel:'D', agear:6, v:HWY.v, gas:0.3}); HWY.z = 0; HWY.rel = -45; HWY.t = 0; HWY.ins = false; };
+  return [
+    {hwy:{rel:[-45,-30]}, body:W, cam:TOP, slow:1, dur:5.5, act:setup, cap:tr('Sur l\'*autoroute*, à 110 km/h','On the *motorway*, at 110 km/h'), sub:tr('Tu es sur la voie de droite. Devant, une voiture roule moins vite.','You\'re in the right-hand lane. The car ahead is slower.')},
+    {hwy:{rel:[-30,-26]}, zones:true, body:W, cam:AHEAD, slow:1, dur:5.5, cap:tr('Tu veux la *doubler*','You want to *overtake* it'), sub:tr('En vert : ce que montrent tes trois rétroviseurs','In green: what your three mirrors show')},
+    {hwy:{rel:[-26,-24]}, zones:true, body:W, cam:TOP_IN, slow:1, dur:5.5, cap:tr('En rouge : l\'*angle* mort','In red: the *blind* spot'), sub:tr('Tu ne le vois ni devant toi, ni dans les rétros','You can\'t see it ahead, or in the mirrors')},
+    {hwy:{rel:[-24,-9]}, mirrors:true, body:W, cam:DRIVER, slow:1, dur:8, cap:tr('Une voiture *arrive* derrière','A car is *coming* up behind'), sub:tr('D\'abord dans le rétro intérieur, puis dans le rétro gauche','First in the interior mirror, then in the left mirror')},
+    {hwy:{rel:[-9,-4]}, mirrors:true, body:W, cam:DRIVER, slow:1, dur:6, cap:tr('Elle *disparaît* du rétro…','It *vanishes* from the mirror…'), sub:tr('Mais elle est toujours là','But it\'s still there')},
+    {hwy:{rel:[-4,-3]}, zones:true, body:W, cam:TOP_IN, slow:1, dur:5, cap:tr('Elle est dans ton angle *mort*','It\'s in your blind *spot*'), sub:tr('Si tu changes de voie maintenant : accident','If you change lanes now: crash')},
+    {hwy:{rel:[-3,-1.5]}, mirrors:true, body:W, cam:SHOULDER, slow:1, dur:5.5, cap:tr('*Tourne* la tête avant de changer de voie','*Turn* your head before changing lanes'), sub:tr('Un coup d\'œil par-dessus l\'épaule gauche','A quick look over your left shoulder')},
+    {hwy:{rel:[-1.5,14]}, body:W, cam:CHASE, slow:1, dur:6, cap:tr('Elle te *dépasse*','It *overtakes* you'), sub:tr('Attends qu\'elle soit bien devant','Wait until it\'s well ahead')},
+    {hwy:{rel:[14,30]}, blink:'L', mirrors:true, body:W, cam:DRIVER, slow:1, dur:5.5, cap:tr('*Clignotant*, rétro, coup d\'œil','*Indicator*, mirror, shoulder check'), sub:tr('La voie du milieu est libre','The middle lane is clear')},
+    {hwy:{rel:[30,46], lane:[0,L]}, blink:'L', body:W, cam:CHASE, slow:1, dur:5, cap:tr('Change de voie *doucement*','Change lanes *smoothly*'), sub:tr('Un tout petit coup de volant, sur 150 mètres','A tiny turn of the wheel, over 150 metres')},
+    {hwy:{rel:[46,58]}, zones:true, body:W, cam:TOP, slow:1, dur:5, cap:tr('Tu es sur la voie du *milieu*','You\'re in the *middle* lane'), sub:tr('Coupe le clignotant','Switch the indicator off')},
+  ];
+}
+
+
+/* ---- Rejoindre l'autoroute : la voie d'insertion ----
+   Au ralenti (×0,3) pour que la voie garde une longueur réaliste (~300 m). On roule à vitesse v (km/h → m/s),
+   les autres à 110 km/h ; leurs positions sont écrites plan par plan (hwy.cars : [voie z, x début, x fin]). */
+function mergeShots(){
+  const man = S.mode==='manual', W = 'wire', R = 0, IN = -LANE_W, M = LANE_W, SL = 0.3;
+  const TOP = {p:[0,30,-6], t:[0,0,-0.5]}, TOP_IN = {p:[-3,20,-5], t:[-3,0,-1]};
+  const CHASE = {car:true, p:[-9,3.2,-1.2], t:[6,0.9,0.8]};
+  const DRIVER = {car:true, p:[-0.3,1.25,0.37], t:[8,0.85,0.37]};
+  const SHOULDER = {car:true, p:[-0.3,1.25,0.37], t:[8,0.85,0.37], t2:[-7,1.0,3.6]};
+  const setup = ()=>{ HWY.v = 14; HWY.z = rampZ(RAMP.x0); HWY.ins = true; HWY.dist = HWY.insX + RAMP.x0;
+    setupState(man ? {engineOn:true, gear:'3', v:14, we:14/WH.r*RATIO_M[3]*FD, gas:0.6} : {engineOn:true, sel:'D', agear:3, v:14, gas:0.6}); };
+  //            A : la voiture qui sera dans l'angle mort, B : celle de derrière (le trou est entre A et B), C et D : la circulation
+  return [
+    {hwy:{v:[14,14], cars:[[R,-62,-48],[R,-100,-82],[R,-30,-12],[M,-45,-25]]}, body:W, cam:CHASE, slow:0.6, dur:8.5, act:setup, cap:tr('Rejoindre l\'*autoroute*','Joining the *motorway*'), sub:tr('Tu arrives par la bretelle, à 50 km/h','You come down the slip road, at 50 km/h')},
+    {hwy:{v:[14,14], cars:[[R,-48,-40],[R,-82,-75],[R,-12,0],[M,-25,-15]]}, body:W, cam:{p:[2,26,-14], t:[2,0,-4]}, slow:SL, dur:4, cap:tr('La voie d\'*insertion*','The *acceleration* lane'), sub:tr('Elle longe la voie de droite pour te laisser prendre de la vitesse','It runs beside the right-hand lane so you can build up speed')},
+    {hwy:{v:[14,14], cars:[[R,-40,-30],[R,-75,-62],[R,0,8],[M,-15,-5]]}, body:W, cam:TOP, slow:SL, dur:4, cap:tr('Les autres roulent à *110* km/h','The others are doing *110* km/h'), sub:tr('Toi, encore à 50','You\'re still at 50')},
+    {hwy:{v:[14,24], cars:[[R,-30,-20],[R,-62,-52],[R,8,20],[M,-5,6]]}, body:W, cam:CHASE, slow:SL, dur:5, cap:tr('*Accélère* sur la voie d\'insertion','*Speed up* on the slip road'), sub:tr('Pour rouler à leur vitesse : 110 km/h','To match their speed: 110 km/h')},
+    {hwy:{v:[24,27], cars:[[R,-20,-11],[R,-52,-45],[R,20,26],[M,6,12]]}, mirrors:true, body:W, cam:DRIVER, slow:SL, dur:5.5, cap:tr('Regarde dans le *rétro* gauche','Check the left *mirror*'), sub:tr('Cherche un trou entre deux voitures','Look for a gap between two cars')},
+    {hwy:{v:[27,28], cars:[[R,-11,-4],[R,-45,-40],[R,26,30],[M,12,16]]}, mirrors:true, body:W, cam:SHOULDER, slow:SL, dur:5, cap:tr('Un coup d\'*œil* par-dessus l\'épaule','A *glance* over your shoulder'), sub:tr('Il y a quelqu\'un dans l\'angle mort ?','Is anyone in the blind spot?')},
+    {hwy:{v:[28,28], cars:[[R,-4,-1],[R,-40,-36],[R,30,32],[M,16,18]]}, zones:true, body:W, cam:TOP_IN, slow:SL, dur:5, cap:tr('Oui : elle est dans ton angle *mort*','Yes: it\'s in your blind *spot*'), sub:tr('Laisse-la passer, reste sur ta voie','Let it pass, stay in your lane')},
+    {hwy:{v:[28,30.6], cars:[[R,-1,9],[R,-36,-30],[R,32,34],[M,18,20]]}, blink:'L', body:W, cam:CHASE, slow:SL, dur:5, cap:tr('*Clignotant* à gauche','Left *indicator*'), sub:tr('Le trou est juste derrière elle','The gap is right behind it')},
+    {hwy:{v:[30.6,30.6], lane:[IN,R], cars:[[R,9,14],[R,-30,-28],[R,34,35],[M,20,21]]}, blink:'L', body:W, cam:CHASE, slow:SL, dur:5, cap:tr('Insère-toi *doucement*','Merge *smoothly*'), sub:tr('Sans freiner, à leur vitesse','Without braking, at their speed')},
+    {hwy:{v:[30.6,30.6], cars:[[R,14,16],[R,-28,-27],[R,35,36],[M,21,22]]}, body:W, cam:TOP, slow:SL, dur:5, cap:tr('Tu es sur l\'*autoroute*','You\'re on the *motorway*'), sub:tr('Coupe le clignotant, garde tes distances','Indicator off, keep your distance')},
+    {hwy:{v:[10,0], insAt:16, cars:[[R,-40,6],[R,-80,-34],[M,-10,36]]}, act:()=>{ HWY.z = IN; }, body:W, cam:{p:[7,22,-7], t:[7,0,-1.5]}, slow:SL, dur:6, cap:tr('Ne t\'*arrête* pas au bout','Don\'t *stop* at the end'), sub:tr('Arrêté, tu dois repartir de 0 au milieu de voitures à 110 km/h','Once stopped, you must pull out from 0 between cars doing 110 km/h')},
+  ];
 }

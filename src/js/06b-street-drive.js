@@ -92,9 +92,9 @@ function streetCam(dt, o){
 
 // Rétroviseurs (vue conducteur) : trois petites caméras rendues dans des textures, affichées en miroir par-dessus
 const MIRRORS = [
-  {p:[0.78,1.0,0.98],  t:[-6,0.8,2.2],  fov:28, w:300, h:150, x:-0.72, y:-0.55, sx:0.26},   // gauche
-  {p:[0.78,1.0,-0.98], t:[-6,0.8,-2.4], fov:28, w:300, h:150, x:0.72,  y:-0.55, sx:0.26},   // droit
-  {p:[0.55,1.27,0.02], t:[-6,1.0,0],    fov:34, w:420, h:120, x:0,     y:0.78,  sx:0.34},   // intérieur
+  {p:[0.78,1.0,0.98],  t:[-6,0.8,2.2],  fov:28, w:360, h:180, x:0.68,  y:-0.5, sx:0.32},    // gauche (le canvas est retourné : à l'écran, il est à gauche)
+  {p:[0.78,1.0,-0.98], t:[-6,0.8,-2.4], fov:28, w:360, h:180, x:-0.68, y:-0.5, sx:0.32},    // droit
+  {p:[0.55,1.27,0.02], t:[-6,1.0,0],    fov:34, w:500, h:140, x:0,     y:0.76,  sx:0.42},   // intérieur
 ].map(m=>{
   m.rt = new THREE.WebGLRenderTarget(m.w, m.h); m.cam = new THREE.PerspectiveCamera(m.fov, m.w/m.h, 0.05, 80);
   return m;
@@ -102,13 +102,12 @@ const MIRRORS = [
 const HUD = new THREE.Scene(), hudCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 MIRRORS.forEach(m=>{
   const frame = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({color:0x15181b}));
-  const geo = new THREE.PlaneGeometry(1, 1), uv = geo.attributes.uv;
-  for(let i=0;i<uv.count;i++) uv.setX(i, 1 - uv.getX(i));                 // image retournée gauche-droite : un miroir
-  m.quad = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({map:m.rt.texture}));
+  m.quad = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({map:m.rt.texture}));   // le retournement CSS du canvas en fait un miroir
   m.frame = frame; HUD.add(frame); HUD.add(m.quad);
 });
+const mirrorsOn = ()=> (STREET.on && STREET.view==='driver') || (tour && tour.shots[tour.i] && tour.shots[tour.i].mirrors);
 function mirrorsPre(){
-  if(!STREET.on || STREET.view!=='driver') return;
+  if(!mirrorsOn()) return;
   const asp = canvas.clientWidth / Math.max(1, canvas.clientHeight);
   MIRRORS.forEach(m=>{
     m.cam.position.copy(ROOT.localToWorld(new THREE.Vector3(...m.p))); m.cam.lookAt(ROOT.localToWorld(new THREE.Vector3(...m.t)));
@@ -120,7 +119,7 @@ function mirrorsPre(){
   renderer.setRenderTarget(null);
 }
 function mirrorsPost(){
-  if(!STREET.on || STREET.view!=='driver') return;
+  if(!mirrorsOn()) return;
   renderer.autoClear = false; renderer.clearDepth(); renderer.render(HUD, hudCam); renderer.autoClear = true;
 }
 
@@ -140,8 +139,8 @@ function streetStart(spot){
   PARK.on = true; PARK.plan = sp.plan; PARK.delta = 0; S.slow = 1;
   scene.fog.near = 30; scene.fog.far = 80;
   bodyMode = 'wire'; applyBodyMode(); refreshVis(); drawSpot();
-  stage.classList.add('street-on'); $('streetBox').hidden = false; appModeUI('drive');
-  document.querySelectorAll('#streetSpot button').forEach(b=>b.classList.toggle('act', b.dataset.k===spot));
+  stage.classList.add('street-on'); $('driveCtl').hidden = false; appTab('drive'); document.querySelector('.panel').classList.add('driving');
+  document.querySelectorAll('#tryRow .btn').forEach(b=>b.classList.toggle('act', b.dataset.try===spot));
   setSteer(0); streetPlace();
   const go = simple ? tr('↑ pour avancer, ↓ pour reculer, Espace pour freiner, ← → pour tourner. ','↑ to go forward, ↓ to reverse, Space to brake, ← → to steer. ')
                     : tr('Démarre et passe la 1re. ','Start the engine and select 1st. ');
@@ -151,7 +150,8 @@ function streetStart(spot){
 function streetStop(){
   if(!STREET.on) return;
   STREET.on = false; $('sensors').hidden = true; S.slow = STREET.slow; bodyMode = STREET.body; applyBodyMode();
-  stage.classList.remove('street-on'); $('streetBox').hidden = true; appModeUI('explore');
+  stage.classList.remove('street-on'); $('driveCtl').hidden = true; document.querySelector('.panel').classList.remove('driving');
+  document.querySelectorAll('#tryRow .btn').forEach(b=>b.classList.remove('act'));
   document.querySelector('.panel').classList.remove('street-simple');
   controls.enabled = true; parkOff(); TRACKS.forEach(t=>t.set([])); SPOT_LINE.set([]); goView('car');
 }
@@ -207,15 +207,17 @@ function streetTick(dt){
   streetCam(dt, o);
 }
 
-function appModeUI(m){ document.querySelectorAll('#appModes .mode').forEach(b=>b.classList.toggle('act', b.dataset.app===m)); }
-document.querySelectorAll('#appModes .mode').forEach(b=> b.onclick = ()=>{ if(b.dataset.app==='drive'){ ensureAudio(); if(!STREET.on) streetStart(STREET.spot); } else streetStop(); });
+// Onglets : « Découvrir » (la voiture ouverte) et « Conduire » (les vidéos pour se garer, puis on essaie)
+function appTab(m){ document.querySelectorAll('#appModes .mode').forEach(b=>b.classList.toggle('act', b.dataset.app===m)); document.querySelector('.panel').classList.toggle('tab-drive', m==='drive'); }
+document.querySelectorAll('#appModes .mode').forEach(b=> b.onclick = ()=>{ if(b.dataset.app==='explore') streetStop(); appTab(b.dataset.app); });
+document.querySelectorAll('#tryRow .btn').forEach(b=> b.onclick = ()=>{ ensureAudio(); streetStart(b.dataset.try); });
+$('streetStop').onclick = streetStop;
 document.querySelectorAll('#streetGear button').forEach(b=> b.onclick = ()=>{ STREET.gearbox = b.dataset.g; streetStart(STREET.spot); });
 function streetDirUI(){ document.querySelectorAll('#streetDir button').forEach(b=>b.classList.toggle('act', !!STREET.keys[b.dataset.k])); }
 document.querySelectorAll('#streetDir button').forEach(b=>{       // boutons à maintenir (téléphone)
   const k = b.dataset.k, on = v => e => { STREET.keys[k] = v; if(v) ensureAudio(); e.preventDefault(); };
   b.addEventListener('pointerdown', on(true)); ['pointerup','pointerleave','pointercancel'].forEach(t=>b.addEventListener(t, on(false)));
 });
-document.querySelectorAll('#streetSpot button').forEach(b=> b.onclick = ()=>streetStart(b.dataset.k));
 function setStreetView(v){
   STREET.view = v; controls.enabled = v==='free';
   document.querySelectorAll('#streetView button').forEach(b=>b.classList.toggle('act', b.dataset.v===v));

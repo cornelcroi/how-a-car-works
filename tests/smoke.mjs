@@ -29,6 +29,7 @@ for (const lang of ['fr', 'en']) {
   }
   // mode « Conduire » : on avance 2 s avec ↑, la voiture doit rouler
   await page.click('#appModes .mode[data-app="drive"]');
+  await page.click('#tryRow .btn[data-try="par"]');
   await page.waitForTimeout(800);
   await page.keyboard.down('ArrowUp'); await page.waitForTimeout(2000);
   const kmh = await page.evaluate(() => +document.querySelector('#speedo .dial-read').textContent);

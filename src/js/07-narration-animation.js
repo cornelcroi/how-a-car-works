@@ -328,7 +328,7 @@ buildLesson(); renderScenarios(); applyBodyMode(); refreshVis(); narrate();
 let last = performance.now(), narrT = 0;
 function frame(now){
   const dt = Math.min(0.1, (now-last)/1000); last = now;
-  runDemo(dt); simulate(dt); parkTick(); streetTick(dt); animate(dt);
+  runDemo(dt); simulate(dt); parkTick(); hwyTick(dt); streetTick(dt); animate(dt);
   tourTick(dt);
   if(follow.back && !tween){ follow.t -= dt; if(follow.t<=0){ flyTo(follow.back.p, follow.back.t); follow.back=null; } }
   if(tween){ tween.t = Math.min(1, tween.t + dt/tween.dur); const k = 1-Math.pow(1-tween.t,3);

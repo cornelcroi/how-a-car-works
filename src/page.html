@@ -20,7 +20,7 @@ html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;overflow:hidden}
 .app{display:grid;grid-template-columns:minmax(0,1fr) 400px;height:100%}
 .stage{position:relative;background:radial-gradient(120% 90% at 50% 30%, color-mix(in srgb,var(--stage) 70%, var(--card)) 0%, var(--stage) 70%);overflow:hidden;min-height:0}
-#c{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+#c{display:block;width:100%;height:100%;touch-action:none;cursor:grab;transform:scaleX(-1)}   /* voir « Image retournée » dans 01-core.js */
 #c:active{cursor:grabbing}
 .panel{overflow-y:auto;border-left:1px solid var(--line);padding-block:18px 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px;min-width:0}
 
@@ -168,6 +168,8 @@ details.fold>*:not(summary){margin-top:10px}
 .sensors{position:absolute;left:12px;top:44px;z-index:6;display:flex;gap:4px;align-items:flex-end;background:rgba(0,0,0,.6);padding:7px 10px;border-radius:8px;color:#fff;font-family:var(--f-display);font-weight:700;font-size:14px;pointer-events:none}
 .sensors b{width:10px;border-radius:2px;background:rgba(255,255,255,.18)}.sensors b:nth-child(1){height:10px}.sensors b:nth-child(2){height:16px}.sensors b:nth-child(3){height:22px}.sensors span{margin-left:6px}
 .street .seg{margin-top:8px}
+.panel:not(.tab-drive) #streetBox,.panel.tab-drive #showMeSec,.panel.tab-drive #lessonSec{display:none!important}
+.panel.driving #tryRow .btn:not(.act){background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:none}
 .panel.street-simple #manualBox,.panel.street-simple #autoBox,.panel.street-simple #handRow,.panel.street-simple #lessonSec,.panel:not(.street-simple) #streetDir{display:none!important}.steer{display:flex;align-items:center;gap:10px;margin-top:10px;font-weight:600}.steer input{flex:1}
 .stage.street-on .bar,.stage.street-on .isobar,.stage.street-on .tags,.stage.street-on .hint{display:none!important}
 .stage.reeling .bar,.stage.reeling .hint,.stage.reeling .tags,.stage.reeling .isobar,.stage.reeling .info{display:none!important}
@@ -282,18 +284,23 @@ details.fold>*:not(summary){margin-top:10px}
       </div>
     </div>
 
-    <section class="street" id="streetBox" hidden>
-      <h2 class="sec-h" data-en="Exercise">Exercice</h2>
-      <div class="seg" id="streetSpot" role="group" aria-label="Exercice" data-en-label="Exercise"><button data-k="par" class="act" data-en="Parallel parking">Créneau</button><button data-k="bay" data-en="Bay parking">Bataille</button></div>
-      <div class="row">
-        <div class="seg" id="streetGear" role="group" aria-label="Boîte" data-en-label="Gearbox"><button data-g="simple" class="act" data-en="Simple: forward / reverse">Simple : avant / arrière</button><button data-g="manual" data-en="Manual gearbox">Boîte manuelle</button></div>
-        <div class="seg" id="streetDir" role="group" aria-label="Conduite" data-en-label="Drive"><button data-k="up" data-en="▲ Forward">▲ Avancer</button><button data-k="brake" data-en="■ Brake">■ Freiner</button><button data-k="down" data-en="▼ Reverse">▼ Reculer</button></div>
+    <section class="street" id="streetBox">
+      <h2 class="sec-h" data-en="🎬 Watch first">🎬 Regarde d'abord</h2>
+      <div class="sclist" id="parkList"></div>
+      <h2 class="sec-h" style="margin-top:14px" data-en="🚗 Your turn">🚗 À toi</h2>
+      <div class="row" id="tryRow"><button class="btn" data-try="par" data-en="Try parallel parking">Essaie le créneau</button><button class="btn" data-try="bay" data-en="Try bay parking">Essaie la bataille</button></div>
+      <div id="driveCtl" hidden>
+        <div class="row">
+          <div class="seg" id="streetGear" role="group" aria-label="Boîte" data-en-label="Gearbox"><button data-g="simple" class="act" data-en="Simple: forward / reverse">Simple : avant / arrière</button><button data-g="manual" data-en="Manual gearbox">Boîte manuelle</button></div>
+          <div class="seg" id="streetDir" role="group" aria-label="Conduite" data-en-label="Drive"><button data-k="up" data-en="▲ Forward">▲ Avancer</button><button data-k="brake" data-en="■ Brake">■ Freiner</button><button data-k="down" data-en="▼ Reverse">▼ Reculer</button></div>
+        </div>
+        <div class="seg" id="streetView" role="group" aria-label="Vue" data-en-label="View">
+          <button data-v="driver" data-en="Driver">Conducteur</button><button data-v="behind" class="act" data-en="Behind">Derrière</button><button data-v="front" data-en="Front">Devant</button><button data-v="top" data-en="Above">Dessus</button><button data-v="free" data-en="Free">Libre</button>
+        </div>
+        <label class="steer"><span data-en="Wheel">Volant</span><input type="range" id="steer" min="-100" max="100" value="0"></label>
+        <p class="note" data-en="&lt;kbd&gt;↑&lt;/kbd&gt; forward, &lt;kbd&gt;↓&lt;/kbd&gt; reverse, &lt;kbd&gt;Space&lt;/kbd&gt; brake, &lt;kbd&gt;←&lt;/kbd&gt; &lt;kbd&gt;→&lt;/kbd&gt; steer, &lt;kbd&gt;V&lt;/kbd&gt; view. Park in the green space!"><kbd>↑</kbd> avancer, <kbd>↓</kbd> reculer, <kbd>Espace</kbd> freiner, <kbd>←</kbd> <kbd>→</kbd> tourner, <kbd>V</kbd> vue. Gare-toi dans la place verte !</p>
+        <button class="btn alt" id="streetStop" style="margin-top:10px" data-en="✖ Stop driving">✖ Arrêter de conduire</button>
       </div>
-      <div class="seg" id="streetView" role="group" aria-label="Vue" data-en-label="View">
-        <button data-v="driver" data-en="Driver">Conducteur</button><button data-v="behind" class="act" data-en="Behind">Derrière</button><button data-v="front" data-en="Front">Devant</button><button data-v="top" data-en="Above">Dessus</button><button data-v="free" data-en="Free">Libre</button>
-      </div>
-      <label class="steer"><span data-en="Wheel">Volant</span><input type="range" id="steer" min="-100" max="100" value="0"></label>
-      <p class="note" data-en="&lt;kbd&gt;↑&lt;/kbd&gt; forward, &lt;kbd&gt;↓&lt;/kbd&gt; reverse, &lt;kbd&gt;Space&lt;/kbd&gt; brake, &lt;kbd&gt;←&lt;/kbd&gt; &lt;kbd&gt;→&lt;/kbd&gt; steer, &lt;kbd&gt;V&lt;/kbd&gt; view. Park in the green space!"><kbd>↑</kbd> avancer, <kbd>↓</kbd> reculer, <kbd>Espace</kbd> freiner, <kbd>←</kbd> <kbd>→</kbd> tourner, <kbd>V</kbd> vue. Gare-toi dans la place verte !</p>
     </section>
 
     <section class="say" aria-live="polite">
@@ -309,7 +316,7 @@ details.fold>*:not(summary){margin-top:10px}
       </div>
     </section>
 
-    <section>
+    <section id="showMeSec">
       <h2 class="sec-h" data-en="🎬 Show me">🎬 Montre-moi</h2>
       <div class="sclist" id="scList"></div>
       <p class="note" data-en="Short automatic videos, one idea each. The car drives itself during the video.">Des petites vidéos automatiques, chacune sur une idée. La voiture conduit toute seule pendant la vidéo.</p>

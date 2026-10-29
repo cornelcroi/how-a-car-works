@@ -37,7 +37,24 @@ renderer.setClearColor(0x000000, 0);
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(38, 1, 0.01, 120);
 camera.position.set(4.3, 2.3, 3.2);
-const controls = new THREE.OrbitControls(camera, canvas);
+/* Image retournée : le modèle est construit avec x vers l'avant et z vers la GAUCHE, mais three.js dessine +z à droite.
+   On affiche donc la scène retournée gauche-droite (CSS sur #c), et on retourne aussi tout ce qui passe entre
+   l'écran et la 3D : la souris (OrbitControls, clics), les étiquettes, le pointeur des vidéos, les rétroviseurs. */
+const mirrorX = x => { const r = canvas.getBoundingClientRect(); return r.left + r.right - x; };   // clientX → clientX vu par la 3D
+const mirrorNdcX = (cx, r) => 1 - ((cx - r.left)/r.width)*2;                                      // clientX → x de -1 à 1
+const mirrorEvent = e => new Proxy(e, { get(t, k){
+  if(k==='clientX') return mirrorX(t.clientX);
+  if(k==='pageX') return mirrorX(t.clientX) + window.scrollX;
+  if(k==='touches') return Array.from(t.touches, o=>({identifier:o.identifier, clientX:mirrorX(o.clientX), clientY:o.clientY, pageX:mirrorX(o.clientX) + window.scrollX, pageY:o.pageY}));
+  const v = t[k]; return typeof v==='function' ? v.bind(t) : v; } });
+const wrapped = new WeakMap(), wrap = f => { if(!wrapped.has(f)) wrapped.set(f, e=>f(mirrorEvent(e))); return wrapped.get(f); };
+const controlsDom = {                                             // ce que OrbitControls voit à la place du canvas
+  get clientWidth(){ return canvas.clientWidth; }, get clientHeight(){ return canvas.clientHeight; }, style: canvas.style,
+  addEventListener:(t,f,o)=>canvas.addEventListener(t, wrap(f), o), removeEventListener:(t,f,o)=>canvas.removeEventListener(t, wrap(f), o),
+  focus:()=>canvas.focus && canvas.focus(),
+  ownerDocument: { addEventListener:(t,f,o)=>document.addEventListener(t, wrap(f), o), removeEventListener:(t,f,o)=>document.removeEventListener(t, wrap(f), o) },
+};
+const controls = new THREE.OrbitControls(camera, controlsDom);
 controls.target.set(0.5, 0.5, 0);
 controls.enableDamping = true; controls.dampingFactor = 0.08;
 controls.minDistance = 0.08; controls.maxDistance = 16;

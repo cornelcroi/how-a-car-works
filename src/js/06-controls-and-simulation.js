@@ -5,7 +5,7 @@
 controls.enableZoom = false;
 function pickPoint(cx, cy){
   const r = canvas.getBoundingClientRect();
-  ptr.set(((cx-r.left)/r.width)*2-1, -((cy-r.top)/r.height)*2+1);
+  ptr.set(mirrorNdcX(cx, r), -((cy-r.top)/r.height)*2+1);
   ray.setFromCamera(ptr, camera);
   const hits = ray.intersectObjects(LEAVES.filter(o=>o.visible && !o.isLine && !o.isPoints && !(o.material.transparent && o.material.opacity<0.2)), false);
   if(hits.length) return hits[0].point.clone();

@@ -49,6 +49,7 @@ The files are concatenated in this order **inside one IIFE** (`01-core.js` opens
 ## Key concepts
 
 - **Coordinates**: metres. x = forward, y = up, z = left. Front axle at x = 1.25. Gearbox shafts rotate about **z**.
+- **Mirrored display (important)**: three.js draws +z on the *right*, so the canvas is flipped with CSS (`#c{transform:scaleX(-1)}`) to make z = left true on screen (French traffic on the right, driver on the left). Everything between screen and 3D is flipped too: OrbitControls gets a proxy element with mirrored mouse/touch (`controlsDom`, 01), clicks use `mirrorNdcX`, labels and the video pointer use `(1 - x)/2*w`, the in-car mirror quads swap sides. Any new screen↔3D code must do the same.
 - **Part registry**: `put(object3d, partKey, category, mode?)` adds an object and tags every mesh with `userData.part / cat / mode`. All meshes are in `LEAVES`.
   - Visibility is decided only in `refreshVis()`, from the category toggles, the car type, the body mode, simple view and isolation.
   - `mode` is `'manual' | 'auto' | 'ev'` (undefined = all). Thermal-only parts are filtered by `iceOnly()`.
@@ -85,6 +86,7 @@ When adding one:
   3. If it moves, animate it in `animate()` (07), deriving its angle from what drives it.
   4. Add it to `docs/PARTS.md`.
 - **Parking and the moving car**: during parking videos and street mode, `PARK.on` is true, the whole car (`ROOT`) moves and turns over a fixed street (`PARKG`), and the scrolling road is hidden. `PARK.delta` is the bicycle-model steering angle (+ = left); `wheelSteer()` turns each front wheel (Ackermann), the steering wheel turns `STEER_RATIO` × more. A parking video is a plan of steps (`{g}` gear, `{steer}`, `{ds}` distance) replayed deterministically: a shot plays `park:k` (or `[k0,k1]`) or freezes `pose:k`. Camera: `cam:{p, t, p2?, car?}` (world, or car-mounted with `car:true`); `dir`/`zoom` shots follow the car.
+- **Motorway videos** (`merge`, `lanechange`, 04/05): our car stays near x = 0 and the road scrolls (`HWY.movers`, the slip road group `INSG`). A shot sets `hwy:{v, rel | cars:[[z, x0, x1]…], lane:[z0,z1], insAt}`, `zones:true` paints mirror coverage (green) and blind spots (red), `mirrors:true` shows the 3 mirrors, `blink:'L'` the indicator. Lanes: right lane z = 0, middle 3.5, left 7; slip road z = -3.5.
 - **Add a parking manoeuvre**: write its steps, compute the start backwards from the parked pose (see `PLAN_PERP`), check clearances (a small Python check is fine), add obstacles to `PARK_OBST` if you add cars.
 - **Add a lesson step**: `buildLesson()` (07) holds the `[text, conditionFn]` pairs per car.
 - **Change a camera preset**: `VIEWS` (05).
@@ -105,7 +107,7 @@ When adding one:
 
 ## Ideas / roadmap
 
-0. A crossroads in street mode: stop sign, yield to the right, pedestrian crossing, scored by simple rules on position and speed (no model).
+0. More driving videos (stopping distance, cyclist overtaking, lorry blind spots, yield to the right). A crossroads in street mode: stop sign, yield to the right, pedestrian crossing, scored by simple rules on position and speed (no model).
 1. Move `SCENARIOS` to plain JSON files (`scenarios/*.json`) with the actions as named commands. AI agents could then write videos without touching JS.
 2. Expose the director as a small command API (`focus`, `isolate`, `zoom`, `caption`, `action`), then as an **MCP server**, so an assistant can drive the page live (« montre-moi l'embrayage »).
 3. More learner-driver videos: see the list at the end of `docs/SCENARIOS.md`.
