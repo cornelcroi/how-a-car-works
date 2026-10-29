@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Modèle 3D interactif pour comprendre une voiture : moteur thermique (boîte manuelle ou automatique) et électrique, avec des vidéos guidées.">
-<meta property="og:title" content="Comment marche une voiture">
-<meta property="og:description" content="Démarre le moteur, passe les vitesses et suis la force jusqu'aux roues. Thermique et électrique, en 3D.">
+<meta name="description" content="Garage &amp; Route : ouvre une voiture en 3D pour comprendre comment elle marche, puis prends le volant et gare-toi dans la rue. Thermique et électrique, en français et en anglais.">
+<meta property="og:title" content="Garage &amp; Route">
+<meta property="og:description" content="Comprends comment marche une voiture, puis conduis-la et gare-toi. Gratuit, dans le navigateur.">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>Comment marche une voiture</title>
+<title>Garage &amp; Route</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Saira:wght@500;700;800&display=swap">
 <style>
@@ -27,7 +27,7 @@
 
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;overflow:hidden}
-.app{display:grid;grid-template-columns:minmax(0,1fr) 390px;height:100%}
+.app{display:grid;grid-template-columns:minmax(0,1fr) 400px;height:100%}
 .stage{position:relative;background:radial-gradient(120% 90% at 50% 30%, color-mix(in srgb,var(--stage) 70%, var(--card)) 0%, var(--stage) 70%);overflow:hidden;min-height:0}
 #c{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 #c:active{cursor:grabbing}
@@ -38,7 +38,7 @@ h1{font-family:var(--f-display);font-weight:800;font-size:26px;letter-spacing:.0
 .sec-h{font-family:var(--f-display);font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 
-.say{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.say{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{font-family:var(--f-display);font-weight:700;font-size:12px;letter-spacing:.04em;padding:3px 9px;border-radius:99px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
 .chip b{color:var(--ink)}
@@ -47,8 +47,9 @@ h1{font-family:var(--f-display);font-weight:800;font-size:26px;letter-spacing:.0
 .chip.good{border-color:var(--ok);color:var(--ok)} .chip.good b{color:var(--ok)}
 #say{margin:0;min-height:4.4em;font-size:15px}
 #alert{margin:0;font-weight:700;color:var(--power)}
-.btn{appearance:none;cursor:pointer;border:0;border-radius:8px;background:var(--steel);color:#fff;font-family:var(--f-display);font-weight:700;font-size:14px;padding:7px 12px}
-.btn.alt{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn{appearance:none;cursor:pointer;border:0;border-radius:10px;background:var(--steel);color:#fff;font-family:var(--f-display);font-weight:700;font-size:14px;min-height:36px;padding:0 14px;display:inline-flex;align-items:center;gap:6px;box-shadow:0 1px 0 color-mix(in srgb,var(--ink) 18%,transparent);transition:transform .12s,filter .12s}
+.btn:hover{filter:brightness(1.06)}.btn:active{transform:translateY(1px)}
+.btn.alt{background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:none}.btn.alt:hover{border-color:var(--ink)}
 .btn.warn{background:var(--power)}
 .btn.good{background:var(--ok)}
 .btn.running{background:var(--muted)}
@@ -61,8 +62,8 @@ h1{font-family:var(--f-display);font-weight:800;font-size:26px;letter-spacing:.0
 .soc i{display:block;height:100%;background:var(--ok);border-radius:1px;width:80%}
 .wl.lit.green{background:var(--ok);border-color:var(--ok);color:#fff}
 .sclist{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.sc{appearance:none;cursor:pointer;text-align:left;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:9px 11px;display:flex;flex-direction:column;gap:2px;font:inherit;min-width:0}
-.sc:hover{border-color:var(--power)}
+.sc{appearance:none;cursor:pointer;text-align:left;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:3px;font:inherit;min-width:0;transition:transform .12s,border-color .12s,box-shadow .12s}
+.sc:hover{border-color:var(--power);transform:translateY(-1px);box-shadow:0 4px 14px color-mix(in srgb,var(--ink) 10%,transparent)}
 .sc b{font-family:var(--f-display);font-weight:800;font-size:14px;line-height:1.2}
 .sc span{font-size:12.5px;color:var(--muted);line-height:1.3}
 .sc:first-child{border-color:var(--power);background:color-mix(in srgb,var(--power) 8%,var(--card))}
@@ -75,7 +76,6 @@ h1{font-family:var(--f-display);font-weight:800;font-size:26px;letter-spacing:.0
 .warnlights{display:flex;justify-content:center;gap:10px;margin-top:6px}
 .wl{font-family:var(--f-display);font-weight:800;font-size:10px;letter-spacing:.06em;padding:2px 6px;border-radius:4px;border:1px solid var(--line);color:var(--line)}
 .wl.lit{color:#fff;background:var(--bad);border-color:var(--bad)}
-.wl.lit.amber{background:var(--slip);border-color:var(--slip);color:#1b2326}
 .dial-face{fill:var(--card);stroke:var(--line)}
 .dial-tick{stroke:var(--ink)} .dial-num{fill:var(--ink);font-family:var(--f-display);font-weight:700;font-size:9px;text-anchor:middle}
 .dial-red{stroke:var(--power);fill:none} .dial-needle{stroke:var(--power);stroke-width:2.6;stroke-linecap:round}
@@ -108,11 +108,6 @@ kbd{font-family:var(--f-display);font-size:11px;border:1px solid var(--line);bor
 .autosel{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:start}
 .pr{display:flex;flex-direction:column;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px}
 .pr .gbtn{font-size:20px}
-table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);font-size:12px;font-variant-numeric:tabular-nums}
-.elems th,.elems td{border:1px solid var(--line);text-align:center;padding:2px 3px}
-.elems th{color:var(--muted);font-weight:700}
-.elems td.on{background:var(--ok);color:#fff;font-weight:800}
-.elems tr.cur td,.elems tr.cur th{outline:2px solid var(--power);outline-offset:-2px}
 .note{font-size:13px;color:var(--muted);margin:6px 0 0}
 .gate{width:100%;max-width:240px;height:auto;display:block;margin:0 auto 10px}
 .gate-slot{fill:none;stroke:var(--line);stroke-width:9;stroke-linecap:round}
@@ -126,11 +121,28 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
 .steps li.now::before{border-color:var(--power);color:var(--power)}
 .steps li.done{color:var(--ok)} .steps li.done::before{content:"✓";background:var(--ok);border-color:var(--ok);color:#fff}
 .linkbtn{appearance:none;border:0;background:none;color:var(--steel);font:inherit;font-size:13px;cursor:pointer;padding:0;text-decoration:underline}
-.panel header{position:relative}.panel header h1{padding-right:64px}.lang{position:absolute;top:2px;right:0}
+.panel header{position:relative}.panel header h1{padding-right:84px}
+.lang{position:absolute;top:2px;right:0;text-decoration:none;border:1px solid var(--line);border-radius:99px;padding:3px 10px;font-family:var(--f-display);font-weight:700;font-size:12px;color:var(--ink)}.lang:hover{border-color:var(--ink)}
+/* les deux façons d'utiliser la page : découvrir la voiture, ou la conduire */
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mode{appearance:none;cursor:pointer;text-align:left;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:16px;padding:12px 14px;display:grid;grid-template-columns:auto 1fr;column-gap:10px;row-gap:2px;align-items:center;font:inherit;transition:transform .12s,border-color .12s,box-shadow .12s}
+.mode:hover{transform:translateY(-1px);box-shadow:0 6px 18px color-mix(in srgb,var(--ink) 10%,transparent)}
+.mode .mi{grid-row:span 2;font-size:28px;line-height:1}
+.mode b{font-family:var(--f-display);font-weight:800;font-size:18px;line-height:1.1}
+.mode small{font-size:12.5px;color:var(--muted);line-height:1.25}
+.mode.act{border-color:var(--power);background:color-mix(in srgb,var(--power) 9%,var(--card));box-shadow:0 0 0 3px color-mix(in srgb,var(--power) 16%,transparent)}
+.street{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:2px}
+details.fold{border-top:1px solid var(--line);padding-top:12px}
+details.fold>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::after{content:"＋";color:var(--muted);font-weight:700}
+details.fold[open]>summary::after{content:"－"}
+details.fold>summary .sec-h{margin:0}
+details.fold>*:not(summary){margin-top:10px}
 
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
-.seg button{appearance:none;border:0;background:var(--card);color:var(--ink);font-family:var(--f-display);font-weight:700;font-size:13px;padding:6px 10px;cursor:pointer}
-.seg button+button{border-left:1px solid var(--line)}
+.seg{display:inline-flex;flex-wrap:wrap;gap:3px;padding:3px;border:1px solid var(--line);border-radius:11px;background:var(--card)}
+.seg button{appearance:none;border:0;border-radius:8px;background:transparent;color:var(--ink);font-family:var(--f-display);font-weight:700;font-size:13px;padding:6px 10px;cursor:pointer;transition:background .12s}
+.seg button:hover{background:color-mix(in srgb,var(--ink) 7%,transparent)}
 .seg button.act{background:var(--ink);color:var(--bg)}
 .seg.big button{font-size:15px;padding:8px 14px}
 .opts{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
@@ -143,11 +155,6 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
 .spec td{padding:3px 0;border-bottom:1px solid var(--line);vertical-align:top}
 .spec td:last-child{text-align:right;font-family:var(--f-display);font-weight:700;font-variant-numeric:tabular-nums}
 
-.garage{background:color-mix(in srgb,var(--power) 10%,var(--card));border:1px solid var(--power);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
-.garage h3{margin:0;font-family:var(--f-display);font-weight:800;font-size:17px}
-.garage p{margin:0;font-size:14px}
-.score{display:flex;gap:14px;font-family:var(--f-display);font-weight:700;font-size:13px;font-variant-numeric:tabular-nums;flex-wrap:wrap}
-.stars{font-size:26px;letter-spacing:4px;color:var(--slip)}
 
 /* surimpressions sur la scène */
 .bar{position:absolute;left:max(12px,env(safe-area-inset-left,0px));right:12px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;align-items:center}
@@ -163,11 +170,15 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
 .part::before{content:"";width:12px;height:12px;border-radius:3px;border:1.5px solid var(--muted);background:transparent}
 .part[aria-pressed="true"]::before{background:var(--power);border-color:var(--power);box-shadow:inset 0 0 0 2px var(--card)}
 .part[aria-pressed="false"]{color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--muted) 60%,transparent)}
-.isobar{position:absolute;top:calc(92px + env(safe-area-inset-top,0px));left:max(12px,env(safe-area-inset-left,0px));display:flex;gap:8px;align-items:center;flex-wrap:wrap;right:12px}
+.parts[hidden]{display:none}
+.stage.parts-open .isobar{top:calc(92px + env(safe-area-inset-top,0px))}
+.isobar{position:absolute;top:calc(52px + env(safe-area-inset-top,0px));left:max(12px,env(safe-area-inset-left,0px));display:flex;gap:8px;align-items:center;flex-wrap:wrap;right:12px}
 .isobar .lbl{font-family:var(--f-display);font-weight:800;font-size:14px;background:var(--ink);color:var(--bg);padding:5px 10px;border-radius:8px}
-.tourcap{position:absolute;left:50%;transform:translateX(-50%);bottom:14px;width:min(560px,calc(100% - 24px));background:var(--ink);color:var(--bg);border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:center;box-shadow:0 10px 30px color-mix(in srgb,#000 30%,transparent)}
-.tourcap p{margin:0;flex:1;font-size:15px}
-.tourcap .tn{font-family:var(--f-display);font-weight:800;font-size:13px;opacity:.7;white-space:nowrap}
+.sensors{position:absolute;left:12px;top:44px;z-index:6;display:flex;gap:4px;align-items:flex-end;background:rgba(0,0,0,.6);padding:7px 10px;border-radius:8px;color:#fff;font-family:var(--f-display);font-weight:700;font-size:14px;pointer-events:none}
+.sensors b{width:10px;border-radius:2px;background:rgba(255,255,255,.18)}.sensors b:nth-child(1){height:10px}.sensors b:nth-child(2){height:16px}.sensors b:nth-child(3){height:22px}.sensors span{margin-left:6px}
+.street .seg{margin-top:8px}
+.panel.street-simple #manualBox,.panel.street-simple #autoBox,.panel.street-simple #handRow,.panel.street-simple #lessonSec,.panel:not(.street-simple) #streetDir{display:none!important}.steer{display:flex;align-items:center;gap:10px;margin-top:10px;font-weight:600}.steer input{flex:1}
+.stage.street-on .bar,.stage.street-on .isobar,.stage.street-on .tags,.stage.street-on .hint{display:none!important}
 .stage.reeling .bar,.stage.reeling .hint,.stage.reeling .tags,.stage.reeling .isobar,.stage.reeling .info{display:none!important}
 .reel{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top, rgba(0,0,0,.45), transparent 38%)}
 .reel-bars{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));left:12px;right:96px;display:flex;gap:4px}
@@ -222,8 +233,9 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
       <button class="view" data-v="wheel" data-en="Wheel and brake">Roue et frein</button>
       <button class="view" data-v="cabin" data-en="Cabin">Habitacle</button>
       <button class="view" data-v="below" data-en="Underneath">Dessous</button>
+      <button class="view" id="partsBtn" aria-pressed="false" data-en="🧩 Parts">🧩 Pièces</button>
     </div>
-    <div class="bar parts" id="parts">
+    <div class="bar parts" id="parts" hidden>
       <span class="bar-l" data-en="Show">Afficher</span>
       <button class="part" data-p="casing" aria-pressed="true" data-en="Engine casing">Carter moteur</button>
       <button class="part" data-p="internals" aria-pressed="true" data-en="Pistons and timing">Pistons et distribution</button>
@@ -242,6 +254,7 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
       <button class="btn alt" id="explodeBtn" hidden data-en="Spread the parts">Écarter les pièces</button>
       <button class="btn" id="isoAll" data-en="Show all">Tout voir</button>
     </div>
+    <div class="sensors" id="sensors" hidden><b></b><b></b><b></b><span id="sensTxt"></span></div>
     <div class="reel" id="reel" hidden>
       <div class="reel-bars" id="reelBars"></div>
       <svg class="reel-ptr" aria-hidden="true"><line id="ptrLine"/><circle id="ptrRing"/></svg>
@@ -257,17 +270,21 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
       <p class="state" id="infoState" hidden></p>
       <div class="row">
         <button class="btn" id="infoIso" data-en="Show alone">Voir seule</button>
-        <button class="btn warn" id="infoRepair" hidden data-en="Repair this part">Réparer cette pièce</button>
       </div>
     </div>
   </div>
 
   <aside class="panel">
     <header>
-      <h1 data-en="How a car works">Comment marche une voiture</h1>
-      <button class="linkbtn lang" id="langBtn" aria-label="Langue / Language"></button>
+      <h1 data-en="Garage &amp;amp; Road">Garage &amp; Route</h1>
+      <button class="lang" id="langBtn" aria-label="Langue / Language"></button>
       <p class="sub" id="subTxt"></p>
     </header>
+
+    <nav class="modes" id="appModes" aria-label="Que veux-tu faire ?" data-en-label="What do you want to do?">
+      <button class="mode act" data-app="explore" data-en="&lt;span class=&quot;mi&quot;&gt;🔍&lt;/span&gt;&lt;b&gt;Explore&lt;/b&gt;&lt;small&gt;Open the car up, part by part&lt;/small&gt;"><span class="mi">🔍</span><b>Découvrir</b><small>Ouvre la voiture, pièce par pièce</small></button>
+      <button class="mode" data-app="drive" data-en="&lt;span class=&quot;mi&quot;&gt;🚗&lt;/span&gt;&lt;b&gt;Drive&lt;/b&gt;&lt;small&gt;Drive in the street and park&lt;/small&gt;"><span class="mi">🚗</span><b>Conduire</b><small>Roule dans la rue et gare-toi</small></button>
+    </nav>
 
     <div class="row">
       <div class="seg big modeseg" id="modeSeg" role="group" aria-label="Type de voiture" data-en-label="Car type">
@@ -275,7 +292,19 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
       </div>
     </div>
 
-    <section class="garage" id="garageBox" hidden></section>
+    <section class="street" id="streetBox" hidden>
+      <h2 class="sec-h" data-en="Exercise">Exercice</h2>
+      <div class="seg" id="streetSpot" role="group" aria-label="Exercice" data-en-label="Exercise"><button data-k="par" class="act" data-en="Parallel parking">Créneau</button><button data-k="bay" data-en="Bay parking">Bataille</button></div>
+      <div class="row">
+        <div class="seg" id="streetGear" role="group" aria-label="Boîte" data-en-label="Gearbox"><button data-g="simple" class="act" data-en="Simple: forward / reverse">Simple : avant / arrière</button><button data-g="manual" data-en="Manual gearbox">Boîte manuelle</button></div>
+        <div class="seg" id="streetDir" role="group" aria-label="Conduite" data-en-label="Drive"><button data-k="up" data-en="▲ Forward">▲ Avancer</button><button data-k="brake" data-en="■ Brake">■ Freiner</button><button data-k="down" data-en="▼ Reverse">▼ Reculer</button></div>
+      </div>
+      <div class="seg" id="streetView" role="group" aria-label="Vue" data-en-label="View">
+        <button data-v="driver" data-en="Driver">Conducteur</button><button data-v="behind" class="act" data-en="Behind">Derrière</button><button data-v="front" data-en="Front">Devant</button><button data-v="top" data-en="Above">Dessus</button><button data-v="free" data-en="Free">Libre</button>
+      </div>
+      <label class="steer"><span data-en="Wheel">Volant</span><input type="range" id="steer" min="-100" max="100" value="0"></label>
+      <p class="note" data-en="&lt;kbd&gt;↑&lt;/kbd&gt; forward, &lt;kbd&gt;↓&lt;/kbd&gt; reverse, &lt;kbd&gt;Space&lt;/kbd&gt; brake, &lt;kbd&gt;←&lt;/kbd&gt; &lt;kbd&gt;→&lt;/kbd&gt; steer, &lt;kbd&gt;V&lt;/kbd&gt; view. Park in the green space!"><kbd>↑</kbd> avancer, <kbd>↓</kbd> reculer, <kbd>Espace</kbd> freiner, <kbd>←</kbd> <kbd>→</kbd> tourner, <kbd>V</kbd> vue. Gare-toi dans la place verte !</p>
+    </section>
 
     <section class="say" aria-live="polite">
       <div class="chips">
@@ -287,7 +316,6 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
       <p id="say"></p>
       <div class="row">
         <button class="btn" id="demoBtn" hidden data-en="▶ Show me">▶ Montre-moi</button>
-        <button class="btn warn" id="garageBtn" data-en="🔧 Game: Garage">🔧 Jeu : Garage</button>
       </div>
     </section>
 
@@ -305,9 +333,6 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
       </div>
       <div class="evread" id="evRead" hidden><div class="soc"><i id="socBar"></i></div><span id="socTxt"></span><span id="pwrTxt"></span></div>
       <div class="warnlights">
-        <span class="wl" id="wlBat" data-en="BATTERY">BATTERIE</span>
-        <span class="wl" id="wlEng" data-en="ENGINE">MOTEUR</span>
-        <span class="wl" id="wlBrk" data-en="BRAKES">FREINS</span>
         <span class="wl" id="wlReady" hidden>READY</span>
       </div>
     </section>
@@ -347,23 +372,19 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
         <div class="pr" id="selector">
           <button class="gbtn act" data-s="P">P</button><button class="gbtn" data-s="R">R</button><button class="gbtn" data-s="N">N</button><button class="gbtn" data-s="D">D</button>
         </div>
-        <div id="elemsWrap">
-          <table class="elems" id="elems" aria-label="Embrayages et freins serrés pour chaque rapport" data-en-label="Clutches and brakes applied for each gear"></table>
-          <p class="note" data-en="In green: the clutches (K) and brakes (B) that are applied. Two applied elements are enough for each gear.">En vert : les embrayages (K) et freins (B) serrés. Deux éléments serrés suffisent pour chaque rapport.</p>
-        </div>
       </div>
       <p class="note" id="evSelNote" hidden data-en="No gearbox: in D, the electric motor pushes from 0 to 150 km/h with a single ratio. In R, it simply spins backwards.">Pas de boîte de vitesses : en D, le moteur électrique pousse de 0 à 150 km/h avec un seul rapport. En R, il tourne simplement à l'envers.</p>
       <p class="note" data-en="Keys &lt;kbd&gt;P&lt;/kbd&gt; &lt;kbd&gt;R&lt;/kbd&gt; &lt;kbd&gt;N&lt;/kbd&gt; &lt;kbd&gt;D&lt;/kbd&gt;. To leave P, keep your foot on the brake.">Touches <kbd>P</kbd> <kbd>R</kbd> <kbd>N</kbd> <kbd>D</kbd>. Pour quitter P, garde le pied sur le frein.</p>
     </section>
 
-    <section>
+    <section id="lessonSec">
       <h2 class="sec-h" data-en="Your turn">À toi de jouer</h2>
       <ol class="steps" id="steps"></ol>
       <p class="note"><button class="linkbtn" id="resetBtn" data-en="Start again">Recommencer</button></p>
     </section>
 
-    <section>
-      <h2 class="sec-h" data-en="Display">Affichage</h2>
+    <details class="fold">
+      <summary><h2 class="sec-h" data-en="Display">Affichage</h2></summary>
       <div class="opts">
         <div class="seg" id="slow" role="group" aria-label="Ralenti" data-en-label="Slow motion">
           <button data-s="0.2" data-en="Slow-mo ÷5">Ralenti ÷5</button><button data-s="0.05" class="act">÷20</button><button data-s="0.0167">÷60</button>
@@ -371,7 +392,7 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
       </div>
       <div class="opts" style="margin-top:10px">
         <span class="sec-h" style="margin:0" data-en="Body">Carrosserie</span>
-        <div class="seg" id="bodySeg"><button data-b="ghost" class="act" data-en="See-through">Transparente</button><button data-b="solid" data-en="Solid">Pleine</button><button data-b="off" data-en="Hidden">Masquée</button></div>
+        <div class="seg" id="bodySeg"><button data-b="ghost" class="act" data-en="See-through">Transparente</button><button data-b="wire" data-en="Wireframe">Fil de fer</button><button data-b="off" data-en="Hidden">Masquée</button></div>
       </div>
       <div class="opts" style="margin-top:10px">
         <div class="swatches" id="swatches" aria-label="Couleur" data-en-label="Colour">
@@ -387,13 +408,13 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
         <label class="tog"><input type="checkbox" id="optSound" checked> <span data-en="Engine sound">Bruit du moteur</span></label>
       </div>
       <p class="note" data-en="A real engine spins far too fast to see: the parts move in slow motion. The dials, though, show the real speeds.">Un vrai moteur tourne bien trop vite pour qu'on le voie : les pièces bougent au ralenti. Les cadrans, eux, montrent les vraies vitesses.</p>
-    </section>
+    </details>
 
-    <section>
-      <h2 class="sec-h" data-en="Spec sheet">Fiche technique</h2>
+    <details class="fold">
+      <summary><h2 class="sec-h" data-en="Spec sheet">Fiche technique</h2></summary>
       <table class="spec" id="spec"></table>
       <p class="note" id="specNote"></p>
-    </section>
+    </details>
   </aside>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -420,7 +441,7 @@ const tr = (frText, enText)=> IS_EN ? enText : frText;
 const fr = (x,d=1)=> IS_EN ? x.toFixed(d) : x.toFixed(d).replace('.',',');   // nombre formaté selon la langue
 if(IS_EN){
   document.documentElement.lang = 'en';
-  document.title = 'How a car works';
+  document.title = 'Garage & Road';
   document.querySelectorAll('[data-en]').forEach(el=>{ el.innerHTML = el.dataset.en; });
   document.querySelectorAll('[data-en-label]').forEach(el=>{ el.setAttribute('aria-label', el.dataset.enLabel); });
 }
@@ -672,8 +693,6 @@ function beltPoints(circles){ // circles dans l'ordre anti-horaire ; courroie à
   const pts = beltPoints([BELT.crank, BELT.tens, BELT.cam, BELT.idler]);
   const bm = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts,true), 240, 0.004, 5, true), plastic(0x1f2326,{roughness:0.9}));
   bm.scale.set(1,1,1); put(bm,'belt','internals'); R.belt = bm;
-  const half = pts.slice(0, Math.floor(pts.length*0.45)); half.push(new THREE.Vector3(EN.xc+0.03, 0.3, BELT.z), new THREE.Vector3(EN.xc-0.02, 0.22, BELT.z+0.02));
-  R.beltBroken = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(half), 120, 0.004, 5, false), plastic(0x1f2326,{roughness:0.9})); put(R.beltBroken,'belt','internals');
   const pm = gm('engine', metal(0x9aa3ab));
   R.crankSprocket = at(gearZ(20, TAU*BELT.crank.r/20, 0.024, 0.008, pm), BELT.crank.x, BELT.crank.y, BELT.z); put(R.crankSprocket,'belt','internals');
   R.camPulley = new THREE.Group(); at(R.camPulley, BELT.cam.x, BELT.cam.y, BELT.z);
@@ -944,19 +963,19 @@ function makeWheel(front){
 [[WH.xF,WH.zF,true],[WH.xF,-WH.zF,true],[WH.xR,WH.zR,false],[WH.xR,-WH.zR,false]].forEach(([x,z,front])=>{
   const sg = Math.sign(z);
   const w = makeWheel(front); at(w, x, WH.r, z); if(sg<0) w.rotation.y = Math.PI;   // faces extérieures vers l'extérieur
-  put(w, front?'wheelF':'wheelR', 'wheels'); R.wheels.push({w, sg});
+  put(w, front?'wheelF':'wheelR', 'wheels'); R.wheels.push({w, sg, front});
   const dr = front ? 0.144 : 0.128, dz = z - sg*0.06;
   const disc = new THREE.Group(); at(disc, x, WH.r, dz);
   disc.add(tubeZ(dr, 0.06, front?0.025:0.012, metal(0x8a8f94,{metalness:0.8,roughness:0.5})));
   for(let k=0;k<5;k++){ const a=k/5*TAU; disc.add(at(cylZ(0.004,0.03,M.dark),Math.cos(a)*0.05,Math.sin(a)*0.05,0)); }
   for(let k=0;k<12;k++){ const a=k/12*TAU; disc.add(at(cylZ(0.003,0.03,M.dark),Math.cos(a)*(dr-0.025),Math.sin(a)*(dr-0.025),0)); }
-  put(disc,'brakedisc','wheels'); R.discs.push({g:disc, sg});
+  put(disc,'brakedisc','wheels'); R.discs.push({g:disc, sg, front});
   const cal = new THREE.Group(); at(cal, x, WH.r, dz);
   const calM = metal(0x2a2e31,{metalness:0.4});
   const ang = front ? 160*DEG : 20*DEG, cr = dr-0.02;
   const body = box(0.06, 0.08, 0.06, calM); body.position.set(Math.cos(ang)*cr, Math.sin(ang)*cr, 0); body.rotation.z = ang; cal.add(body);
   const pads=[]; [-1,1].forEach(s=>{ const p=box(0.05,0.035,0.008,metal(0x6b5a48,{roughness:0.9})); p.position.set(Math.cos(ang)*cr, Math.sin(ang)*cr, s*0.02); p.rotation.z=ang; cal.add(p); pads.push(p); });
-  put(cal, 'caliper', 'wheels'); R.calipers.push({g:cal, pads, base:front?0.0205:0.0145});
+  put(cal, 'caliper', 'wheels'); R.calipers.push({g:cal, pads, sg, front, base:front?0.0205:0.0145});
 });
 (function suspension(){
   const C='chassis', sm=metal(0x3d4448), dm=metal(0x8a9298);
@@ -1003,8 +1022,10 @@ R.cab = {};
   put(seat(-0.05,0.37,0.5),'seat',C); put(seat(-0.05,-0.37,0.5),'seat',C); put(seat(-0.95,0,1.3),'seat',C);
   const dash = at(box(0.22,0.09,1.4,plastic(0x23272a)),0.8,0.9,0); put(dash,'dash',C);
   const swp = new THREE.Group(); at(swp,0.48,0.97,0.37); swp.rotation.z = 0.45;
-  const rimW = new THREE.Mesh(new THREE.TorusGeometry(0.185,0.016,10,40), plastic(0x1b1e20)); rimW.rotation.y = Math.PI/2; swp.add(rimW);
-  swp.add(box(0.02,0.03,0.36,plastic(0x1b1e20))); swp.add(at(cylX(0.05,0.04,plastic(0x23272a)),0,0,0));
+  const spin = new THREE.Group(); swp.add(spin); R.cab.sw = spin;     // tourne autour de la colonne (axe x local)
+  const rimW = new THREE.Mesh(new THREE.TorusGeometry(0.185,0.016,10,40), plastic(0x1b1e20)); rimW.rotation.y = Math.PI/2; spin.add(rimW);
+  spin.add(box(0.02,0.03,0.36,plastic(0x1b1e20))); spin.add(at(cylX(0.05,0.04,plastic(0x23272a)),0,0,0));
+  spin.add(at(box(0.036,0.04,0.03,plastic(0xe8742a)),0,0.185,0));    // repère « midi » : on voit les tours de volant
   put(swp,'steering',C);
   put(between(new THREE.Vector3(0.48,0.97,0.37), new THREE.Vector3(0.9,0.75,0.37), 0.015, M.dark),'steering',C);
   // pédales (bougent avec les vraies pédales)
@@ -1170,18 +1191,15 @@ R.lights = {};
   const headM = new THREE.MeshStandardMaterial({color:0xf3f6f8, emissive:0xfff6dd, emissiveIntensity:0.05, metalness:0.3, roughness:0.2});
   const tailM = new THREE.MeshStandardMaterial({color:0x8d1010, emissive:0xff1a1a, emissiveIntensity:0.08, roughness:0.3});
   const revM = new THREE.MeshStandardMaterial({color:0xdddddd, emissive:0xffffff, emissiveIntensity:0, roughness:0.3});
-  const indM = new THREE.MeshStandardMaterial({color:0xd98a1a, emissive:0xff9a1a, emissiveIntensity:0.05, roughness:0.3});
   R.lights.head=headM; R.lights.tail=tailM; R.lights.rev=revM;
+  // feux ronds, simples : phares blancs devant, feux rouges derrière (avec un petit feu de recul blanc)
+  const ring = plastic(0x9aa2a8,{metalness:0.6, roughness:0.3});
+  const lamp = (r, m) => { const g = new THREE.Group(); g.add(cylX(r, 0.05, m)); const t = new THREE.Mesh(new THREE.TorusGeometry(r, 0.012, 8, 28), ring); t.rotation.y = Math.PI/2; t.position.x = 0.026; g.add(t); return g; };
   [1,-1].forEach(sg=>{
-    const h=new THREE.Group(); at(h,2.04,0.66,sg*0.57); h.rotation.y = sg*0.5;
-    h.add(box(0.06,0.1,0.3,BODY.trim)); h.add(at(cylX(0.038,0.02,headM),0.03,0,sg*0.05)); h.add(at(cylX(0.03,0.02,headM),0.03,0,-sg*0.07));
-    h.add(at(box(0.065,0.1,0.3,glass(0xeaf2f8,0.25)),0.005,0,0)); h.add(at(box(0.02,0.03,0.06,indM),0.03,-0.03,sg*0.12));
-    put(h,'headlight',C);
-    const fog=at(cylX(0.03,0.02,headM),2.125,0.32,sg*0.55); put(fog,'headlight',C);
-    const t=new THREE.Group(); at(t,-2.04,0.89,sg*0.6); t.rotation.y = -sg*0.35;
-    t.add(box(0.06,0.12,0.26,tailM)); t.add(at(box(0.062,0.04,0.08,revM),0,-0.03,-sg*0.06));
-    put(t,'taillight',C);
-    const sl=new THREE.SpotLight(0xfff3d6, 0, 22, 0.42, 0.5, 1.2); sl.position.set(2.1,0.66,sg*0.57); sl.target.position.set(9,0,sg*0.9); scene.add(sl); scene.add(sl.target); (R.lights.spots=R.lights.spots||[]).push(sl);
+    const h = lamp(0.075, headM); at(h, 2.075, 0.66, sg*0.56); h.rotation.y = sg*0.12; put(h,'headlight',C);
+    const t = lamp(0.06, tailM); at(t, -2.075, 0.9, sg*0.6); t.rotation.y = Math.PI - sg*0.1; put(t,'taillight',C);
+    const r = lamp(0.035, revM); at(r, -2.075, 0.9, sg*0.46); r.rotation.y = Math.PI; put(r,'taillight',C);
+    const sl=new THREE.SpotLight(0xfff3d6, 0, 22, 0.42, 0.5, 1.2); sl.position.set(2.1,0.66,sg*0.56); sl.target.position.set(9,0,sg*0.9); scene.add(sl); scene.add(sl.target); (R.lights.spots=R.lights.spots||[]).push(sl);
   });
   put(at(box(0.03,0.025,0.25,tailM),-1.95,1.235,0),'taillight',C);
 })();
@@ -1190,14 +1208,116 @@ R.lights = {};
 R.movers=[];
 (function road(){
   const C='road';
-  const rd = new THREE.Mesh(new THREE.PlaneGeometry(50, 4.6).rotateX(-Math.PI/2), new THREE.MeshStandardMaterial({color:0x474d52, roughness:1})); rd.position.set(0,-0.001,0.6); put(rd,'road',C);
+  const rd = new THREE.Mesh(new THREE.PlaneGeometry(50, 6.6).rotateX(-Math.PI/2), new THREE.MeshStandardMaterial({color:0x474d52, roughness:1})); rd.position.set(0,-0.001,1.0); put(rd,'road',C);
   const lm = new THREE.MeshBasicMaterial({color:0xe8e4d4});
-  [-1.6, 2.8].forEach(z=>{ const l=new THREE.Mesh(new THREE.PlaneGeometry(50,0.1).rotateX(-Math.PI/2), lm); l.position.set(0,0.001,z); put(l,'road',C); });
-  for(let i=0;i<18;i++){ const d=new THREE.Mesh(new THREE.PlaneGeometry(1.4,0.1).rotateX(-Math.PI/2), lm); d.position.set(-24+i*2.8,0.002,1.6); put(d,'road',C); R.movers.push(d); }
-  for(let i=0;i<10;i++){ const p=new THREE.Group();
-    p.add(at(cylY(0.03,0.7,new THREE.MeshStandardMaterial({color:0xeeeeea,roughness:0.7})),0,0.35,0));
-    p.add(at(box(0.02,0.1,0.065,new THREE.MeshBasicMaterial({color:0xff5a1f})),0,0.6,0.03));
-    p.position.set(-24+i*5,0,-2.1); put(p,'road',C); R.movers.push(p); }
+  for(let i=0;i<18;i++){ const d=new THREE.Mesh(new THREE.PlaneGeometry(1.4,0.1).rotateX(-Math.PI/2), lm); d.position.set(-24+i*2.8,0.002,1.2); put(d,'road',C); R.movers.push(d); }
+  // trottoirs à la française : bordure en granit, trottoir gris, potelets sombres le long de la bordure
+  const kerbM = plastic(0xb4b6b2,{roughness:0.9}), walkM = plastic(0x8e918c,{roughness:1}), bolM = plastic(0x3b3226,{roughness:0.6});
+  [[-2.3,-5.2],[4.3,7.6]].forEach(([zk, zb])=>{ const sg = Math.sign(zb - zk), w = Math.abs(zb - zk);
+    put(at(box(50, 0.15, 0.18, kerbM), 0, 0.075, zk + sg*0.09), 'road', C);
+    put(at(box(50, 0.13, w - 0.18, walkM), 0, 0.065, zk + sg*(0.18 + (w-0.18)/2)), 'road', C); });
+  for(let i=0;i<34;i++){ const b = new THREE.Group(); b.add(at(cylY(0.05, 0.75, bolM), 0, 0.5, 0)); b.add(at(new THREE.Mesh(new THREE.SphereGeometry(0.06, 10, 8), bolM), 0, 0.88, 0));
+    b.position.set(-25 + i*50/34, 0, -2.55); put(b,'road',C); R.movers.push(b); }
+})();
+
+/* ---------------- Quartier : immeubles, arbres et petit parc, des deux côtés ----------------
+   Une seule texture de fenêtres (teintée par la couleur du mur), des formes simples. */
+const WIN_TEX = (()=>{ const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d');
+  x.fillStyle = '#fff'; x.fillRect(0,0,64,64); x.fillStyle = '#3d4a57'; x.fillRect(14,12,36,30); x.fillStyle = '#5d6b78'; x.fillRect(14,12,36,6);
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; })();
+const BLD_COLS = [0xd9cbb4, 0xc7b9a6, 0xb98f78, 0xa7b0b3, 0xe3ddd0, 0xc49a7f, 0x9fa9a6];
+const roofM = plastic(0x5a5f63,{roughness:0.9});
+function building(w, d, h, col){            // w le long de la rue (x), d en profondeur (z)
+  const wall = (rx, ry) => { const t = WIN_TEX.clone(); t.needsUpdate = true; t.repeat.set(rx, ry); return plastic(col,{map:t, roughness:0.85}); };
+  const fx = wall(Math.round(d/3.2), Math.round(h/3)), fz = wall(Math.round(w/3.2), Math.round(h/3));
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), [fx, fx, roofM, roofM, fz, fz]); m.position.y = h/2; return m;
+}
+const leafM = plastic(0x5f8a4a,{roughness:0.9, flatShading:true}), trunkM = plastic(0x6b5040,{roughness:1});
+function tree(s=1){ const g = new THREE.Group(); g.add(at(cylY(0.12*s, 1.6*s, trunkM), 0, 0.8*s, 0));
+  const f = new THREE.Mesh(new THREE.IcosahedronGeometry(1.1*s, 0), leafM); f.position.y = 2.3*s; g.add(f); return g; }
+let seed = 7; const rnd = ()=>{ seed = (seed*16807) % 2147483647; return (seed-1)/2147483646; };
+// rangée le long de x : immeubles, avec parfois un trou de parc planté d'arbres. add(obj, x) place l'objet.
+function streetRow(x0, x1, zFront, side, add){
+  let x = x0;
+  while(x < x1){
+    if(rnd() < 0.18){ for(let k=0;k<3;k++) add(at(tree(0.8+rnd()*0.5), x + 1.5 + k*2.6, 0, zFront - side*(1.5 + rnd()*3)), x); x += 9; continue; }
+    const w = 6 + rnd()*7, d = 8 + rnd()*4, h = 6 + Math.floor(rnd()*5)*3;
+    const b = building(w, d, h, BLD_COLS[Math.floor(rnd()*BLD_COLS.length)]); b.position.x = x + w/2; b.position.z = zFront - side*d/2; add(b, x);
+    x += w + 0.3;
+  }
+}
+// route qui défile (vue normale) : les immeubles bougent avec les traits de la route, sur 50 m qui bouclent
+(function scenery(){
+  const add = o => { put(o, 'scenery', 'road'); R.movers.push(o); };
+  streetRow(-25, 24, -5.2, 1, add); streetRow(-25, 24, 7.6, -1, add);
+  for(let i=0;i<10;i++) add(at(tree(0.6), -24 + i*5 + 2.5, 0, -4.3));
+})();
+
+// Carrosserie « fil de fer » : les arêtes de la coque et des vitres, affichées seulement dans ce mode
+BODY.wire = new THREE.LineBasicMaterial({color:0x6fa3e8, transparent:true, opacity:0.95});
+BODY.wires = [];
+LEAVES.filter(o=>o.isMesh && (o.material===BODY.paint || o.material===BODY.glass)).forEach(m=>{
+  const l = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry, 6), BODY.wire);
+  l.visible = false; l.raycast = ()=>{}; m.add(l); BODY.wires.push(l);
+});
+
+/* ---------------- Rue des vidéos « se garer » (fixe dans le monde, visible seulement pendant ces vidéos) ----------------
+   Créneau : la voiture part de l'origine, cap +x, à côté de la voiture garée A, et finit garée derrière elle.
+   Bataille : plus loin dans la rue (x ≈ 27-40), 5 places perpendiculaires au trottoir, en retrait.
+   Trottoir côté droit (z négatif). */
+const PARK = { on:false, delta:0, plan:null };       // delta : braquage « vélo » des roues avant (rad, + = à gauche)
+const PARKG = new THREE.Group(); scene.add(PARKG);
+const PARKED_Z = -2.46, KERB_Z = PARKED_Z - 0.88 - 0.25;
+const BAY_W = 2.5, BAY_D = 5, BAY_X0 = 27.5, BAY_N = 5, BAY_KERB = KERB_Z - 3.5;   // places en bataille
+const BAY_X = BAY_X0 + 2.5*BAY_W;                                                   // milieu de la place libre (la 3e)
+const PARK_OBST = [];        // obstacles (rectangles vus de dessus : centre, demi-longueurs, cap) pour les chocs et les radars
+(function street(){
+  const K='parkscene', C='road', add = o => put(o, K, C, undefined, PARKG);
+  const asph = new THREE.MeshStandardMaterial({color:0x474d52, roughness:1});
+  const kerbM = plastic(0x9a9d99,{roughness:1}), walkM = plastic(0x80837e,{roughness:1}), grassM = plastic(0x6c8556,{roughness:1});
+  const plane = (w, d, x, z) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d).rotateX(-Math.PI/2), asph); m.position.set(x, -0.002, z); add(m); };
+  plane(100, 14, 10, KERB_Z + 7);
+  PARK_OBST.push({x:10, z:KERB_Z + 14.5, hx:52, hz:0.5, th:0, wall:true}, {x:-40.5, z:0, hx:0.5, hz:20, th:0, wall:true}, {x:60.5, z:0, hx:0.5, hz:20, th:0, wall:true});   // bords de la rue
+  // bordure, trottoir et pelouse de x1 à x2, bordure en zk
+  function side(x1, x2, zk){ const w = x2-x1, cx = (x1+x2)/2; PARK_OBST.push({x:cx, z:zk-0.08, hx:w/2, hz:0.08, th:0, kerb:true});
+    add(at(box(w, 0.14, 0.16, kerbM), cx, 0.07, zk - 0.08));
+    add(at(box(w, 0.12, 3, walkM), cx, 0.06, zk - 1.66));
+    add(at(box(w, 0.1, 14, grassM), cx, 0.05, zk - 10.16)); }
+  const bx1 = BAY_X0 - 1.5, bx2 = BAY_X0 + BAY_N*BAY_W + 1.5;
+  side(-40, bx1, KERB_Z); side(bx2, 60, KERB_Z); side(bx1, bx2, BAY_KERB);
+  plane(bx2 - bx1, KERB_Z - BAY_KERB, (bx1+bx2)/2, (KERB_Z + BAY_KERB)/2);
+  [bx1, bx2].forEach(x => { add(at(box(0.16, 0.14, KERB_Z - BAY_KERB + 3.2, kerbM), x, 0.07, (KERB_Z + BAY_KERB)/2 - 1.6));
+    PARK_OBST.push({x, z:(KERB_Z + BAY_KERB)/2, hx:0.08, hz:(KERB_Z - BAY_KERB)/2, th:0, kerb:true}); });
+  const paint = new THREE.MeshBasicMaterial({color:0xe8e4d4});
+  const line = (w, d, x, z) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d).rotateX(-Math.PI/2), paint); m.position.set(x, 0.001, z); add(m); };
+  line(bx1 + 40, 0.1, (bx1 - 40)/2, PARKED_Z + 1.2);                                                // limite des places en créneau
+  [-8.6, -2.5, 2.7].forEach(x => line(0.1, 2.0, x, PARKED_Z + 0.2));                                 // séparations
+  for(let i=0;i<=BAY_N;i++) line(0.1, BAY_D, BAY_X0 + i*BAY_W, BAY_KERB + BAY_D/2);                 // places en bataille
+  for(let i=0;i<20;i++) line(1.4, 0.1, -36 + i*5, 2.6);                                              // axe de la rue
+  for(let i=0;i<5;i++){ const lamp = new THREE.Group();                                              // lampadaires
+    lamp.add(at(cylY(0.05, 3.2, plastic(0x3a4045)), 0, 1.6, 0)); lamp.add(at(box(0.5, 0.08, 0.18, plastic(0x3a4045)), 0.2, 3.2, 0.05));
+    at(lamp, -26 + i*12, 0.12, KERB_Z - 0.5); add(lamp); }
+  // voitures garées : génériques, volontairement simples (x, z = centre ; rot = cap)
+  function parkedCar(x, z, col, rot=0){
+    const g = new THREE.Group(), body = plastic(col,{roughness:0.45}), dark = plastic(0x1d2226,{roughness:0.9}), win = plastic(0x27333d,{roughness:0.15});
+    g.add(at(box(4.2, 0.6, 1.74, body), 0, 0.58, 0));
+    g.add(at(box(2.2, 0.46, 1.58, win), -0.3, 1.1, 0));
+    g.add(at(box(2.0, 0.06, 1.5, body), -0.35, 1.35, 0));
+    [[1.28,1],[1.28,-1],[-1.3,1],[-1.3,-1]].forEach(([wx,sg]) => g.add(at(cylZ(0.31, 0.2, dark), wx, 0.31, sg*0.78)));
+    [1,-1].forEach(sg => { g.add(at(box(0.04, 0.1, 0.3, plastic(0xf3f6f8)), 2.1, 0.7, sg*0.6)); g.add(at(box(0.04, 0.12, 0.26, plastic(0x8d1010)), -2.1, 0.78, sg*0.6)); });
+    at(g, x, 0, z); g.rotation.y = rot; add(g);
+    PARK_OBST.push({x, z, hx:2.1, hz:0.87, th:-rot});
+  }
+  // le quartier autour : immeubles derrière le trottoir (avec un parc), et de l'autre côté de la rue
+  seed = 11; streetRow(-40, 58, KERB_Z - 7, 1, o => add(o));
+  add(at(box(100, 0.12, 3, walkM), 10, 0.06, KERB_Z + 15.5)); add(at(box(100, 0.1, 14, grassM), 10, 0.05, KERB_Z + 24));
+  streetRow(-40, 58, KERB_Z + 19, -1, o => add(o));
+  parkedCar(0.02, PARKED_Z, 0x8d969c);      // créneau, A : la voiture de devant (son arrière est en x = -2,08, comme le nôtre au départ)
+  parkedCar(-11.1, PARKED_Z, 0x7a2a2e);     // créneau, B : la voiture de derrière
+  parkedCar(5.4, PARKED_Z, 0x2f4a5c);
+  const bayZ = BAY_KERB + 0.3 + 2.1;        // bataille : nez à 30 cm de la bordure
+  parkedCar(BAY_X - BAY_W, bayZ, 0x7a2a2e, Math.PI/2);   // à droite de la place libre
+  parkedCar(BAY_X + BAY_W, bayZ, 0x8d969c, Math.PI/2);   // à gauche
 })();
 
 /* ===== 05-catalog-and-director.js ===== */
@@ -1283,7 +1403,7 @@ const INFO = {
   pedalbrake:{t:tr('Pédale de frein','Brake pedal'), a:[0.8,0.42,0.37], l:2, p:tr('La pédale du milieu (ou de gauche en boîte auto).','The middle pedal (or the left one in an automatic).')},
   pedalgas:{t:tr('Accélérateur','Accelerator'), a:[0.8,0.42,0.27], l:2, p:tr('Il ouvre le papillon des gaz dans le moteur.','It opens the throttle in the engine.')},
   lever:{t:tr('Levier de vitesses','Gear lever'), a:[0.42,0.8,0], l:2, p:tr('Il bouge comme le levier de l\'écran.','It moves like the lever on the screen.')},
-  body:{t:tr('Carrosserie','Body'), p:tr('La coque en acier : 4,20 m de long, 1,76 m de large et 1,48 m de haut. Choisis « Pleine », « Transparente » ou « Masquée » dans Affichage.','The steel shell: 4.20 m long, 1.76 m wide and 1.48 m high. Choose "Solid", "See-through" or "Hidden" in Display.')},
+  body:{t:tr('Carrosserie','Body'), p:tr('La coque en acier : 4,20 m de long, 1,76 m de large et 1,48 m de haut. Choisis « Transparente », « Fil de fer » ou « Masquée » dans Affichage.','The steel shell: 4.20 m long, 1.76 m wide and 1.48 m high. Choose "See-through", "Wireframe" or "Hidden" in Display.')},
   glass:{t:tr('Vitres','Windows'), p:tr('Pare-brise, vitres latérales et lunette arrière.','Windscreen, side windows and rear window.')},
   headlight:{t:tr('Phares','Headlights'), a:[2.06,0.75,0.57], l:2, p:tr('Allume-les avec « Phares » dans Affichage.','Turn them on with "Headlights" in Display.')},
   taillight:{t:tr('Feux arrière','Rear lights'), a:[-2.04,0.98,0.6], l:2, p:tr('Ils s\'allument plus fort quand tu freines, et le feu blanc de recul s\'allume en marche arrière.','They light up brighter when you brake, and the white reversing light comes on in reverse.')},
@@ -1305,7 +1425,6 @@ const MASS = 1350, IE = 0.16, IIN = 0.05, KC = 60, W_IDLE = 760/RPM, KTC = 0.003
 const torqueCurve = rpm => rpm<1000 ? 140 : rpm<3500 ? lerp(150,200,(rpm-1000)/2500) : rpm<4500 ? 200 : rpm<6000 ? lerp(200,178,(rpm-4500)/1500) : lerp(178,150,clamp((rpm-6000)/800,0,1));
 const S = { mode:'manual', engineOn:false, cranking:0, runTime:0, we:0, win:0, v:0, gear:'N', sel:'P', agear:1, shiftT:0, lock:false,
   clutch:0, gas:0, brake:0, slow:0.05, msg:'', msgT:0, hand:false, slipLast:0, tcSR:0, evSOC:0.8, evT:0, evP:0 };
-const FAULT = { kind:null, cyl:1, active:false };
 const ratioNow = ()=> S.mode==='manual' ? RATIO_M[S.gear] : S.mode==='ev' ? (S.sel==='D' ? EV_R1 : S.sel==='R' ? -EV_R1 : 0) : (S.sel==='D' ? RATIO_A[S.agear] : S.sel==='R' ? RATIO_A.R : 0);
 const massNow = ()=> S.mode==='ev' ? 1615 : MASS;
 const engagement = () => S.mode==='manual' ? clamp((0.72 - S.clutch)/0.42, 0, 1) : 1;
@@ -1328,15 +1447,15 @@ function refreshVis(){
     if(u.cat==='body' && bodyMode==='off') v = false;
     if(iso) v = iso.has(u.part) && (!u.mode || u.mode===S.mode);
     if(S.mode==='ev' && iceOnly(u)) v = false;
-    if(o===R.beltBroken) v = v && FAULT.kind==='belt' && FAULT.active;
-    if(o===R.belt) v = v && !(FAULT.kind==='belt' && FAULT.active);
+    if(u.part==='parkscene') v = v && PARK.on; else if(u.cat==='road' && PARK.on) v = false;
     o.visible = v;
   });
 }
 function applyBodyMode(){
-  const ghost = bodyMode==='ghost';
-  BODY.paint.transparent = ghost; BODY.paint.opacity = ghost ? 0.13 : 1; BODY.paint.depthWrite = !ghost;
-  BODY.glass.opacity = ghost ? 0.07 : 0.45;
+  const ghost = bodyMode==='ghost', wire = bodyMode==='wire', see = ghost || wire;
+  BODY.paint.transparent = see; BODY.paint.opacity = ghost ? 0.13 : wire ? 0.05 : 1; BODY.paint.depthWrite = !see;
+  BODY.glass.opacity = ghost ? 0.07 : wire ? 0.03 : 0.45;
+  BODY.wires.forEach(l=>{ l.visible = wire; }); BODY.wire.color.copy(BODY.paint.color).offsetHSL(0, 0.15, 0.3);
   BODY.paint.needsUpdate = true; BODY.glass.needsUpdate = true;
   refreshVis();
 }
@@ -1387,7 +1506,6 @@ function showInfo(k){
   const v=INFO[k]; if(!v) return; infoKey = k;
   $('infoH').textContent=v.t; $('infoP').textContent=v.p; $('info').hidden=false;
   $('infoIso').hidden = isoKey===k;
-  $('infoRepair').hidden = !(GAME.state==='fault');
 }
 $('infoX').onclick = ()=>{ $('info').hidden=true; };
 $('infoIso').onclick = ()=>{ if(infoKey) isolate(infoKey); $('infoIso').hidden=true; };
@@ -1405,6 +1523,7 @@ canvas.addEventListener('pointerup', e=>{
 });
 
 /* ---- Afficher / masquer ---- */
+$('partsBtn').onclick = ()=>{ const open = $('parts').hidden; $('parts').hidden = !open; $('partsBtn').setAttribute('aria-pressed', open); stage.classList.toggle('parts-open', open); };
 document.querySelectorAll('.part').forEach(b=>{ const k=b.dataset.p;
   b.onclick = ()=>{ catOn[k]=!catOn[k]; b.setAttribute('aria-pressed', catOn[k]); refreshVis(); }; });
 
@@ -1450,7 +1569,7 @@ function tourShift(g){ const tok=tour; anim.gas={to:0,rate:3}; anim.clutch={to:1
   setTimeout(()=>{ if(tour!==tok) return; selectGear(g); }, 450);
   setTimeout(()=>{ if(tour!==tok) return; anim.clutch={to:0,rate:0.55}; anim.gas={to:0.3,rate:1}; }, 1500); }
 function resetForTour(){
-  stopDemo(); if(GAME.state!=='off') gameQuit();
+  stopDemo();
   Object.assign(S,{engineOn:false,cranking:0,we:0,win:0,v:0,clutch:0,gas:0,brake:0,gear:'N',sel:'P',agear:1,lock:false}); for(const k in anim) anim[k]=null; resetLever();
   document.querySelectorAll('#shifter .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.g==='N'));
   document.querySelectorAll('#selector .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.s==='P'));
@@ -1490,6 +1609,7 @@ function reelShots(){
   return common1.concat(auto?autoMid:manualMid, common2);
 }
 function startTour(shotList, title){
+  if(STREET.on) streetStop();
   ensureAudio(); stopDemo(); if(iso) unIsolate(); $('info').hidden=true;
   const shots = shotList || reelShots();
   tour = {i:-1, t:0, shots, paused:false, saved:{slow:S.slow, body:bodyMode, cats:{...catOn}, simple}}; simple=false;
@@ -1503,38 +1623,48 @@ function stopTour(){
   if(!tour) return; const sv = tour.saved; tour=null;
   S.slow = sv.slow; bodyMode = sv.body; Object.assign(catOn, sv.cats); simple = sv.simple; applyBodyMode();
   controls.enabled = true; stage.classList.remove('reeling'); reelEl.hidden=true; explodeTarget=0;
-  iso=null; isoKey=null; $('isobar').hidden=true; refreshVis();
+  parkOff(); iso=null; isoKey=null; $('isobar').hidden=true; refreshVis();
 }
 function nextShot(){
   tour.i++; tour.t=0;
   if(tour.i >= tour.shots.length){ stopTour(); goView('car'); return; }
   const s = tour.shots[tour.i];
   if(s.act) s.act(); if(s.at) s.at.forEach(a=>a.done=false);
+  parkShot(s);
   S.slow = s.slow || 0.05;
   if(s.body){ bodyMode = s.body; applyBodyMode(); }
   iso = s.iso ? new Set(s.iso) : null; explodeTarget = s.explode ? 1 : 0; refreshVis();
   // cadrage : boîte englobante de la pièce visée
   const bb = new THREE.Box3(), tmp = new THREE.Box3(); let any=false;
   if(s.focus){ LEAVES.forEach(o=>{ if(o.visible && o.userData.part===s.focus && !o.isPoints){ tmp.setFromObject(o); if(!tmp.isEmpty()){ bb.union(tmp); any=true; } } }); }
-  const c = any ? bb.getCenter(new THREE.Vector3()) : new THREE.Vector3(0.3,0.55,0);
+  const c = any ? bb.getCenter(new THREE.Vector3()) : ROOT.localToWorld(new THREE.Vector3(0.3,0.55,0));
   const sz = any ? Math.max(0.12, bb.getSize(new THREE.Vector3()).length()) : 4.6;
-  s._c = c; s._d = Math.max(0.22, sz*1.35); s._p0 = camera.position.clone(); s._t0 = controls.target.clone();
-  s._dir = new THREE.Vector3(...s.dir).normalize();
+  s._c = c; s._cl = ROOT.worldToLocal(c.clone()); s._d = Math.max(0.22, sz*1.35); s._p0 = camera.position.clone(); s._t0 = controls.target.clone();
+  s._dir = new THREE.Vector3(...(s.dir||[1,0.5,0.8])).normalize();
   $('reelCap').innerHTML = cap(s.cap) + (s.sub ? `<em class="reel-sub" style="animation-delay:${s.cap.split(' ').length*0.07+0.15}s">${s.sub}</em>` : '');
   const tagEl = $('reelTag'); tagEl.textContent = s.focus && INFO[s.focus] ? INFO[s.focus].t : ''; tagEl.hidden = !s.focus;
   [...$('reelBars').children].forEach((b,i)=>{ b.firstChild.style.width = i<tour.i ? '100%' : '0%'; });
 }
 const ease = p => p<0.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2;
+const UP_Y = new THREE.Vector3(0,1,0);
 function tourTick(dt){
   if(!tour) return;
   const s = tour.shots[tour.i]; if(!tour.paused) tour.t += dt;
   if(s.at) s.at.forEach(a=>{ if(!a.done && tour.t>=a[0]){ a.done=true; a[1](); } });
   const p = clamp(tour.t/s.dur, 0, 1);
-  const ang = s.orbit*(p-0.5), ca=Math.cos(ang), sa=Math.sin(ang);
-  const d = new THREE.Vector3(s._dir.x*ca + s._dir.z*sa, s._dir.y, -s._dir.x*sa + s._dir.z*ca).normalize();
-  const want = s._c.clone().add(d.multiplyScalar(s._d*lerp(s.zoom[0], s.zoom[1], ease(p))*(tour.zm||1)));
+  s._c = ROOT.localToWorld(s._cl.clone());       // suit la voiture quand elle bouge (créneau)
+  let want, look = s._c;
+  if(s.cam){
+    const P = v => s.cam.car ? ROOT.localToWorld(new THREE.Vector3(...v)) : new THREE.Vector3(...v);
+    want = P(s.cam.p2 ? s.cam.p.map((x,i)=>lerp(x, s.cam.p2[i], ease(p))) : s.cam.p);
+    if(s.cam.t) look = P(s.cam.t);
+  } else {
+    const ang = (s.orbit||0)*(p-0.5), ca=Math.cos(ang), sa=Math.sin(ang);
+    const d = new THREE.Vector3(s._dir.x*ca + s._dir.z*sa, s._dir.y, -s._dir.x*sa + s._dir.z*ca).normalize().applyAxisAngle(UP_Y, ROOT.rotation.y);
+    want = s._c.clone().add(d.multiplyScalar(s._d*lerp(s.zoom[0], s.zoom[1], ease(p))*(tour.zm||1)));
+  }
   const k = clamp(tour.t/0.9, 0, 1), kk = k*k*(3-2*k);
-  camera.position.lerpVectors(s._p0, want, kk); controls.target.lerpVectors(s._t0, s._c, kk);
+  camera.position.lerpVectors(s._p0, want, kk); controls.target.lerpVectors(s._t0, look, kk);
   $('reelBars').children[tour.i].firstChild.style.width = (p*100)+'%';
   // pointeur
   const ring=$('ptrRing'), line=$('ptrLine'), tag=$('reelTag');
@@ -1598,6 +1728,8 @@ const SCENARIOS = {
     ]},
     {id:'stroke', t:tr('Les 4 temps du moteur','The engine\'s 4 strokes'), d:tr('Admission, compression, explosion, échappement','Intake, compression, power, exhaust'), shots:()=>strokeShots()},
     {id:'tour', t:tr('Tout le chemin de la force','The whole path of the force'), d:tr('La grande visite, du piston à la route','The big tour, from piston to road'), shots:()=>reelShots()},
+    {id:'parking', t:tr('Le créneau','Parallel parking'), d:tr('Se garer entre deux voitures, sous tous les angles','Parking between two cars, from every angle'), shots:()=>parkShots()},
+    {id:'bay', t:tr('Se garer en bataille','Bay parking'), d:tr('Nez vers le trottoir, en deux manœuvres','Nose-in, in two moves'), shots:()=>bayShots()},
   ],
   auto: [
     {id:'prnd', t:'P, R, N, D', d:tr('Moteur allumé, que se passe-t-il dans la boîte ?','Engine on: what happens in the gearbox?'), shots:()=>[
@@ -1615,6 +1747,8 @@ const SCENARIOS = {
     ]},
     {id:'stroke', t:tr('Les 4 temps du moteur','The engine\'s 4 strokes'), d:tr('Admission, compression, explosion, échappement','Intake, compression, power, exhaust'), shots:()=>strokeShots()},
     {id:'tour', t:tr('Tout le chemin de la force','The whole path of the force'), d:tr('La grande visite, du piston à la route','The big tour, from piston to road'), shots:()=>reelShots()},
+    {id:'parking', t:tr('Le créneau','Parallel parking'), d:tr('Se garer entre deux voitures, sous tous les angles','Parking between two cars, from every angle'), shots:()=>parkShots()},
+    {id:'bay', t:tr('Se garer en bataille','Bay parking'), d:tr('Nez vers le trottoir, en deux manœuvres','Nose-in, in two moves'), shots:()=>bayShots()},
   ],
   ev: [
     {id:'evtour', t:tr('Comment avance une voiture électrique','How an electric car moves'), d:tr('De la batterie aux roues','From the battery to the wheels'), shots:()=>[
@@ -1642,6 +1776,8 @@ const SCENARIOS = {
       {focus:'reducer', iso:['evrotor','reducer','diff','cv','wheelF'], dir:[0.6,0.6,0.9], zoom:[1.3,1.0], orbit:0.4, dur:7, cap:tr('Un *seul* rapport suffit de 0 à 150 km/h','A *single* ratio is enough from 0 to 150 km/h'), sub:tr('Regarde le compteur monter sans aucune coupure','Watch the speedometer climb without a single break')},
       {focus:null, body:'ghost', dir:[0.9,0.35,-0.9], zoom:[1.15,1.3], orbit:0.6, dur:5, cap:tr('Pas d\'embrayage, *pas de calage*','No clutch, no *stalling*'), sub:tr('Et en marche arrière, le moteur tourne juste à l\'envers','And in reverse, the motor just spins backwards'), act:()=>{ anim.gas={to:0,rate:2}; anim.brake={to:0.5,rate:1}; }},
     ]},
+    {id:'parking', t:tr('Le créneau','Parallel parking'), d:tr('Se garer entre deux voitures, sous tous les angles','Parking between two cars, from every angle'), shots:()=>parkShots()},
+    {id:'bay', t:tr('Se garer en bataille','Bay parking'), d:tr('Nez vers le trottoir, en deux manœuvres','Nose-in, in two moves'), shots:()=>bayShots()},
   ],
 };
 function strokeShots(){
@@ -1695,12 +1831,212 @@ function renderSpec(){
   $('spec').innerHTML = (S.mode==='ev'?evRows:rows).map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('');
   $('specNote').textContent = S.mode==='ev' ? tr('Valeurs proches d\'une compacte électrique de 2017 (100 kW, 35,8 kWh). Les formes sont simplifiées.','Values close to a 2017 compact electric car (100 kW, 35.8 kWh). The shapes are simplified.') : tr('Moteur et dimensions : valeurs d\'une compacte 2.0 essence de 150 ch des années 2000. Boîte auto : vrai schéma à trains épicycloïdaux, dentures choisies pour retrouver ses rapports. Boîte manuelle : rapports approchés. Les formes sont simplifiées.','Engine and dimensions: values of a 2000s compact 2.0 petrol with 150 hp. Automatic: a real planetary gearset layout, with tooth counts chosen to match its ratios. Manual gearbox: approximate ratios. The shapes are simplified.');
   $('subTxt').textContent = S.mode==='ev' ? tr('Voiture électrique : batterie sous le plancher, moteur électrique à l\'avant, un seul rapport. Démarre, roule, et regarde l\'énergie aller… et revenir quand tu freines.','Electric car: battery under the floor, electric motor at the front, a single ratio. Switch on, drive, and watch the energy go… and come back when you brake.') : S.mode==='auto' ? tr('Moteur 4 cylindres essence et boîte automatique 6 vitesses, traction avant. Pas de pédale d\'embrayage : la boîte fait tout.','4-cylinder petrol engine and 6-speed automatic gearbox, front-wheel drive. No clutch pedal: the gearbox does it all.') : tr('Moteur 4 cylindres essence et boîte manuelle 6 vitesses, traction avant. Démarre, passe les vitesses et suis la force jusqu\'aux roues.','4-cylinder petrol engine and 6-speed manual gearbox, front-wheel drive. Start the engine, change gear and follow the force to the wheels.');
-
-  const els=['K1','K2','K3','B1','B2'];
-  $('elems').innerHTML = `<tr><th></th>${els.map(e=>`<th>${e}</th>`).join('')}<th>×</th></tr>` +
-    ['1','2','3','4','5','6','R'].map(g=>`<tr data-g="${g}"><th>${g==='R'?'R':g}</th>${els.map(e=>`<td class="${SHIFT_EL[g].includes(e)?'on':''}">${SHIFT_EL[g].includes(e)?'●':''}</td>`).join('')}<td>${fr(Math.abs(RATIO_A[g]),2)}</td></tr>`).join('');
 }
 renderSpec();
+
+/* ---- Le créneau : un trajet calculé d'avance (modèle « vélo » autour de l'essieu arrière), rejouable sous tous les angles ----
+   Braquage à fond à droite jusqu'à 45°, un peu de ligne droite, braquage à fond à gauche jusqu'à être parallèle.
+   Les longueurs sont calculées pour finir à 25 cm du trottoir (PARKED_Z, 04). Un plan joue une étape avec `park:k`
+   (ou `park:[k0,k1]`), ou fige la voiture au début de l'étape k avec `pose:k`. */
+const PARK_WB = WH.xF - WH.xR, PARK_DMAX = 34*DEG, PARK_R = PARK_WB/Math.tan(PARK_DMAX), PARK_ALPHA = 45*DEG;
+const PARK_D3 = (-PARKED_Z - 2*PARK_R*(1-Math.cos(PARK_ALPHA)))/Math.sin(PARK_ALPHA);
+const STEER_RATIO = 15.5;                 // 34° aux roues ≈ 1,5 tour de volant
+const PARK_STEPS = [
+  {g:'R', T:0.8},                         // 0 marche arrière
+  {ds:-0.75},                             // 1 recule droit : la roue arrière arrive au pare-chocs de la voiture de devant
+  {steer:-PARK_DMAX, T:2.4},              // 2 braque à fond à droite
+  {ds:-PARK_R*PARK_ALPHA},                // 3 recule jusqu'à 45°
+  {steer:0, T:2.4},                       // 4 roues droites
+  {ds:-PARK_D3},                          // 5 recule droit : l'avant dépasse la voiture de devant
+  {steer:PARK_DMAX, T:2.4},               // 6 braque à fond à gauche
+  {ds:-PARK_R*PARK_ALPHA},                // 7 recule jusqu'à être parallèle
+  {steer:0, T:2.4},                       // 8 roues droites
+  {g:'F', T:0.8},                         // 9 1re (ou D)
+  {ds:0.9},                               // 10 avance pour se centrer
+];
+// Bataille, nez vers le trottoir : avance braqué à droite jusqu'à 45°, recule braqué vers la voiture de gauche
+// jusqu'à être face à la place, puis entre tout droit. Départ calculé à rebours depuis la place.
+const PERP_STEPS = [
+  {g:'F', T:0.8},                         // 0 1re (ou D)
+  {ds:4, sp:1.2},                         // 1 avance le long des places
+  {steer:-PARK_DMAX, T:2.4},              // 2 braque à fond à droite
+  {ds:PARK_R*PARK_ALPHA},                 // 3 avance jusqu'à 45°
+  {g:'R', T:0.8},                         // 4 marche arrière
+  {steer:PARK_DMAX, T:2.4},               // 5 braque à fond à gauche, vers la voiture de gauche
+  {ds:-PARK_R*PARK_ALPHA},                // 6 recule jusqu'à être face à la place
+  {steer:0, T:2.4},                       // 7 roues droites
+  {g:'F', T:0.8},                         // 8 1re (ou D)
+  {ds:7, sp:0.8},                         // 9 entre tout droit
+];
+[PARK_STEPS, PERP_STEPS].forEach(L=>L.forEach(st=>{ if(st.ds!==undefined) st.T = Math.max(2, Math.abs(st.ds)/(st.sp||0.4)); }));   // ~1,5 km/h
+// Avance l'essieu arrière (x, z, cap th) de ds mètres avec le braquage d.
+function parkArc(p, d, ds){
+  const kap = Math.tan(d)/PARK_WB;
+  if(Math.abs(kap)<1e-6) return {x:p.x + ds*Math.cos(p.th), z:p.z + ds*Math.sin(p.th), th:p.th};
+  const th2 = p.th + ds*kap;
+  return {x:p.x + (Math.sin(th2)-Math.sin(p.th))/kap, z:p.z - (Math.cos(th2)-Math.cos(p.th))/kap, th:th2};
+}
+const PLAN_PAR = {steps:PARK_STEPS, x:WH.xR, z:0, th:0};    // départ : essieu arrière
+const PLAN_PERP = (()=>{
+  const th = -Math.PI/2; let p = {x:BAY_X, z:BAY_KERB + 0.3 + 2.14 - WH.xR, th};    // garée : pare-chocs à 30 cm de la bordure
+  for(let i=PERP_STEPS.length-1; i>=0; i--){ const st = PERP_STEPS[i];               // on rejoue le trajet à l'envers
+    if(st.ds===undefined) continue;
+    let d = 0; for(let j=i-1; j>=0; j--) if(PERP_STEPS[j].steer!==undefined){ d = PERP_STEPS[j].steer; break; }
+    p = parkArc(p, d, -st.ds); }
+  return {steps:PERP_STEPS, x:p.x, z:p.z, th:p.th};
+})();
+const sEase = u => (1-Math.cos(Math.PI*u))/2;
+// État au début de l'étape k, avancé de u (0..1) : origine de la voiture, cap, braquage, rapport, vitesse.
+function parkState(k, u=0){
+  const P = PARK.plan; let p = {x:P.x, z:P.z, th:P.th}, d=0, g='N', v=0;     // p : milieu de l'essieu arrière
+  for(let i=0; i<=k && i<P.steps.length; i++){
+    const st = P.steps[i], f = i<k ? 1 : u; if(f<=0) break;
+    if(st.g) g = st.g;
+    else if(st.steer!==undefined) d = lerp(d, st.steer, sEase(f));
+    else { p = parkArc(p, d, st.ds*sEase(f)); if(i===k && f<1) v = st.ds*Math.PI/2*Math.sin(Math.PI*f)/st.T; }
+  }
+  return { x: p.x - WH.xR*Math.cos(p.th), z: p.z - WH.xR*Math.sin(p.th), th:p.th, d, g, v };
+}
+let parkLastG = null, parkLastPed = null;
+function parkGear(g){
+  if(S.mode==='manual'){ const mg = g==='F' ? '1' : g; S.gear = mg; if(GATE[mg]){ LEV.col=GATE[mg][0]; LEV.row=GATE[mg][1]; }
+    document.querySelectorAll('#shifter .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.g===mg)); }
+  else { const sel = g==='F' ? 'D' : g==='R' ? 'R' : 'N'; S.sel = sel; if(sel==='D') S.agear = 1;
+    document.querySelectorAll('#selector .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.s===sel)); }
+}
+function parkApply(st){
+  ROOT.position.set(st.x, 0, st.z); ROOT.rotation.y = -st.th; ROOT.updateMatrixWorld(true);
+  PARK.delta = st.d; S.v = st.v;           // la simulation suit : moteur au ralenti, embrayage ou convertisseur qui patine
+  if(st.g !== parkLastG){ parkLastG = st.g; parkGear(st.g); }
+  const man = S.mode==='manual', ped = Math.abs(st.v) > 0.01 ? (man ? [0.62,0] : [0,0.12]) : (man ? [1,0.7] : [0,0.8]);   // [embrayage, frein]
+  if(ped.join() !== parkLastPed){ parkLastPed = ped.join(); if(man) anim.clutch = {to:ped[0], rate:2}; anim.brake = {to:ped[1], rate:2}; }
+}
+function parkShot(s){
+  if(s.park===undefined && s.pose===undefined) return;
+  if(!PARK.on){ PARK.on = true; parkLastG = parkLastPed = null; scene.fog.near = 30; scene.fog.far = 80; refreshVis(); }
+  parkApply(parkState(s.park!==undefined ? [].concat(s.park)[0] : s.pose, 0));
+}
+function parkTick(){
+  if(!PARK.on || !tour) return;
+  const s = tour.shots[tour.i]; if(!s) return;
+  if(s.park===undefined){ if(s.pose!==undefined){ const st = parkState(s.pose, 0); parkApply(st); parkMarks(s.pose, 0, st); } return; }
+  const ks = [].concat(s.park); let t = tour.t - (s.pAt ?? 0.6), k = ks[0];
+  const ST = PARK.plan.steps;
+  for(; k < (ks[1] ?? ks[0]); k++){ if(t < ST[k].T) break; t -= ST[k].T; }
+  const u = clamp(t/ST[k].T, 0, 1), st = parkState(k, u);
+  parkApply(st); parkMarks(k, u, st); sensorsTick(st);
+}
+function parkOff(){
+  if(!PARK.on) return;
+  PARK.on = false; PARK.delta = 0; S.v = 0; $('sensors').hidden = true; scene.fog.near = 10; scene.fog.far = 26; ROOT.position.set(0,0,0); ROOT.rotation.y = 0; ROOT.updateMatrixWorld(true); refreshVis();
+}
+function parkShots(){
+  const man = S.mode==='manual', END = PARK_STEPS.length;
+  const TOP = {p:[-2.8,17,1.2], t:[-2.8,0,-0.3]}, TOP_IN = {p:[-3.6,11,2.2], p2:[-4.6,7.5,0.4], t:[-4.6,0,-2]};
+  const STREET = {p:[-2.5,2.6,8.5], t:[-3,0.4,-2]}, STREET0 = {p:[1.5,3.0,9.5], t:[-0.6,0.4,-1.4]}, PAVEMENT = {p:[-4.5,1.6,-7.8], t:[-4,0.5,-1]};
+  const BEHIND = {p:[-17,2.2,-0.5], t:[-4,0.5,-1.6]}, CORNER = {p:[1.8,3.4,2.6], t:[-2.8,0.3,-1.5]};
+  const REF = {p:[-2.6,5.5,1.8], t:[-2.1,0,-1.2]};
+  const STEER = {car:true, p:[-0.1,1.25,-0.15], t:[0.48,0.97,0.37]}, WHEELS = {car:true, p:[-0.9,9,0], t:[-0.2,0,0]};
+  const creep = man ? tr('Embrayage au point de patinage, sans accélérer','Clutch at the biting point, no accelerator')
+                    : tr('Relâche doucement le frein : elle recule toute seule','Ease off the brake: it rolls back on its own');
+  return [
+    {pose:0, body:'wire', cam:TOP, slow:1, dur:5, cap:tr('Le *créneau* : se garer entre deux voitures','*Parallel* parking: between two cars'), sub:tr('Étape par étape, sous tous les angles','Step by step, from every angle'), act:()=>{ setupState({engineOn:true, we:W_IDLE}); PARK.plan = PLAN_PAR; }},
+    {pose:0, body:'wire', cam:STREET0, slow:1, dur:5, cap:tr('Arrête-toi à *côté* de la voiture de devant','Stop *alongside* the car in front'), sub:tr('À 50 cm – 1 m d\'elle, arrières alignés, clignotant à droite','50 cm – 1 m away, rear ends level, right indicator on')},
+    {park:0, focus:'lever', body:'ghost', dir:[-0.5,0.9,-0.6], zoom:[1.4,1.0], slow:1, dur:4, cap:man ? tr('Passe la marche *arrière*','Select *reverse*') : tr('Mets le levier sur *R*','Move the lever to *R*'), sub:man ? tr('Embrayage enfoncé, levier sur R','Clutch down, lever to R') : tr('Pied sur le frein, levier sur R','Foot on the brake, lever to R')},
+    {pose:1, focus:'taillight', body:'wire', dir:[-1,0.35,0.5], zoom:[2.6,2.0], slow:1, dur:4, cap:tr('Les feux de *recul* s\'allument','The *reversing* lights come on'), sub:tr('Les autres savent que tu recules','Others know you are backing up')},
+    {park:1, body:'wire', cam:TOP, slow:1, dur:4.5, cap:tr('Recule *doucement*, tout droit','Reverse *slowly*, straight back'), sub:creep},
+    {park:1, body:'ghost', cam:REF, slow:1, dur:4.5, cap:tr('*Stop* : ta roue arrière arrive au niveau de son pare-chocs','*Stop*: your rear wheel is level with its bumper'), sub:tr('Repère simplifié : chaque moniteur a le sien','A simplified reference: every instructor has their own')},
+    {park:2, focus:'steering', body:'ghost', cam:STEER, slow:1, dur:4.5, cap:tr('Braque à *fond* à droite','Turn the wheel *fully* to the right'), sub:tr('Environ un tour et demi de volant','About one and a half turns')},
+    {park:2, focus:'wheelF', body:'wire', cam:WHEELS, slow:1, dur:4.5, cap:tr('Les roues avant *tournent* à droite','The front wheels *turn* right'), sub:tr('Celle de l\'intérieur tourne un peu plus','The inner one turns a little more')},
+    {park:3, body:'wire', cam:TOP, slow:1, dur:9.5, cap:tr('L\'arrière *rentre* dans la place','The rear *swings* into the space'), sub:tr('Recule doucement, volant braqué','Reverse slowly, wheel on full lock')},
+    {park:3, body:'wire', cam:BEHIND, slow:1, dur:9.5, cap:tr('L\'avant *s\'écarte* vers la rue','The front *swings* out into the street'), sub:tr('Regarde autour : personne ne doit arriver','Look around: nobody should be coming')},
+    {pose:4, body:'wire', cam:PAVEMENT, slow:1, dur:4.5, cap:tr('*Stop* à 45° environ','*Stop* at about 45°'), sub:tr('La voiture est en diagonale','The car is at an angle')},
+    {park:4, focus:'steering', body:'ghost', cam:STEER, slow:1, dur:4.5, cap:tr('Remets les roues *droites*','Straighten the *wheels*'), sub:tr('Un tour et demi dans l\'autre sens','One and a half turns back')},
+    {park:5, body:'wire', cam:CORNER, slow:1, dur:4.5, cap:tr('Recule jusqu\'à *dépasser* la voiture de devant','Reverse until you *clear* the car in front'), sub:tr('Ton coin avant droit passe derrière elle','Your front right corner passes behind it')},
+    {park:6, focus:'steering', body:'ghost', cam:STEER, slow:1, dur:4.5, cap:tr('Braque à *fond* à gauche','Turn *fully* to the left'), sub:tr('Encore un tour et demi','One and a half turns again')},
+    {park:6, focus:'wheelF', body:'wire', cam:WHEELS, slow:1, dur:4.5, cap:tr('Les roues pointent vers la *rue*','The wheels point to the *street*'), sub:tr('L\'avant va venir se ranger','The front will now tuck in')},
+    {park:7, body:'wire', cam:TOP, slow:1, dur:9.5, cap:tr('L\'avant se *range* le long du trottoir','The front *tucks* in along the kerb'), sub:tr('Recule doucement jusqu\'à être parallèle','Reverse slowly until you are parallel')},
+    {park:7, body:'wire', cam:PAVEMENT, slow:1, dur:9.5, cap:tr('Ne *touche* pas le trottoir','Don\'t *touch* the kerb'), sub:tr('Vise 20 à 30 cm entre le pneu et la bordure','Aim for 20 to 30 cm between tyre and kerb')},
+    {park:8, focus:'steering', body:'ghost', cam:STEER, slow:1, dur:4.5, cap:tr('Volant au *centre*','Wheel back to the *centre*'), sub:tr('Les roues sont droites','The wheels are straight')},
+    {park:[9,10], body:'wire', cam:STREET, slow:1, dur:5.5, cap:man ? tr('Passe la *1re* et avance un peu','Select *1st* and move forward a little') : tr('Mets *D* et avance un peu','Select *D* and move forward a little'), sub:tr('Pour te centrer dans la place','To centre the car in the space')},
+    {pose:END, body:'wire', cam:TOP_IN, slow:1, dur:5.5, cap:tr('*Bravo*, la voiture est garée !','*Done*, the car is parked!'), sub:man ? tr('Frein à main serré, moteur coupé','Handbrake on, engine off') : tr('Levier sur P, frein à main serré','Lever to P, handbrake on')},
+  ];
+}
+
+function bayShots(){
+  const man = S.mode==='manual', END = PERP_STEPS.length, X = BAY_X;
+  const TOP = {p:[X-0.5,17,4.5], t:[X-0.5,0,-1.2]}, TOP_IN = {p:[X,12,2.5], p2:[X,8,-0.5], t:[X,0,-4]};
+  const BEHIND = {p:[X-12,2.4,4.2], t:[X-1,0.5,-0.5]}, FACING = {p:[X,3.2,10.5], t:[X,0.4,-3]};
+  const SIDE = {p:[X+7.5,1.8,0.5], t:[X,0.5,-2]}, PAVEMENT = {p:[X+0.4,1.7,BAY_KERB-6], t:[X,0.6,BAY_KERB+2]};
+  const STEER = {car:true, p:[-0.1,1.25,-0.15], t:[0.48,0.97,0.37]}, WHEELS = {car:true, p:[-0.9,9,0], t:[-0.2,0,0]};
+  const W = 'wire';
+  return [
+    {pose:0, body:W, cam:TOP, slow:1, dur:5, cap:tr('Se garer en *bataille*, en marche avant','Nose-in *bay* parking'), sub:tr('Entre deux voitures, l\'avant vers le trottoir','Between two cars, front towards the kerb'), act:()=>{ setupState({engineOn:true, we:W_IDLE}); PARK.plan = PLAN_PERP; }},
+    {park:[0,1], body:W, cam:BEHIND, slow:1, dur:5.5, cap:tr('Avance *doucement* le long des places','Drive *slowly* past the bays'), sub:tr('La place libre est à ta droite','The free bay is on your right')},
+    {park:2, focus:'steering', body:W, cam:STEER, slow:1, dur:4.5, cap:tr('Braque à *fond* à droite','Turn the wheel *fully* to the right'), sub:tr('Environ un tour et demi de volant','About one and a half turns')},
+    {park:2, focus:'wheelF', body:W, cam:WHEELS, slow:1, dur:4.5, cap:tr('Les roues avant *tournent* à droite','The front wheels *turn* right'), sub:tr('La voiture va pivoter vers la place','The car will pivot towards the bay')},
+    {park:3, body:W, cam:TOP, slow:1, dur:8.5, cap:tr('L\'avant *tourne* vers la place','The front *turns* towards the bay'), sub:tr('Mais le virage est trop large pour entrer d\'un coup','But the turn is too wide to get in at once')},
+    {park:3, body:W, cam:FACING, slow:1, dur:8.5, cap:tr('Vue d\'en *face*','The view from *opposite*'), sub:tr('Elle arrive en biais : elle toucherait la voiture de droite','It comes in at an angle: it would hit the car on the right')},
+    {park:[4,5], focus:'steering', body:W, cam:STEER, slow:1, dur:5, cap:tr('Marche arrière, volant à *gauche*','Reverse, wheel to the *left*'), sub:tr('Vers la voiture garée à ta gauche','Towards the parked car on your left')},
+    {park:5, focus:'wheelF', body:W, cam:WHEELS, slow:1, dur:4.5, cap:tr('Les roues pointent à *gauche*','The wheels point *left*'), sub:tr('En reculant, l\'avant va se placer face à la place','Reversing brings the front round to face the bay')},
+    {park:6, body:W, cam:TOP, slow:1, dur:8.5, cap:tr('Recule : la voiture se *redresse*','Reverse: the car *straightens* up'), sub:tr('Elle se met face à la place','It lines up with the bay')},
+    {park:6, body:W, cam:SIDE, slow:1, dur:8.5, cap:tr('Regarde *derrière* en reculant','Look *behind* while reversing'), sub:tr('L\'arrière recule dans la rue','The rear swings out into the street')},
+    {park:7, focus:'steering', body:W, cam:STEER, slow:1, dur:4.5, cap:tr('Volant au *centre*','Wheel back to the *centre*'), sub:tr('Les roues sont droites','The wheels are straight')},
+    {park:[8,9], body:W, cam:TOP, slow:1, dur:11, cap:man ? tr('Passe la *1re* et avance tout droit','Select *1st* and drive straight in') : tr('Mets *D* et avance tout droit','Select *D* and drive straight in'), sub:tr('Autant de place à gauche qu\'à droite','The same space on the left and on the right')},
+    {park:9, body:W, cam:PAVEMENT, slow:1, dur:10, cap:tr('Arrête-toi avant le *trottoir*','Stop before the *kerb*'), sub:tr('Le pare-chocs à 30 cm de la bordure','The bumper 30 cm from the kerb')},
+    {pose:END, body:W, cam:TOP_IN, slow:1, dur:5.5, cap:tr('*Bravo*, la voiture est garée !','*Done*, the car is parked!'), sub:man ? tr('Frein à main serré, moteur coupé','Handbrake on, engine off') : tr('Levier sur P, frein à main serré','Lever to P, handbrake on')},
+  ];
+}
+
+/* ---- Traces au sol pendant les vidéos « se garer » ----
+   Traces des pneus (où la voiture est passée) et, en marche arrière, les lignes de guidage
+   comme sur l'écran de la caméra de recul (où les coins arrière vont passer avec ce braquage). */
+function ribbon(max, color, w, y, opacity=0.85){
+  const g = new THREE.BufferGeometry(), pos = new Float32Array(max*6), idx = [];
+  for(let i=0;i<max-1;i++){ const a=2*i; idx.push(a,a+1,a+2, a+1,a+3,a+2); }
+  g.setAttribute('position', new THREE.BufferAttribute(pos,3)); g.setIndex(idx); g.setDrawRange(0,0);
+  const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({color, transparent:true, opacity, side:THREE.DoubleSide, depthWrite:false}));
+  m.frustumCulled = false; put(m, 'parkscene', 'road', undefined, PARKG);
+  return { m, set(pts){
+    const n = Math.min(pts.length, max);
+    for(let i=0;i<n;i++){
+      const a = pts[Math.max(0,i-1)], b = pts[Math.min(n-1,i+1)];
+      let tx = b[0]-a[0], tz = b[1]-a[1]; const l = Math.hypot(tx,tz) || 1; tx/=l; tz/=l;
+      pos[i*6]   = pts[i][0] - tz*w/2; pos[i*6+1] = y; pos[i*6+2] = pts[i][1] + tx*w/2;
+      pos[i*6+3] = pts[i][0] + tz*w/2; pos[i*6+4] = y; pos[i*6+5] = pts[i][1] - tx*w/2;
+    }
+    g.attributes.position.needsUpdate = true; g.setDrawRange(0, n>1 ? (n-1)*6 : 0);
+  }};
+}
+const WHEEL_PTS = [[WH.xF, WH.zF], [WH.xF, -WH.zF], [WH.xR, WH.zR], [WH.xR, -WH.zR]];
+const TRACKS = WHEEL_PTS.map((_,i)=>ribbon(600, i<2 ? 0xf08a24 : 0x4f8fe0, 0.16, 0.004, 0.75));
+const GUIDE_BANDS = [[0,1,0xe0402a],[1,2,0xf0b429],[2,3,0x3cc46a]];          // 0-1 m rouge, 1-2 m orange, 2-3 m vert
+const GUIDES = [1,-1].flatMap(sg=>GUIDE_BANDS.map(([a,b,c])=>({sg, a, b, r:ribbon(24, c, 0.06, 0.006, 0.95)})));
+const toWorld = (o, lx, lz) => [o.x + lx*Math.cos(o.th) - lz*Math.sin(o.th), o.z + lx*Math.sin(o.th) + lz*Math.cos(o.th)];
+function parkSamples(){                         // le trajet complet, échantillonné une fois par plan
+  const P = PARK.plan; if(P._samples) return P._samples;
+  P._samples = [];
+  P.steps.forEach((st,i)=>{ if(st.ds===undefined) return; const n = Math.max(6, Math.ceil(Math.abs(st.ds)/0.08));
+    for(let j=0;j<=n;j++) P._samples.push({key:i+j/n, o:parkState(i, j/n)}); });
+  return P._samples;
+}
+function parkMarks(k, u, st){
+  const now = k + u, past = parkSamples().filter(s=>s.key <= now).map(s=>s.o).concat([st]);
+  TRACKS.forEach((t,i)=>t.set(past.map(o=>toWorld(o, WHEEL_PTS[i][0], WHEEL_PTS[i][1]))));
+  drawGuides(st);
+}
+// st : origine de la voiture {x, z, th}, braquage d, rapport g
+function drawGuides(st){
+  const rev = st.g==='R';
+  GUIDES.forEach(G=>{
+    G.r.m.visible = rev; if(!rev) return;
+    const pts = [], ra = {x:st.x + WH.xR*Math.cos(st.th), z:st.z + WH.xR*Math.sin(st.th), th:st.th};   // essieu arrière
+    for(let j=0;j<=12;j++){ const s = G.a + (G.b-G.a)*j/12, p = parkArc(ra, st.d, -s);
+      const o = {x:p.x - WH.xR*Math.cos(p.th), z:p.z - WH.xR*Math.sin(p.th), th:p.th};
+      pts.push(toWorld(o, -2.08, G.sg*0.88)); }
+    G.r.set(pts);
+  });
+}
 
 /* ===== 06-controls-and-simulation.js ===== */
 
@@ -1759,6 +2095,7 @@ window.addEventListener('keydown', e=>{
   if(e.target.closest && e.target.closest('.pedal')) return;
   if(e.metaKey||e.ctrlKey||e.altKey) return;
   const k=e.key.toLowerCase();
+  if(STREET.on && STREET.gearbox==='simple' && (k==='arrowup' || k==='arrowdown' || k===' ')) return;
   if(KEYMAP[k] && !(k==='c' && S.mode==='auto')){ const p=KEYMAP[k]; if(!held[p]){ held[p]=true; anim[p]={to: p==='gas'?0.6:1, rate:3.2}; } e.preventDefault(); ensureAudio(); stopDemo(); return; }
   if(e.repeat) return;
   if(k==='k' || k==='enter'){ stopDemo(); pressStart(); return; }
@@ -1768,7 +2105,7 @@ window.addEventListener('keydown', e=>{
     else if(k==='n' || e.code==='Digit0') { stopDemo(); selectGear('N'); }
   } else if('prnd'.includes(k) && k.length===1){ stopDemo(); selectAuto(k.toUpperCase()); }
 });
-window.addEventListener('keyup', e=>{ const p=KEYMAP[e.key.toLowerCase()]; if(p){ held[p]=false; anim[p]={to:0, rate: p==='clutch'?1.1:3}; } });
+window.addEventListener('keyup', e=>{ const p=KEYMAP[e.key.toLowerCase()]; if(STREET.on && STREET.gearbox==='simple' && (e.key==='ArrowUp' || e.key==='ArrowDown')) return; if(p){ held[p]=false; anim[p]={to:0, rate: p==='clutch'?1.1:3}; } });
 window.addEventListener('blur', ()=>{ for(const p in held) if(held[p]){ held[p]=false; anim[p]={to:0, rate:3}; } });
 
 let nudgeClutchT = 0;
@@ -1778,16 +2115,11 @@ function pressStart(){
   if(S.cranking>0) return;
   if(S.mode==='ev'){
     if(!(S.sel==='P'||S.sel==='N')){ say(tr('Mets le levier sur P pour allumer la voiture.','Put the lever in P to switch the car on.'),4); return; }
-    gameOnStart();
-    if(FAULT.active && FAULT.kind==='ev12v'){ say(tr('Rien ne s\'allume… La petite batterie 12 V est vide : c\'est elle qui réveille l\'ordinateur de la voiture.','Nothing lights up… The small 12 V battery is flat: it\'s the one that wakes up the car\'s computer.'),5); return; }
     if(S.brake<0.3){ say(tr('Pour allumer une voiture électrique, garde le pied sur le frein en appuyant sur Démarrer.','To switch on an electric car, keep your foot on the brake while you press Start.'),4.5); return; }
     S.engineOn=true; S.runTime=0; say(tr('READY ! La voiture est prête… et complètement silencieuse.','READY! The car is ready… and completely silent.'),4); followAction('engine',3); return;
   }
   if(S.mode==='manual' && S.gear!=='N' && S.clutch < 0.6){ say(tr('Enfonce d\'abord la pédale d\'embrayage à fond (ou mets le point mort). Sinon la voiture ferait un bond au démarrage !','First press the clutch pedal all the way down (or select neutral). Otherwise the car would jump forward when it starts!'),5); nudgeClutchT=4; return; }
   if(S.mode==='auto' && !(S.sel==='P' || S.sel==='N')){ say(tr('Une boîte automatique ne démarre que sur P ou N. Mets le levier sur P.','An automatic only starts in P or N. Put the lever in P.'),4.5); return; }
-  gameOnStart();
-  if(FAULT.active && FAULT.kind==='battery'){ say(tr('Clic… La batterie est vide : elle n\'a plus assez d\'électricité pour faire tourner le démarreur.','Click… The battery is flat: it no longer has enough electricity to turn the starter motor.'),4); return; }
-  if(FAULT.active && FAULT.kind==='starter'){ say(tr('Rien ne tourne… Les phares marchent, donc ce n\'est pas la batterie.','Nothing turns… The headlights work, so it\'s not the battery.'),4); return; }
   S.cranking = 1.1; followAction('engine', 3);
 }
 $('startBtn').onclick = ()=>{ stopDemo(); pressStart(); };
@@ -1810,7 +2142,6 @@ function updateLever(dt){
 function selectGear(g){
   if(g===(LEV.pending||S.gear)) return;
   if(g!=='N' && S.engineOn && S.clutch < 0.85){ say(tr('Crrrrr ! Ça craque : les pignons tournent à des vitesses différentes. Enfonce l\'embrayage à fond, puis passe la vitesse.','Crrrrr! It grinds: the gears are spinning at different speeds. Press the clutch all the way down, then change gear.'),4.5); nudgeClutchT=4; flashEl($('shifter')); return; }
-  if(g==='3' && FAULT.kind==='synchro'){ gameTrigger(); if(FAULT.active){ say(tr('Crrrrr ! Impossible de passer la 3e, même avec l\'embrayage enfoncé.','Crrrrr! You can\'t get into 3rd, even with the clutch down.'),4); flashEl($('shifter')); return; } }
   if(g==='R' && S.v > 0.8){ say(tr('Arrête la voiture avant de passer la marche arrière.','Stop the car before you select reverse.'),3.5); return; }
   if(g!=='N' && g!=='R' && S.v < -0.8){ say(tr('Arrête la voiture avant de passer une vitesse pour avancer.','Stop the car before you select a forward gear.'),3.5); return; }
   if(S.gear!=='N') S.win = (S.v/WH.r)*RATIO_M[S.gear]*FD;
@@ -1825,7 +2156,7 @@ function selectAuto(s){
   if(s==='D' && S.v < -0.8){ say(tr('Arrête la voiture avant de passer en D.','Stop the car before you select D.'),3.5); return; }
   if(s==='D' && S.sel!=='D') S.agear = 1;
   S.sel = s; S.shiftT = 0.6;
-  document.querySelectorAll('#selector .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.s===s));
+  document.querySelectorAll('#selector .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.s===s)); 
   followAction('gearbox', 3.5);
 }
 function flashEl(s){ if(s.animate) s.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}],{duration:260}); }
@@ -1837,13 +2168,13 @@ const handBtn = $('handBtn');
 
 function setMode(m){
   if(m===S.mode) return;
-  stopDemo(); stopTour(); gameQuit();
+  stopDemo(); stopTour();
   Object.assign(S,{mode:m, engineOn:false, cranking:0, we:0, win:0, v:0, clutch:0, gas:0, brake:0, gear:'N', sel:'P', agear:1, lock:false});
   for(const k in anim) anim[k]=null; resetLever();
   document.querySelectorAll('#modeSeg button').forEach(b=>b.classList.toggle('act', b.dataset.m===m));
   const ev = m==='ev'; S.evSOC = 0.8;
   $('manualBox').hidden = m!=='manual'; $('autoBox').hidden = m==='manual';
-  $('elemsWrap').hidden = ev; $('evSelNote').hidden = !ev; $('handRow').hidden = ev; $('evRead').hidden = !ev; $('wlReady').hidden = !ev;
+  $('evSelNote').hidden = !ev; $('handRow').hidden = ev; $('evRead').hidden = !ev; $('wlReady').hidden = !ev;
   $('vTiming').hidden = ev; $('vClutch').hidden = ev; $('vPack').hidden = !ev; $('pEvCat').hidden = !ev;
   ['casing','internals','clutch'].forEach(k=>{ document.querySelector(`.part[data-p="${k}"]`).hidden = ev; });
   setTach(); renderSpec();
@@ -1858,7 +2189,7 @@ function setMode(m){
 document.querySelectorAll('#modeSeg button').forEach(b=> b.onclick = ()=> setMode(b.dataset.m));
 document.querySelectorAll('#slow button').forEach(b=> b.onclick = ()=>{ S.slow=+b.dataset.s; document.querySelectorAll('#slow button').forEach(x=>x.classList.toggle('act',x===b)); });
 document.querySelectorAll('#bodySeg button').forEach(b=> b.onclick = ()=>{ bodyMode=b.dataset.b; document.querySelectorAll('#bodySeg button').forEach(x=>x.classList.toggle('act',x===b)); applyBodyMode(); });
-document.querySelectorAll('#swatches .sw').forEach(b=> b.onclick = ()=>{ BODY.paint.color.set('#'+b.dataset.c); document.querySelectorAll('#swatches .sw').forEach(x=>x.classList.toggle('act',x===b)); });
+document.querySelectorAll('#swatches .sw').forEach(b=> b.onclick = ()=>{ BODY.paint.color.set('#'+b.dataset.c); applyBodyMode(); document.querySelectorAll('#swatches .sw').forEach(x=>x.classList.toggle('act',x===b)); });
 $('optTags').onchange = e=>{ tagsEl.hidden = !e.target.checked; };
 $('optSound').onchange = e=>{ if(e.target.checked) ensureAudio(); };
 
@@ -1868,7 +2199,7 @@ $('optSound').onchange = e=>{ if(e.target.checked) ensureAudio(); };
    SIMULATION
    ====================================================================== */
 function carStep(v, Fd, h){
-  let brakeF = 9500*S.brake; if(FAULT.active && FAULT.kind==='pads') brakeF *= 0.18;
+  let brakeF = 9500*S.brake;
   if(S.mode==='ev') brakeF *= 0.6;
   if((S.mode==='auto'||S.mode==='ev') && S.sel==='P') brakeF = 30000;
   const Fres = 160 + brakeF, drag = 0.43*v*Math.abs(v);
@@ -1877,13 +2208,10 @@ function carStep(v, Fd, h){
   if(Math.sign(nv)!==Math.sign(v) && Math.abs(Fd) < Fres) return 0;
   return nv;
 }
-const misfire = () => FAULT.active && FAULT.kind==='spark';
-const beltBroken = () => FAULT.active && FAULT.kind==='belt';
-const cvBroken = () => FAULT.active && FAULT.kind==='cv';
 let outFree = 0;   // vitesse de l'arbre de sortie quand un cardan est cassé
 function engineTorque(rpm){
   let Te = 0;
-  if(S.engineOn){ if(rpm < 6600) Te = S.gas*torqueCurve(rpm)*(misfire()?0.7:1); Te += clamp(10 + 3*(W_IDLE - S.we), 0, 80); }
+  if(S.engineOn){ if(rpm < 6600) Te = S.gas*torqueCurve(rpm); Te += clamp(10 + 3*(W_IDLE - S.we), 0, 80); }
   if(S.cranking>0) Te += 55*Math.max(0, 1 - S.we/30);
   if(S.hand && !S.engineOn && S.cranking<=0) Te += 40*Math.max(0, 1 - S.we/6.3);
   return Te;
@@ -1892,15 +2220,14 @@ function simulate(dt){
   for(const k in anim){ const a=anim[k]; if(!a) continue; const d=a.to-S[k], st=a.rate*dt; if(Math.abs(d)<=st){ S[k]=a.to; anim[k]=null; } else S[k]+=Math.sign(d)*st; }
   if(S.mode==='auto') S.clutch = 0;
   if(S.cranking>0){ S.cranking -= dt; if(S.cranking<=0){ S.cranking=0;
-      if(beltBroken()) say(tr('Le démarreur fait tourner le moteur… mais il ne démarre pas. Regarde bien ce qui tourne et ce qui ne tourne pas.','The starter turns the engine… but it doesn\'t start. Look closely at what turns and what doesn\'t.'),5);
-      else { S.engineOn=true; S.runTime=0; } } }
+      S.engineOn=true; S.runTime=0; } }
   if(S.engineOn) S.runTime += dt;
   const n = Math.max(20, Math.ceil(dt/0.0004)), h = dt/n; let slipAcc = 0;
   const ratio = ratioNow();
   if(S.mode==='ev'){ simEV(n,h,dt); }
   else if(S.mode==='manual'){
-    const e = engagement(), C = (FAULT.active && FAULT.kind==='clutch' ? 75 : 330)*Math.pow(e,1.6);
-    const free = !ratio || cvBroken();
+    const e = engagement(), C = 330*Math.pow(e,1.6);
+    const free = !ratio;
     for(let i=0;i<n;i++){
       const Te = engineTorque(S.we*RPM);
       const Tf = S.we > 0.5 ? 8 + 0.03*S.we : S.we*16;
@@ -1912,12 +2239,11 @@ function simulate(dt){
       slipAcc += Math.abs(S.we - S.win);
     }
     S.slipLast = slipAcc/n;
-    outFree = cvBroken() && ratio ? S.win/ratio : (S.v/WH.r)*FD;
+    outFree = (S.v/WH.r)*FD;
     if(S.engineOn && S.runTime > 0.6 && S.we*RPM < 350){ S.engineOn=false; say(ratio && e>0 ? tr('Le moteur a calé ! L\'embrayage est remonté trop vite. Enfonce l\'embrayage, redémarre, puis relâche-le doucement avec un peu d\'accélérateur.','The engine stalled! The clutch came up too fast. Press the clutch, restart, then let it up gently with a bit of accelerator.') : tr('Le moteur a calé.','The engine stalled.'), 6); }
   } else {
     autoShiftLogic(dt);
-    const drive = (S.sel==='D' || S.sel==='R') && !cvBroken();
-    const tcDead = FAULT.active && FAULT.kind==='converter';
+    const drive = S.sel==='D' || S.sel==='R';
     for(let i=0;i<n;i++){
       const Te = engineTorque(S.we*RPM);
       const Tf = S.we > 0.5 ? 8 + 0.03*S.we : S.we*16;
@@ -1925,25 +2251,23 @@ function simulate(dt){
       let Tp, Tt;
       if(S.lock){ Tp = Tt = clamp(KC*(S.we - wt), -420, 420); }
       else { Tp = KTC*(S.we*Math.abs(S.we) - wt*Math.abs(wt)); const SR = S.we>1 ? wt/S.we : 1; S.tcSR = SR; Tt = Tp*(Tp>0 && SR<0.85 ? 2 - SR/0.85 : 1); }
-      if(tcDead){ Tp *= 0.35; Tt = 0; }
       S.we = Math.max(0, S.we + (Te - Tf - Tp)/IE*h);
       if(drive){ S.v = carStep(S.v, Tt*ratio*FD/WH.r, h); S.win = (S.v/WH.r)*ratio*FD; }
       else { const Tfi = Math.abs(S.win)>0.5 ? 0.6*Math.sign(S.win)+0.012*S.win : S.win*0.8; S.win += (Tt - Tfi)/IIN*h; S.v = carStep(S.v, 0, h); }
     }
-    outFree = cvBroken() && ratio ? S.win/ratio : (S.v/WH.r)*FD;
+    outFree = (S.v/WH.r)*FD;
     if(S.engineOn && S.runTime > 0.6 && S.we*RPM < 300){ S.engineOn=false; say(tr('Le moteur s\'est arrêté.','The engine stopped.'),4); }
   }
-  if(beltBroken() && S.engineOn){ S.engineOn=false; }
   if(S.msgT>0) S.msgT -= dt;
   if(nudgeClutchT>0) nudgeClutchT -= dt;
 }
 function simEV(n,h,dt){
-  const dir = S.sel==='D'?1:S.sel==='R'?-1:0, dead = FAULT.active && FAULT.kind==='inverter';
+  const dir = S.sel==='D'?1:S.sel==='R'?-1:0;
   let Psum=0, T=0;
   for(let i=0;i<n;i++){
     const wm = (S.v/WH.r)*EV_TOTAL, wa = Math.abs(wm);
     T = 0;
-    if(S.engineOn && dir && !dead && !cvBroken()){
+    if(S.engineOn && dir){
       const Tav = Math.min(EV.Tmax, EV.Pmax/Math.max(wa,1)) * (wa*RPM > EV.rpmMax ? 0 : 1);
       if(S.gas>0.02) T = dir*S.gas*Tav;
       else if(Math.abs(S.v)<1.2){ if(S.brake<0.1) T = dir*30; }
@@ -1954,8 +2278,7 @@ function simEV(n,h,dt){
   }
   S.evT = T; S.evP = Psum/n;
   S.evSOC = clamp(S.evSOC - (S.evP>0 ? S.evP/0.9 : S.evP*0.7)*dt/(EV.kWh*3.6e6)*40, 0, 1);   // ×40 pour que ça se voie
-  if(cvBroken() && S.engineOn && dir){ S.win += ((dir*S.gas*900) - S.win)*Math.min(1,dt*3); S.we = S.win; outFree = S.win/EV_R1; }
-  else { S.we = (S.v/WH.r)*EV_TOTAL; S.win = S.we; outFree = (S.v/WH.r)*FD; }
+  S.we = (S.v/WH.r)*EV_TOTAL; S.win = S.we; outFree = (S.v/WH.r)*FD;
 }
 let lastAutoShift = 0;
 function autoShiftLogic(dt){
@@ -1976,150 +2299,246 @@ function autoShiftLogic(dt){
 function onAutoShift(){ const now=performance.now(); if(now-lastAutoShift>6000) followAction('gearbox',3); lastAutoShift=now;
   say(tr(`La boîte passe la ${S.agear}${S.agear===1?'re':'e'} toute seule : ${SHIFT_EL[S.agear].join(' et ')} se serrent.`, `The gearbox shifts into ${S.agear}${['','st','nd','rd'][S.agear]||'th'} gear by itself: ${SHIFT_EL[S.agear].join(' and ')} apply.`), 3); }
 
-/* ===== 07-game-narration-animation.js ===== */
-
+/* ===== 06b-street-drive.js ===== */
 /* ======================================================================
-   JEU : GARAGE
+   CONDUIRE DANS LA RUE : on conduit soi-même dans la rue des vidéos « se garer ».
+   Même simulation (moteur, embrayage, boîte), + volant, vues, rétroviseurs,
+   radars de recul, chocs, et une place à atteindre.
    ====================================================================== */
-const FAULTS = [
-  {k:'spark', modes:['manual','auto'], parts:['spark'], name:tr('Bougie d\'allumage morte','Dead spark plug'),
-   trig:()=> S.engineOn && S.runTime>4,
-   sym:tr('Le moteur tousse et tremble, il a moins de force. Le voyant MOTEUR s\'est allumé.','The engine coughs and shakes, and it has less power. The ENGINE warning light is on.'),
-   hints:[tr('Le problème est à l\'intérieur du moteur : enlève le « Carter moteur » dans la barre Afficher.','The problem is inside the engine: turn off "Engine casing" in the Show bar.'),tr('Regarde les petites flammes orange dans les cylindres : il en manque une. Qu\'est-ce qui fait l\'étincelle ?','Look at the small orange flames in the cylinders: one is missing. What makes the spark?')],
-   fix:tr('Le moteur tourne rond à nouveau.','The engine runs smoothly again.')},
-  {k:'belt', modes:['manual','auto'], parts:['belt'], name:tr('Courroie de distribution cassée','Broken timing belt'),
-   trig:()=> S.engineOn && Math.abs(S.v)*3.6>30,
-   sym:tr('Le moteur s\'est arrêté net en roulant et ne veut plus redémarrer : le démarreur tourne, mais le moteur ne part pas.','The engine stopped dead while driving and won\'t restart: the starter turns, but the engine doesn\'t start.'),
-   hints:[tr('Appuie sur Démarrer et regarde la vue « Distribution » : est-ce que les arbres à cames tournent ?','Press Start and look at the "Timing" view: are the camshafts turning?'),tr('Quelque chose relie le vilebrequin aux arbres à cames, et ce n\'est plus là…','Something links the crankshaft to the camshafts, and it\'s not there any more…')],
-   fix:tr('Les soupapes s\'ouvrent à nouveau au bon moment.','The valves open at the right moment again.')},
-  {k:'battery', modes:['manual','auto'], parts:['battery'], name:tr('Batterie vide','Flat battery'), atStart:true,
-   sym:tr('Quand tu tournes la clé : juste un petit « clic ». Le voyant BATTERIE est allumé et les phares sont tout faibles.','When you turn the key: just a small "click". The BATTERY warning light is on and the headlights are very dim.'),
-   hints:[tr('Qu\'est-ce qui donne l\'électricité au démarreur et aux phares ?','What gives electricity to the starter and the headlights?'),tr('Vue « Moteur » : cherche une boîte noire avec une borne rouge, au-dessus de la boîte de vitesses.','"Engine" view: look for a black box with a red terminal, above the gearbox.')],
-   fix:tr('La batterie est chargée.','The battery is charged.')},
-  {k:'starter', modes:['manual','auto'], parts:['starter'], name:tr('Démarreur en panne','Broken starter'), atStart:true,
-   sym:tr('Quand tu tournes la clé, rien ne tourne. Pourtant les phares s\'allument bien fort : la batterie est bonne.','When you turn the key, nothing turns. Yet the headlights are nice and bright: the battery is fine.'),
-   hints:[tr('Quelle pièce fait tourner le moteur au démarrage ?','Which part turns the engine when you start it?'),tr('Regarde près du volant moteur, entre le moteur et la boîte (vue « Embrayage »).','Look near the flywheel, between the engine and the gearbox ("Clutch" view).')],
-   fix:tr('Le démarreur lance le moteur.','The starter cranks the engine.')},
-  {k:'clutch', modes:['manual'], parts:['disc'], name:tr('Disque d\'embrayage usé','Worn clutch disc'),
-   trig:()=> S.engineOn && S.gear!=='N' && S.gear!=='1' && S.gas>0.35 && engagement()>0.95 && S.slipLast>40,
-   sym:tr('Quand tu accélères, le moteur monte dans les tours mais la voiture n\'accélère presque pas. Ça sent le brûlé !','When you accelerate, the engine revs up but the car barely speeds up. It smells burnt!'),
-   hints:[tr('Le moteur va bien, mais sa force n\'arrive pas jusqu\'à la boîte.','The engine is fine, but its force doesn\'t reach the gearbox.'),tr('Vue « Embrayage », accélère en 3e et regarde : le disque tourne moins vite que le volant moteur…','"Clutch" view: accelerate in 3rd and watch: the disc turns slower than the flywheel…')],
-   fix:tr('L\'embrayage ne patine plus.','The clutch doesn\'t slip any more.')},
-  {k:'pads', parts:['caliper'], name:tr('Plaquettes de frein usées','Worn brake pads'),
-   trig:()=> Math.abs(S.v)*3.6>25 && S.brake>0.3,
-   sym:tr('Tu appuies sur le frein mais la voiture ralentit à peine ! Le voyant FREINS est allumé.','You press the brake but the car barely slows down! The BRAKES warning light is on.'),
-   hints:[tr('Va voir derrière une roue : vue « Roue et frein ».','Go and look behind a wheel: "Wheel and brake" view.'),tr('Ce qui frotte sur le disque est tout usé.','The thing that rubs on the disc is all worn out.')],
-   fix:tr('Les freins mordent à nouveau.','The brakes bite again.')},
-  {k:'cv', parts:['cv'], name:tr('Cardan cassé','Broken driveshaft'),
-   trig:()=> S.engineOn && ratioNow()!==0 && engagement()>0.9 && Math.abs(S.v)*3.6>15,
-   sym:tr('Clac ! La voiture n\'avance plus : le moteur tourne, la vitesse est passée, mais les roues ne sont plus entraînées.','Clunk! The car doesn\'t move any more: the engine runs, a gear is in, but the wheels are no longer driven.'),
-   hints:[tr('La force arrive jusqu\'au différentiel… Regarde la vue « Dessous » en accélérant.','The force reaches the differential… Look at the "Underneath" view while you accelerate.'),tr('Un des deux arbres qui vont aux roues tourne tout seul, très vite, et son soufflet est déchiré.','One of the two shafts going to the wheels spins on its own, very fast, and its CV boot is torn.')],
-   fix:tr('Les deux roues sont à nouveau entraînées.','Both wheels are driven again.')},
-  {k:'converter', modes:['auto'], parts:['tcturbine','tcimpeller','tcstator','tclockup','tcoil'], name:tr('Convertisseur de couple en panne','Broken torque converter'),
-   trig:()=> S.engineOn && S.sel==='D' && S.gas>0.15,
-   sym:tr('En D, le moteur monte dans les tours mais la voiture ne bouge pas.','In D, the engine revs up but the car doesn\'t move.'),
-   hints:[tr('Le moteur va bien. Qu\'est-ce qui remplace l\'embrayage dans une boîte automatique ?','The engine is fine. What replaces the clutch in an automatic gearbox?'),tr('Vue « Convertisseur » : la turbine tourne-t-elle quand la pompe tourne ?','"Converter" view: does the turbine turn when the pump turns?')],
-   fix:tr('La turbine est à nouveau entraînée par l\'huile.','The oil drives the turbine again.')},
-  {k:'synchro', modes:['manual'], parts:['synchro'], name:tr('Synchro de 3e cassé','Broken 3rd-gear synchro'), triggerOnGear3:true,
-   sym:tr('Impossible de passer la 3e : ça craque à chaque fois, même avec l\'embrayage enfoncé.','You can\'t get 3rd: it grinds every time, even with the clutch pressed down.'),
-   hints:[tr('Le problème est dans la boîte de vitesses (vue « Boîte »).','The problem is in the gearbox ("Gearbox" view).'),tr('Qu\'est-ce qui glisse pour verrouiller un pignon sur l\'arbre ? Un des anneaux est abîmé.','What slides along to lock a gear onto the shaft? One of the rings is damaged.')],
-   fix:tr('La 3e passe sans craquer.','3rd goes in without grinding.')},
-];
-FAULTS.push(
-  {k:'ev12v', modes:['ev'], parts:['battery'], name:tr('Batterie 12 V vide','Flat 12 V battery'), atStart:true,
-   sym:tr('Pied sur le frein, tu appuies sur Démarrer… rien ne s\'allume, pas de READY. Le voyant BATTERIE est allumé.','Foot on the brake, you press Start… nothing lights up, no READY. The BATTERY warning light is on.'),
-   hints:[tr('Une voiture électrique a aussi une petite batterie 12 V, comme une voiture à essence.','An electric car also has a small 12 V battery, like a petrol car.'),tr('Vue « Moteur » : cherche une boîte noire avec une borne rouge, à l\'avant.','"Engine" view: look for a black box with a red terminal, at the front.')],
-   fix:tr('La voiture se réveille à nouveau.','The car wakes up again.')},
-  {k:'inverter', modes:['ev'], parts:['inverter'], name:tr('Onduleur en panne','Broken inverter'),
-   trig:()=> S.engineOn && S.sel==='D' && S.gas>0.15,
-   sym:tr('READY est allumé, tu accélères… mais la voiture ne bouge pas, et les bobines du moteur restent éteintes.','READY is on, you accelerate… but the car doesn\'t move, and the motor\'s coils stay dark.'),
-   hints:[tr('La batterie est chargée. Le courant arrive-t-il jusqu\'au moteur ?','The battery is charged. Does the current reach the motor?'),tr('Ce qui transforme le courant de la batterie pour le moteur ne marche plus (au-dessus du moteur).','The thing that converts the battery\'s current for the motor has stopped working (above the motor).')],
-   fix:tr('Le courant arrive à nouveau dans les bobines.','Current reaches the coils again.')});
-const GAME = { state:'off', f:null, t0:0, tFault:0, errors:0, hints:0, verify:null, lastHintT:0 };
-function missionText(){ const f=GAME.f; if(f.k==='synchro') return tr('Démarre, puis roule en passant la 1re, la 2e et la 3e.','Start, then drive through 1st, 2nd and 3rd.');
-  if(f.k==='pads') return tr('Démarre, roule jusqu\'à 50 km/h puis freine pour t\'arrêter.','Start, drive up to 50 km/h, then brake to a stop.');
-  if(S.mode==='ev') return tr('Allume la voiture (pied sur le frein), passe en D et roule jusqu\'à 60 km/h.','Switch the car on (foot on the brake), select D and drive up to 60 km/h.');
-  if(S.mode==='auto') return tr('Démarre, passe en D et roule jusqu\'à 60 km/h.','Start, select D and drive up to 60 km/h.');
-  return tr('Démarre et roule jusqu\'à 60 km/h en passant les vitesses.','Start and drive up to 60 km/h, changing gears.'); }
-function gameStart(){
-  stopDemo(); stopTour(); if(iso) unIsolate();
-  const pool = FAULTS.filter(f=>!f.modes || f.modes.includes(S.mode));
-  const f = pool[Math.floor(Math.random()*pool.length)];
-  Object.assign(S,{engineOn:false, cranking:0, we:0, win:0, v:0, clutch:0, gas:0, brake:0, gear:'N', sel:'P', agear:1, lock:false}); for(const k in anim) anim[k]=null; resetLever();
-  document.querySelectorAll('#shifter .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.g==='N'));
-  document.querySelectorAll('#selector .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.s==='P'));
-  Object.assign(GAME,{state:'drive', f, t0:performance.now(), errors:0, hints:0, verify:null, fastSeen:false});
-  Object.assign(FAULT,{kind:f.k, active:false, cyl:1+Math.floor(Math.random()*3)});
-  resetFaultVisuals(); renderGarage(); $('garageBtn').textContent=tr('✖ Quitter le jeu','✖ Quit the game');
-}
-function gameQuit(){ GAME.state='off'; FAULT.kind=null; FAULT.active=false; resetFaultVisuals(); refreshVis(); $('garageBox').hidden=true; $('garageBtn').textContent=tr('🔧 Jeu : Garage','🔧 Game: Garage'); $('infoRepair').hidden=true; }
-$('garageBtn').onclick = ()=>{ GAME.state==='off' || GAME.state==='done' ? gameStart() : gameQuit(); };
-function gameOnStart(){ if(GAME.state==='drive' && GAME.f.atStart) gameTrigger(); }
-function gameTrigger(){
-  if(GAME.state!=='drive' || FAULT.active) return;
-  FAULT.active = true; GAME.state='fault'; GAME.tFault=performance.now(); GAME.lastHintT=performance.now();
-  applyFaultVisuals(); refreshVis(); renderGarage();
-  if(FAULT.kind==='cv'||FAULT.kind==='belt') say(FAULT.kind==='cv'?tr('CLAC !','CLUNK!'):tr('Le moteur s\'est arrêté net !','The engine stopped dead!'),3);
-}
-function gameRepair(key){
-  if(GAME.state!=='fault') return;
-  if(GAME.f.parts.includes(key)){
-    FAULT.active=false; resetFaultVisuals(); refreshVis();
-    GAME.state='verify'; renderGarage(); say(tr('Réparé ! ','Fixed! ')+GAME.f.fix+tr(' Vérifie maintenant que tout marche.',' Now check that everything works.'),5);
-    $('infoRepair').hidden=true; $('info').hidden=true;
-  } else { GAME.errors++; say(tr(`${INFO[key]?INFO[key].t:'Cette pièce'} : en bon état. Ce n\'est pas elle ! (+1 erreur)`, `${INFO[key]?INFO[key].t:'This part'}: in good shape. It's not this one! (+1 mistake)`),4); renderGarage(); }
-}
-$('infoRepair').onclick = ()=>{ if(infoKey) gameRepair(infoKey); };
-const gameGoal = ()=>{ const f=GAME.f, kmh=Math.abs(S.v)*3.6;
-  if(f.k==='battery'||f.k==='starter'||f.k==='ev12v') return S.engineOn;
-  if(f.k==='synchro') return S.gear==='3' && engagement()>0.9 && kmh>15;
-  if(f.k==='pads') return GAME.fastSeen && kmh<1 || (kmh>30 && (GAME.fastSeen=true) && false);
-  return S.engineOn && kmh>50; };
-function gameTick(){
-  if(GAME.state==='drive' && GAME.f.trig && GAME.f.trig()) gameTrigger();
-  if(GAME.state==='verify'){
-    if(GAME.f.k==='pads' && Math.abs(S.v)*3.6>30) GAME.fastSeen=true;
-    if(gameGoal()){ GAME.state='done'; renderGarage(); }
+const STREET = { on:false, spot:'par', gearbox:'simple', view:'behind', slow:0.05, steerKey:0, keys:{}, trail:[], hit:0, done:false };
+const CAR_HX = 2.11, CAR_CX = 0.03, CAR_HZ = 0.88;            // la voiture vue de dessus (centre à x = +3 cm)
+const planEnd = P => { const old = PARK.plan; PARK.plan = P; const s = parkState(P.steps.length, 0); PARK.plan = old; return s; };
+const STREET_SPOTS = {
+  par: { start:{x:PLAN_PAR.x - 7, z:0, th:0}, plan:PLAN_PAR },
+  bay: { start:{x:PLAN_PERP.x - 9, z:PLAN_PERP.z, th:0}, plan:PLAN_PERP },
+};
+const rearAxle = () => STREET.pose;                            // pose : milieu de l'essieu arrière {x, z, th}
+const originOf = p => ({x:p.x - WH.xR*Math.cos(p.th), z:p.z - WH.xR*Math.sin(p.th), th:p.th});
+
+// Rectangles orientés qui se chevauchent ? (axes séparateurs)
+function obbHit(a, b){
+  const axes = [a.th, a.th + Math.PI/2, b.th, b.th + Math.PI/2];
+  for(const t of axes){
+    const ux = Math.cos(t), uz = Math.sin(t);
+    const r = o => o.hx*Math.abs(Math.cos(o.th)*ux + Math.sin(o.th)*uz) + o.hz*Math.abs(-Math.sin(o.th)*ux + Math.cos(o.th)*uz);
+    if(Math.abs((b.x-a.x)*ux + (b.z-a.z)*uz) > r(a) + r(b)) return false;
   }
-  if(GAME.state==='fault' && GAME.hints < GAME.f.hints.length && performance.now()-GAME.lastHintT > 25000 && !$('hintBtn')?.classList.contains('nudge')) $('hintBtn')?.classList.add('nudge');
-  if(GAME.state==='drive' || GAME.state==='fault' || GAME.state==='verify'){ const el=$('gTime'); if(el) el.textContent = fmtT((performance.now()-GAME.t0)/1000); }
+  return true;
 }
-const fmtT = s => `${Math.floor(s/60)} min ${String(Math.floor(s%60)).padStart(2,'0')} s`;
-function renderGarage(){
-  const box=$('garageBox'); box.hidden=false; const f=GAME.f;
-  const score = `<div class="score"><span>⏱ <span id="gTime">${fmtT((performance.now()-GAME.t0)/1000)}</span></span><span>❌ ${GAME.errors} ${tr('erreur','mistake')}${(IS_EN?GAME.errors!==1:GAME.errors>1)?'s':''}</span><span>💡 ${GAME.hints} ${tr('indice','hint')}${(IS_EN?GAME.hints!==1:GAME.hints>1)?'s':''}</span></div>`;
-  if(GAME.state==='drive') box.innerHTML = `<h3>🔧 Mission</h3><p>${missionText()}</p><p class="note">${tr('Une panne va arriver… À toi de trouver la pièce en cause.','A fault is coming… Your job is to find the part to blame.')}</p>${score}`;
-  else if(GAME.state==='fault'){
-    const hs = f.hints.slice(0,GAME.hints).map(h=>`<p>💡 ${h}</p>`).join('');
-    box.innerHTML = `<h3>${tr('⚠️ Panne !','⚠️ Breakdown!')}</h3><p><b>${f.sym}</b></p><p>${tr('Inspecte la voiture : touche la pièce que tu soupçonnes, puis appuie sur « Réparer cette pièce ».','Inspect the car: tap the part you suspect, then press "Repair this part".')}</p>${hs}
-      <div class="row">${GAME.hints<f.hints.length?'<button class="btn alt" id="hintBtn">'+tr('💡 Indice','💡 Hint')+'</button>':''}</div>${score}`;
-    const hb=$('hintBtn'); if(hb) hb.onclick=()=>{ GAME.hints++; GAME.lastHintT=performance.now(); renderGarage(); };
+const carBox = o => ({x:o.x + CAR_CX*Math.cos(o.th), z:o.z + CAR_CX*Math.sin(o.th), hx:CAR_HX, hz:CAR_HZ, th:o.th});
+
+// Radars : des points tous les 15 cm sur le contour des obstacles, vus depuis la voiture
+const SENS_PTS = [];
+PARK_OBST.filter(o=>!o.wall).forEach(o=>{
+  const c = Math.cos(o.th), s = Math.sin(o.th);
+  [[-1,-1,1,-1],[1,-1,1,1],[1,1,-1,1],[-1,1,-1,-1]].forEach(([a,b,e,f])=>{
+    const n = Math.max(1, Math.ceil(Math.hypot((e-a)*o.hx, (f-b)*o.hz)/0.15));
+    for(let i=0;i<n;i++){ const lx = (a + (e-a)*i/n)*o.hx, lz = (b + (f-b)*i/n)*o.hz; SENS_PTS.push([o.x + lx*c - lz*s, o.z + lx*s + lz*c]); }
+  });
+});
+// Distance (m) entre le pare-chocs et l'obstacle le plus proche, derrière (back) ou devant
+function sensorDist(o, back){
+  const c = Math.cos(o.th), s = Math.sin(o.th); let best = Infinity;
+  for(const [px,pz] of SENS_PTS){
+    const dx = px - o.x, dz = pz - o.z; if(Math.abs(dx) > 5 || Math.abs(dz) > 5) continue;
+    const lx = dx*c + dz*s, lz = -dx*s + dz*c; if(Math.abs(lz) > 0.95) continue;
+    const d = back ? -2.08 - lx : lx - 2.14; if(d >= -0.05 && d < best) best = d;
   }
-  else if(GAME.state==='verify') box.innerHTML = tr(`<h3>✅ Réparé : ${f.name}</h3><p>Vérifie que tout marche : ${missionText().toLowerCase()}</p>${score}`, `<h3>✅ Fixed: ${f.name}</h3><p>Check that everything works: ${missionText().toLowerCase()}</p>${score}`);
-  else if(GAME.state==='done'){
-    const tt = (performance.now()-GAME.t0)/1000; const stars = GAME.errors===0 && GAME.hints===0 ? 3 : GAME.errors+GAME.hints<=2 ? 2 : 1;
-    box.innerHTML = `<h3>${tr('🏁 Voiture réparée !','🏁 Car fixed!')}</h3><div class="stars">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</div><p>${tr('La panne','The fault')}${tr(' : ',': ')}<b>${f.name}</b>.</p>
-      <div class="score"><span>⏱ ${fmtT(tt)}</span><span>❌ ${GAME.errors} ${tr('erreur','mistake')}${(IS_EN?GAME.errors!==1:GAME.errors>1)?'s':''}</span><span>💡 ${GAME.hints} ${tr('indice','hint')}${(IS_EN?GAME.hints!==1:GAME.hints>1)?'s':''}</span></div>
-      <div class="row"><button class="btn warn" id="againBtn">${tr('Nouvelle panne','New fault')}</button></div>`;
-    $('againBtn').onclick = gameStart; $('garageBtn').textContent=tr('🔧 Jeu : Garage','🔧 Game: Garage');
+  return Math.max(0, best);
+}
+let beepNext = 0;
+function sensorsTick(o){
+  const el = $('sensors'), rev = S.mode==='manual' ? S.gear==='R' : S.sel==='R';
+  const fwdSlow = !rev && Math.abs(S.v) < 3 && (S.mode==='manual' ? S.gear!=='N' : S.sel==='D');
+  const d = (rev || fwdSlow) ? sensorDist(o, rev) : Infinity;
+  if(d > 1.5){ el.hidden = true; return; }
+  el.hidden = false;
+  const lvl = d < 0.35 ? 3 : d < 0.8 ? 2 : 1, col = ['#3cc46a','#f0b429','#e0402a'][lvl-1];
+  [...el.querySelectorAll('b')].forEach((b,i)=>{ b.style.background = i < lvl ? col : ''; });
+  $('sensTxt').textContent = (rev ? '▼ ' : '▲ ') + Math.round(d*100) + ' cm';
+  if(!AC || !$('optSound').checked) return;
+  const t = AC.currentTime; if(t < beepNext) return;
+  const period = d < 0.3 ? 0.13 : 0.12 + (d - 0.3)/1.2*0.6, len = d < 0.3 ? 0.14 : 0.07;
+  const os = AC.createOscillator(), g = AC.createGain(); os.type = 'sine'; os.frequency.value = rev ? 2050 : 1650;
+  g.gain.setValueAtTime(0.08, t); g.gain.setValueAtTime(0, t + len); os.connect(g); g.connect(AC.destination); os.start(t); os.stop(t + len + 0.02);
+  beepNext = t + period;
+}
+
+// La place à atteindre, tracée en vert au sol
+const SPOT_LINE = ribbon(6, 0x3cc46a, 0.08, 0.007, 0.95);
+function drawSpot(){
+  const e = planEnd(STREET_SPOTS[STREET.spot].plan), c = Math.cos(e.th), s = Math.sin(e.th);
+  const P = [[2.5,1.05],[2.5,-1.05],[-2.45,-1.05],[-2.45,1.05],[2.5,1.05],[2.5,-1.05]].map(([lx,lz])=>[e.x + lx*c - lz*s, e.z + lx*s + lz*c]);
+  SPOT_LINE.set(P);
+}
+
+// Vues : coordonnées dans la voiture (x avant, y haut, z gauche), sauf « dessus » (monde) et « libre » (souris)
+const STREET_VIEWS = {
+  driver: {p:[-0.3,1.25,0.37], t:[8,0.85,0.37]},
+  behind: {p:[-6.8,2.7,0], t:[2,0.6,0]},
+  front:  {p:[7.2,1.9,0.4], t:[0,0.6,0]},
+};
+function streetCam(dt, o){
+  if(STREET.view==='free'){                                    // la souris tourne autour, la caméra suit la voiture
+    if(STREET.lastO){ const dx = o.x - STREET.lastO.x, dz = o.z - STREET.lastO.z; camera.position.x += dx; camera.position.z += dz; controls.target.x += dx; controls.target.z += dz; }
+    STREET.lastO = {x:o.x, z:o.z}; return;
   }
+  STREET.lastO = null;
+  const k = 1 - Math.exp(-dt*7);
+  let want, look;
+  if(STREET.view==='top'){ want = new THREE.Vector3(o.x, 22, o.z + 1.8); look = new THREE.Vector3(o.x, 0, o.z - 0.3); }
+  else { const v = STREET_VIEWS[STREET.view]; want = ROOT.localToWorld(new THREE.Vector3(...v.p)); look = ROOT.localToWorld(new THREE.Vector3(...v.t)); }
+  if(STREET.view==='driver'){ camera.position.copy(want); controls.target.copy(look); }   // assis dans la voiture : pas de retard
+  else { camera.position.lerp(want, k); controls.target.lerp(look, k); }
 }
-const FV = {};   // visuels de panne
-function applyFaultVisuals(){
-  const k = FAULT.kind;
-  if(k==='spark'){ const tip=R.plugs[FAULT.cyl].children[0]; FV.tip=[tip, tip.material]; tip.material = metal(0x111111,{roughness:1}); }
-  if(k==='clutch'){ const m=R.clutch.disc.children[0].material; FV.disc=[m, m.color.getHex()]; m.color.setHex(0x3a2412); }
-  if(k==='pads'){ FV.pads = []; R.calipers.forEach(c=>c.pads.forEach(p=>{ FV.pads.push(p); p.scale.z=0.3; })); }
-  if(k==='cv'){ const b=R.shafts[0].boot; FV.boot=[b, b.material]; b.material = plastic(0x8c1f1a); b.scale.set(1,0.5,1); }
-  if(k==='synchro'){ const c=R.man.coll['34'].g; FV.coll=[]; c.traverse(o=>{ if(o.isMesh){ FV.coll.push([o,o.material]); o.material = metal(0x8c3a2a,{roughness:0.8}); } }); }
+
+// Rétroviseurs (vue conducteur) : trois petites caméras rendues dans des textures, affichées en miroir par-dessus
+const MIRRORS = [
+  {p:[0.78,1.0,0.98],  t:[-6,0.8,2.2],  fov:28, w:300, h:150, x:-0.72, y:-0.55, sx:0.26},   // gauche
+  {p:[0.78,1.0,-0.98], t:[-6,0.8,-2.4], fov:28, w:300, h:150, x:0.72,  y:-0.55, sx:0.26},   // droit
+  {p:[0.55,1.27,0.02], t:[-6,1.0,0],    fov:34, w:420, h:120, x:0,     y:0.78,  sx:0.34},   // intérieur
+].map(m=>{
+  m.rt = new THREE.WebGLRenderTarget(m.w, m.h); m.cam = new THREE.PerspectiveCamera(m.fov, m.w/m.h, 0.05, 80);
+  return m;
+});
+const HUD = new THREE.Scene(), hudCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+MIRRORS.forEach(m=>{
+  const frame = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({color:0x15181b}));
+  const geo = new THREE.PlaneGeometry(1, 1), uv = geo.attributes.uv;
+  for(let i=0;i<uv.count;i++) uv.setX(i, 1 - uv.getX(i));                 // image retournée gauche-droite : un miroir
+  m.quad = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({map:m.rt.texture}));
+  m.frame = frame; HUD.add(frame); HUD.add(m.quad);
+});
+function mirrorsPre(){
+  if(!STREET.on || STREET.view!=='driver') return;
+  const asp = canvas.clientWidth / Math.max(1, canvas.clientHeight);
+  MIRRORS.forEach(m=>{
+    m.cam.position.copy(ROOT.localToWorld(new THREE.Vector3(...m.p))); m.cam.lookAt(ROOT.localToWorld(new THREE.Vector3(...m.t)));
+    renderer.setRenderTarget(m.rt); renderer.render(scene, m.cam);
+    const sy = m.sx * asp * m.h/m.w;
+    m.quad.position.set(m.x, m.y, 0); m.quad.scale.set(m.sx, sy, 1);
+    m.frame.position.set(m.x, m.y, -0.1); m.frame.scale.set(m.sx + 0.02, sy + 0.02*asp, 1);
+  });
+  renderer.setRenderTarget(null);
 }
-function resetFaultVisuals(){
-  if(FV.tip){ FV.tip[0].material=FV.tip[1]; FV.tip=null; }
-  if(FV.disc){ FV.disc[0].color.setHex(FV.disc[1]); FV.disc=null; }
-  if(FV.pads){ FV.pads.forEach(p=>p.scale.z=1); FV.pads=null; }
-  if(FV.boot){ FV.boot[0].material=FV.boot[1]; FV.boot[0].scale.set(1,1,1); FV.boot=null; }
-  if(FV.coll){ FV.coll.forEach(([o,m])=>o.material=m); FV.coll=null; }
+function mirrorsPost(){
+  if(!STREET.on || STREET.view!=='driver') return;
+  renderer.autoClear = false; renderer.clearDepth(); renderer.render(HUD, hudCam); renderer.autoClear = true;
 }
+
+function streetStart(spot){
+  if(tour) stopTour();
+  // Boîte « simple » : la boîte auto (ou l'électrique) en D, moteur tournant ; on ne s'occupe que d'avancer, reculer et braquer
+  const simple = STREET.gearbox==='simple';
+  if(simple && S.mode==='manual') setMode('auto'); else if(!simple && S.mode!=='manual') setMode('manual');
+  resetForTour();
+  if(simple){ Object.assign(S, {engineOn:true, runTime:5, we:W_IDLE, sel:'D', agear:1, brake:1}); STREET.keys = {}; }
+  document.querySelector('.panel').classList.toggle('street-simple', simple);
+  document.querySelectorAll('#streetGear button').forEach(b=>b.classList.toggle('act', b.dataset.g===STREET.gearbox));
+  const sp = STREET_SPOTS[spot]; STREET.spot = spot;
+  if(!STREET.on){ STREET.slow = S.slow; STREET.body = bodyMode; }
+  STREET.on = true; STREET.trail = []; STREET.done = false; STREET.hit = 0;
+  STREET.pose = {x:sp.start.x + WH.xR*Math.cos(sp.start.th), z:sp.start.z + WH.xR*Math.sin(sp.start.th), th:sp.start.th};
+  PARK.on = true; PARK.plan = sp.plan; PARK.delta = 0; S.slow = 1;
+  scene.fog.near = 30; scene.fog.far = 80;
+  bodyMode = 'wire'; applyBodyMode(); refreshVis(); drawSpot();
+  stage.classList.add('street-on'); $('streetBox').hidden = false; appModeUI('drive');
+  document.querySelectorAll('#streetSpot button').forEach(b=>b.classList.toggle('act', b.dataset.k===spot));
+  setSteer(0); streetPlace();
+  const go = simple ? tr('↑ pour avancer, ↓ pour reculer, Espace pour freiner, ← → pour tourner. ','↑ to go forward, ↓ to reverse, Space to brake, ← → to steer. ')
+                    : tr('Démarre et passe la 1re. ','Start the engine and select 1st. ');
+  say(go + (spot==='par' ? tr('Gare-toi en créneau dans la place verte, derrière la voiture grise.','Parallel park in the green space, behind the grey car.')
+                         : tr('Gare-toi en bataille dans la place verte.','Park nose-in in the green space.')), 8);
+}
+function streetStop(){
+  if(!STREET.on) return;
+  STREET.on = false; $('sensors').hidden = true; S.slow = STREET.slow; bodyMode = STREET.body; applyBodyMode();
+  stage.classList.remove('street-on'); $('streetBox').hidden = true; appModeUI('explore');
+  document.querySelector('.panel').classList.remove('street-simple');
+  controls.enabled = true; parkOff(); TRACKS.forEach(t=>t.set([])); SPOT_LINE.set([]); goView('car');
+}
+function streetPlace(){
+  const o = originOf(STREET.pose);
+  ROOT.position.set(o.x, 0, o.z); ROOT.rotation.y = -o.th; ROOT.updateMatrixWorld(true);
+  return o;
+}
+function setSteer(d){ PARK.delta = clamp(d, -PARK_DMAX, PARK_DMAX); $('steer').value = Math.round(-PARK.delta/PARK_DMAX*100); }
+
+// Boîte simple : ↑ avance (D), ↓ recule (R), Espace freine. Touche lâchée : la voiture freine jusqu'à l'arrêt et y reste.
+function streetPedals(){
+  const K = STREET.keys, v = S.v; let gas = 0, brake = 0, sel = S.sel;
+  if(K.brake) brake = 1;
+  else if(K.up){ if(v < -0.3) brake = 1; else { sel = 'D'; gas = 0.45; } }
+  else if(K.down){ if(v > 0.3) brake = 1; else { sel = 'R'; gas = 0.35; } }
+  else brake = Math.abs(v) < 0.4 ? 1 : 0.45;                          // touche lâchée : la voiture s'arrête en douceur
+  if(sel !== S.sel){ S.sel = sel; if(sel==='D') S.agear = 1; document.querySelectorAll('#selector .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.s===sel)); }
+  anim.gas = {to:gas, rate:2}; anim.brake = {to:brake, rate:brake ? 4 : 3};
+  streetDirUI();
+}
+function streetTick(dt){
+  if(!STREET.on) return;
+  if(STREET.gearbox==='simple') streetPedals();
+  // direction façon jeu de voiture : on tient la flèche pour tourner, on lâche et le volant revient au centre ;
+  // plus on va vite, moins les roues braquent (pleine butée seulement au pas)
+  const lim = PARK_DMAX/(1 + Math.pow(Math.abs(S.v)/7, 2));
+  if(STREET.steerKey) setSteer(clamp(PARK.delta + STREET.steerKey*2.2*dt, -lim, lim));
+  else if(!STREET.sliderHeld) setSteer(Math.sign(PARK.delta)*Math.max(0, Math.abs(PARK.delta) - 2.6*dt));
+  // avance la voiture de la distance parcourue, sauf si ça touche
+  const ds = S.v*dt, next = parkArc(STREET.pose, PARK.delta, ds), box = carBox(originOf(next));
+  const hit = PARK_OBST.find(ob=>obbHit(box, ob));
+  if(hit){
+    S.v = 0; S.win = 0; if(S.mode==='ev') S.we = 0;
+    if(STREET.hit <= 0) say(hit.kerb ? tr('Aïe, le trottoir ! Recule un peu et redresse.','Ouch, the kerb! Back up a little and straighten.')
+                       : hit.wall ? tr('Fin de la rue : fais demi-tour en marche arrière.','End of the street: back up.')
+                       : tr('Boum ! Tu as touché une voiture. Repars dans l\'autre sens.','Bump! You touched a car. Go the other way.'), 4);
+    STREET.hit = 1.5;
+  } else STREET.pose = next;
+  if(STREET.hit > 0) STREET.hit -= dt;
+  const o = streetPlace();
+  // traces des pneus
+  const last = STREET.trail[STREET.trail.length-1];
+  if(!last || Math.hypot(o.x-last.x, o.z-last.z) > 0.05){ STREET.trail.push(o); if(STREET.trail.length > 600) STREET.trail.shift(); }
+  TRACKS.forEach((t,i)=>t.set(STREET.trail.map(p=>toWorld(p, WHEEL_PTS[i][0], WHEEL_PTS[i][1]))));
+  drawGuides({...o, d:PARK.delta, g:(S.mode==='manual' ? S.gear==='R' : S.sel==='R') ? 'R' : 'F'});
+  sensorsTick(o);
+  // garée ?
+  const e = planEnd(STREET_SPOTS[STREET.spot].plan), dTh = Math.abs(Math.atan2(Math.sin(o.th-e.th), Math.cos(o.th-e.th)));
+  const ok = Math.hypot(o.x-e.x, o.z-e.z) < 0.45 && dTh < 6*DEG && Math.abs(S.v) < 0.05;
+  if(ok && !STREET.done){ STREET.done = true; say(tr('Bravo, bien garée ! Coupe le moteur, ou choisis un autre exercice.','Well done, parked! Switch the engine off, or pick another exercise.'), 8); }
+  if(!ok && Math.hypot(o.x-e.x, o.z-e.z) > 1) STREET.done = false;
+  streetCam(dt, o);
+}
+
+function appModeUI(m){ document.querySelectorAll('#appModes .mode').forEach(b=>b.classList.toggle('act', b.dataset.app===m)); }
+document.querySelectorAll('#appModes .mode').forEach(b=> b.onclick = ()=>{ if(b.dataset.app==='drive'){ ensureAudio(); if(!STREET.on) streetStart(STREET.spot); } else streetStop(); });
+document.querySelectorAll('#streetGear button').forEach(b=> b.onclick = ()=>{ STREET.gearbox = b.dataset.g; streetStart(STREET.spot); });
+function streetDirUI(){ document.querySelectorAll('#streetDir button').forEach(b=>b.classList.toggle('act', !!STREET.keys[b.dataset.k])); }
+document.querySelectorAll('#streetDir button').forEach(b=>{       // boutons à maintenir (téléphone)
+  const k = b.dataset.k, on = v => e => { STREET.keys[k] = v; if(v) ensureAudio(); e.preventDefault(); };
+  b.addEventListener('pointerdown', on(true)); ['pointerup','pointerleave','pointercancel'].forEach(t=>b.addEventListener(t, on(false)));
+});
+document.querySelectorAll('#streetSpot button').forEach(b=> b.onclick = ()=>streetStart(b.dataset.k));
+function setStreetView(v){
+  STREET.view = v; controls.enabled = v==='free';
+  document.querySelectorAll('#streetView button').forEach(b=>b.classList.toggle('act', b.dataset.v===v));
+  if(v==='free'){ const o = originOf(STREET.pose); controls.target.set(o.x, 0.6, o.z); }
+}
+document.querySelectorAll('#streetView button').forEach(b=> b.onclick = ()=>setStreetView(b.dataset.v));
+$('steer').addEventListener('input', e=>{ PARK.delta = -e.target.value/100*PARK_DMAX; });
+$('steer').addEventListener('pointerdown', ()=>{ STREET.sliderHeld = true; });
+['pointerup','pointercancel'].forEach(t=>$('steer').addEventListener(t, ()=>{ STREET.sliderHeld = false; }));
+window.addEventListener('keydown', e=>{
+  if(!STREET.on || e.metaKey || e.ctrlKey || e.altKey) return;
+  const SK = {ArrowUp:'up', ArrowDown:'down', ' ':'brake'}[e.key];
+  if(SK && STREET.gearbox==='simple'){ STREET.keys[SK] = true; e.preventDefault(); ensureAudio(); return; }
+  if(e.key==='ArrowLeft'){ STREET.steerKey = 1; e.preventDefault(); }
+  else if(e.key==='ArrowRight'){ STREET.steerKey = -1; e.preventDefault(); }
+  else if(e.key.toLowerCase()==='v' && !e.repeat){ const L = ['driver','behind','front','top','free']; setStreetView(L[(L.indexOf(STREET.view)+1) % L.length]); }
+});
+window.addEventListener('keyup', e=>{ if(e.key==='ArrowLeft' || e.key==='ArrowRight') STREET.steerKey = 0;
+  const SK = {ArrowUp:'up', ArrowDown:'down', ' ':'brake'}[e.key]; if(SK) STREET.keys[SK] = false; });
+
+/* ===== 07-narration-animation.js ===== */
 
 /* ======================================================================
    EXPLICATIONS, LEÇON, DÉMO
@@ -2130,12 +2549,12 @@ function narrate(){
   const man = S.mode==='manual';
   const slipping = man && ((e>0 && e<1 && S.slipLast > 6) || (e>0 && S.slipLast > 12));
   const live = S.engineOn || S.cranking>0 || S.hand;
-  const driven = live && ratio && e>0 && !cvBroken();
+  const driven = live && ratio && e>0;
   const ev = S.mode==='ev';
   if(ev){ const regen = S.engineOn && S.evP < -500, push = S.engineOn && S.evP > 500;
     setChip('chE',tr('Voiture','Car'), S.engineOn ? 'READY' : tr('Éteinte','Off'), S.engineOn?'good':'');
     setChip('chC',tr('Moteur électrique','Electric motor'), regen ? tr('Recharge','Charging') : push ? tr('Pousse','Pushing') : tr('Au repos','Resting'), regen?'good':push?'on':'');
-    setChip('chW',tr('Roues','Wheels'), S.engineOn && ratio && !cvBroken() ? tr('Entraînées','Driven') : tr('Libres','Free'), S.engineOn && ratio?'on':''); }
+    setChip('chW',tr('Roues','Wheels'), S.engineOn && ratio ? tr('Entraînées','Driven') : tr('Libres','Free'), S.engineOn && ratio?'on':''); }
   else {
   setChip('chE',tr('Moteur','Engine'), S.cranking>0 ? tr('Démarre…','Starting…') : S.engineOn ? tr('Tourne','Running') : S.hand ? tr('Tourné à la main','Turned by hand') : tr('Arrêté','Stopped'), live?'on':'');
   if(man){ const cs = e===0 ? tr('Débrayé','Disengaged') : slipping ? tr('Patine','Slipping') : tr('Embrayé','Engaged'); setChip('chC',tr('Embrayage','Clutch'), cs, e===0?'':slipping?'slip':'good'); }
@@ -2196,17 +2615,13 @@ function narrate(){
   pedals.clutch.classList.toggle('nudge', needClutch && !demo);
   pedals.brake.classList.toggle('nudge', !man && !demo && lesson.done===0 && S.brake<0.5);
   const startReady = !S.engineOn && !S.cranking && (man ? (S.gear==='N'||S.clutch>=0.6) && lesson.done>=1 : (S.sel==='P'||S.sel==='N') && lesson.done>=1);
-  $('startBtn').classList.toggle('nudge', !demo && startReady && GAME.state==='off');
+  $('startBtn').classList.toggle('nudge', !demo && startReady);
 
   const gb=$('gearBig'); const gtxt = man ? S.gear : (S.sel==='D' && !ev ? 'D'+S.agear : S.sel);
   if(gb.firstChild.nodeValue!==gtxt) gb.firstChild.nodeValue=gtxt; gb.style.borderColor = driven ? 'var(--power)' : '';
   const sb=$('startBtn'); sb.classList.toggle('running', S.engineOn); sb.firstChild.firstChild.nodeValue = S.engineOn ? (ev?tr('ÉTEINDRE','SWITCH OFF'):tr('COUPER','STOP')) : S.cranking>0 ? '…' : (ev?tr('ALLUMER','SWITCH ON'):tr('DÉMARRER','START'));
-  document.querySelectorAll('#elems tr[data-g]').forEach(row=>row.classList.toggle('cur', !man && ((S.sel==='D' && row.dataset.g===String(S.agear)) || (S.sel==='R' && row.dataset.g==='R'))));
-  $('wlBat').classList.toggle('lit', FAULT.active && (FAULT.kind==='battery'||FAULT.kind==='ev12v'));
   $('wlReady').classList.toggle('lit', ev && S.engineOn); $('wlReady').classList.add('green');
   if(ev){ $('socBar').style.width = Math.round(S.evSOC*100)+'%'; setText('socTxt', Math.round(S.evSOC*100)+tr(' %','%')); const kw=Math.round(S.evP/1000); setText('pwrTxt', (kw>0?'+':'')+kw+' kW'); $('pwrTxt').style.color = kw<0 ? 'var(--ok)' : kw>0 ? 'var(--power)' : ''; }
-  $('wlEng').classList.toggle('lit', FAULT.active && (FAULT.kind==='spark'||FAULT.kind==='belt'||FAULT.kind==='inverter')); $('wlEng').classList.add('amber');
-  $('wlBrk').classList.toggle('lit', FAULT.active && FAULT.kind==='pads');
 }
 function setChip(id, name, val, cls){ const el=$(id); const html=`${name} <b>${val}</b>`; if(el._h!==html){ el.innerHTML=html; el._h=html; } el.className='chip '+cls; }
 function setText(id, t){ const el=$(id); if(el.textContent!==t) el.textContent=t; }
@@ -2288,15 +2703,17 @@ function ensureAudio(){
 function updateAudio(){
   if(!AC) return;
   const on = $('optSound').checked && (S.engineOn || S.cranking>0);
-  if(S.mode==='ev'){ const t=AC.currentTime, rpmE=Math.abs(S.we*RPM); osc1.type='sine'; osc1.frequency.setTargetAtTime(120+rpmE*0.11, t, 0.05); osc2.frequency.setTargetAtTime(60+rpmE*0.055, t, 0.05);
-    filt.frequency.setTargetAtTime(2500, t, 0.1); gain.gain.setTargetAtTime($('optSound').checked && S.engineOn && rpmE>50 ? 0.01 + Math.min(0.025, Math.abs(S.evP)/4e6) : 0, t, 0.1); return; }
-  osc1.type='sawtooth';
+  if(S.mode==='ev'){   // sifflement électrique doux, une quinte, qui monte avec le moteur ; silence à l'arrêt
+    const t=AC.currentTime, rpmE=Math.abs(S.we*RPM), f = 150 + rpmE*0.075; osc1.type='triangle'; osc2.type='sine';
+    osc1.frequency.setTargetAtTime(f, t, 0.05); osc2.frequency.setTargetAtTime(f*1.5, t, 0.05);
+    filt.frequency.setTargetAtTime(1800, t, 0.1); filt.Q.setTargetAtTime(1, t, 0.1);
+    gain.gain.setTargetAtTime($('optSound').checked && S.engineOn && Math.abs(S.v)>0.05 ? 0.028 + Math.min(0.03, Math.abs(S.evP)/2.5e6) : 0, t, 0.12); return; }
+  osc1.type='sawtooth'; osc2.type='square'; filt.Q.setTargetAtTime(3, AC.currentTime, 0.1);
   const rpm = S.we*RPM, f = Math.max(12, rpm/30), t = AC.currentTime;
   osc1.frequency.setTargetAtTime(f, t, 0.02); osc2.frequency.setTargetAtTime(f*0.5, t, 0.02);
   filt.frequency.setTargetAtTime(300 + S.gas*1500 + rpm*0.14, t, 0.04);
   let g = on ? (S.cranking>0 ? 0.05 : 0.045 + S.gas*0.05) : 0;
-  if(on && misfire()) g *= (Math.sin(t*rpm/120*TAU) > 0.3 ? 0.25 : 1);
-  gain.gain.setTargetAtTime(g, t, misfire()?0.01:0.06);
+  gain.gain.setTargetAtTime(g, t, 0.06);
 }
 
 /* ======================================================================
@@ -2310,11 +2727,17 @@ R.cams.ex.lobes.forEach(L=>{ L.m.rotation.z = -Math.PI/2 - camExAng(FIRE[L.cyl]+
 const vIn = R.valves.filter(v=>v.kind==='in'), vEx = R.valves.filter(v=>v.kind==='ex');
 const PSI_I_IDL = Math.atan2(RIDL.y-IY, RIDL.x-IX), PSI_IDL_O = Math.atan2(OY-RIDL.y, OX-RIDL.x);
 const OIL_R = 0.086, tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3();
+// Braquage d'une roue avant (épure de Jeantaud / Ackermann : la roue intérieure braque plus)
+function wheelSteer(w){
+  const d = PARK.delta; if(!w.front || Math.abs(d) < 1e-4) return 0;
+  const Rr = PARK_WB/Math.tan(Math.abs(d)), inner = (d>0) === (w.sg>0), t = WH.zF;
+  return Math.sign(d)*Math.atan(PARK_WB/(inner ? Rr - t : Rr + t));
+}
 function animate(dt){
   const vis = (S.hand && !S.engineOn) ? 0.5 : S.slow, dv = dt*vis, e = engagement(), ratio = ratioNow(), man = S.mode==='manual';
   explode += (explodeTarget - explode)*Math.min(1, dt*4); const ex = explode;
   const wW = S.v/WH.r, ringW = outFree/FD;
-  A.e += S.we*dv; if(!beltBroken()) A.cam += S.we*dv; A.in += S.win*dv; A.wheel += wW*dv; A.diff += ringW*dv; A.brk += (2*ringW - wW)*dv;
+  A.e += S.we*dv; A.cam += S.we*dv; A.in += S.win*dv; A.wheel += wW*dv; A.diff += ringW*dv; A.brk += (2*ringW - wW)*dv;
   if(S.cranking>0) A.starter = 1;
   // moteur
   R.crank.rotation.z = -A.e; R.fly.rotation.z = -A.e; R.crankSprocket.rotation.z = -A.e;
@@ -2325,7 +2748,7 @@ function animate(dt){
     tmpA.set(EN.xc - s, EN.yc + c, z); tmpB.set(EN.xc, py, z);
     R.rods[i].position.copy(tmpA).add(tmpB).multiplyScalar(0.5); R.rods[i].scale.y = EN.L;
     R.rods[i].quaternion.setFromUnitVectors(UPV, tmpB.sub(tmpA).normalize());
-    let f=0; if(S.engineOn && !beltBroken() && !(misfire() && i===FAULT.cyl)){ const d=(((A.e-FIRE[i])%(4*Math.PI))+4*Math.PI)%(4*Math.PI); f = d<0.9 ? 1-d/0.9 : 0; }
+    let f=0; if(S.engineOn){ const d=(((A.e-FIRE[i])%(4*Math.PI))+4*Math.PI)%(4*Math.PI); f = d<0.9 ? 1-d/0.9 : 0; }
     R.flames[i].material.opacity = f*0.85; R.flames[i].scale.set(0.9+f*0.1, 0.15+f*0.5, 0.9+f*0.1);
   });
   const ci = camInAng(A.cam), ce = camExAng(A.cam);
@@ -2366,7 +2789,7 @@ function animate(dt){
   } else {
     R.aut.inShaft.rotation.z = -A.in; R.aut.outShaft.rotation.z = thO;
     const nIn = S.win, n1 = nIn/A_PG, nR = outFree;
-    const gk = S.sel==='R' ? 'R' : String(S.agear), els = (S.sel==='D'||S.sel==='R') && !cvBroken() ? SHIFT_EL[gk] : [];
+    const gk = S.sel==='R' ? 'R' : String(S.agear), els = (S.sel==='D'||S.sel==='R') ? SHIFT_EL[gk] : [];
     let nC;
     if(els.includes('B2')) nC = 0; else if(els.includes('K2')) nC = nIn;
     else if(els.includes('B1')) nC = (K3*nR)/(1+K3); else if(els.includes('K3')) nC = (n1+K3*nR)/(1+K3); else nC = nR;
@@ -2385,8 +2808,8 @@ function animate(dt){
   }
   if(S.mode==='ev'){
     const thRot = meshAng(thO, EV.n2, PSI_OI, EV.n1);
-    R.ev.mid.rotation.z = thO; R.ev.rotor.rotation.z = cvBroken() ? -A.in : thRot;
-    const rotA = cvBroken() ? -A.in : thRot, amp = S.engineOn ? clamp(Math.abs(S.evT)/EV.Tmax, 0, 1) : 0, sgnT = Math.sign(S.evT||0);
+    R.ev.mid.rotation.z = thO; R.ev.rotor.rotation.z = thRot;
+    const rotA = thRot, amp = S.engineOn ? clamp(Math.abs(S.evT)/EV.Tmax, 0, 1) : 0, sgnT = Math.sign(S.evT||0);
     const fieldE = rotA*EV.poles + sgnT*Math.PI/2;
     R.ev.coils.forEach(c=>{ const cur = Math.sin(fieldE - c.a*EV.poles - c.ph*TAU/3); c.mat.emissiveIntensity = amp*Math.max(0,cur)*1.6 + (amp>0?0.05:0); });
     const lit = Math.round(S.evSOC*R.ev.mods.length); R.ev.mods.forEach((m,i)=>{ m.emissiveIntensity = i<lit ? 0.25 : 0; });
@@ -2397,9 +2820,11 @@ function animate(dt){
     setGlow('ev', S.engineOn ? 0.1 + 0.5*amp : 0);
   }
   // cardans, roues, freins
-  R.shafts.forEach(s=>{ s.rot.rotation.y = s.sg>0 ? -(cvBroken() ? A.brk : A.wheel) : A.wheel; });
-  R.wheels.forEach(w=>{ w.w.rotation.z = w.sg>0 ? -A.wheel : A.wheel; });
-  R.discs.forEach(d=>{ d.g.rotation.z = -A.wheel; });
+  R.shafts.forEach(s=>{ s.rot.rotation.y = s.sg>0 ? -A.wheel : A.wheel; });
+  R.wheels.forEach(w=>{ w.w.rotation.z = w.sg>0 ? -A.wheel : A.wheel; w.w.rotation.y = (w.sg>0 ? 0 : Math.PI) - wheelSteer(w); });
+  R.discs.forEach(d=>{ d.g.rotation.z = -A.wheel; d.g.rotation.y = -wheelSteer(d); });
+  R.calipers.forEach(c=>{ c.g.rotation.y = -wheelSteer(c); });
+  R.cab.sw.rotation.x = PARK.delta*STEER_RATIO;      // volant : x positif = sens inverse des aiguilles d'une montre vu du conducteur = à gauche
   R.calipers.forEach(c=>{ const m=c.g.children[0].material; m.emissive.setHex(0xff2a1a); m.emissiveIntensity = S.brake*0.5; });
   // habitacle
   ['clutch','brake','gas'].forEach(k=>{ R.cab.ped[k].rotation.z = 0.35*S[k]; });
@@ -2407,9 +2832,9 @@ function animate(dt){
   if(man){ updateLever(dt); R.cab.lever.rotation.x = (LEV.col-0.5)*0.14; R.cab.lever.rotation.z = -LEV.row*0.3; }
   else { lz = -({P:1.5,R:0.5,N:-0.5,D:-1.5})[S.sel]*0.14; R.cab.lever.rotation.x = 0; R.cab.lever.rotation.z += (lz - R.cab.lever.rotation.z)*Math.min(1,dt*10); }
   // feux
-  const lightsOn = $('optLights').checked, weak = FAULT.active && FAULT.kind==='battery';
-  R.lights.head.emissiveIntensity = lightsOn ? (weak?0.15:1.3) : 0.05;
-  R.lights.spots.forEach(s=>s.intensity = lightsOn ? (weak?0.25:1.6) : 0);
+  const lightsOn = $('optLights').checked;
+  R.lights.head.emissiveIntensity = lightsOn ? 1.3 : 0.05;
+  R.lights.spots.forEach(s=>s.intensity = lightsOn ? 1.6 : 0);
   R.lights.tail.emissiveIntensity = 0.08 + (lightsOn?0.45:0) + S.brake*1.6;
   R.lights.rev.emissiveIntensity = (man ? S.gear==='R' : S.sel==='R') ? 1.3 : 0;
   R.movers.forEach(m=>{ m.position.x -= S.v*dv; if(m.position.x < -25) m.position.x += 50; if(m.position.x > 25) m.position.x -= 50; });
@@ -2419,7 +2844,7 @@ function animate(dt){
   setGlow('engine', live ? 0.15 + 0.45*S.gas : 0);
   const ig = man ? live*e*(0.2+0.4*S.gas) : live*(0.2+0.4*S.gas);
   setGlow('input', ig);
-  const og = S.mode==='ev' ? (evDrive ? 0.2+0.4*Math.min(1,Math.abs(S.evT)/150) : 0) : (ratio && !cvBroken() ? ig : 0);
+  const og = S.mode==='ev' ? (evDrive ? 0.2+0.4*Math.min(1,Math.abs(S.evT)/150) : 0) : (ratio ? ig : 0);
   setGlow('output', og); setGlow('collar', man ? og : 0);
   ['pg1','rvc','s2','s3'].forEach(k=>setGlow(k, man ? 0 : og*0.8));
   if(man) for(const g in R.man.gearMat){ const m=R.man.gearMat[g]; m.emissive.copy(POWER); m.emissiveIntensity = g===S.gear ? og*1.4 : 0; }
@@ -2444,12 +2869,13 @@ buildLesson(); renderScenarios(); applyBodyMode(); refreshVis(); narrate();
 let last = performance.now(), narrT = 0;
 function frame(now){
   const dt = Math.min(0.1, (now-last)/1000); last = now;
-  runDemo(dt); simulate(dt); gameTick(); animate(dt);
+  runDemo(dt); simulate(dt); parkTick(); streetTick(dt); animate(dt);
   tourTick(dt);
   if(follow.back && !tween){ follow.t -= dt; if(follow.t<=0){ flyTo(follow.back.p, follow.back.t); follow.back=null; } }
   if(tween){ tween.t = Math.min(1, tween.t + dt/tween.dur); const k = 1-Math.pow(1-tween.t,3);
     camera.position.lerpVectors(tween.p0, tween.p1, k); controls.target.lerpVectors(tween.t0, tween.t1, k); if(tween.t>=1) tween=null; }
-  if(controls.enabled) controls.update(); else camera.lookAt(controls.target); renderer.render(scene, camera);
+  if(controls.enabled) controls.update(); else camera.lookAt(controls.target);
+  mirrorsPre(); renderer.render(scene, camera); mirrorsPost();
   placeTags(); drawPedals(); updateAudio();
   narrT += dt; if(narrT > 0.12){ narrT = 0; narrate(); }
   requestAnimationFrame(frame);

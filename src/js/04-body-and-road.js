@@ -77,18 +77,15 @@ R.lights = {};
   const headM = new THREE.MeshStandardMaterial({color:0xf3f6f8, emissive:0xfff6dd, emissiveIntensity:0.05, metalness:0.3, roughness:0.2});
   const tailM = new THREE.MeshStandardMaterial({color:0x8d1010, emissive:0xff1a1a, emissiveIntensity:0.08, roughness:0.3});
   const revM = new THREE.MeshStandardMaterial({color:0xdddddd, emissive:0xffffff, emissiveIntensity:0, roughness:0.3});
-  const indM = new THREE.MeshStandardMaterial({color:0xd98a1a, emissive:0xff9a1a, emissiveIntensity:0.05, roughness:0.3});
   R.lights.head=headM; R.lights.tail=tailM; R.lights.rev=revM;
+  // feux ronds, simples : phares blancs devant, feux rouges derrière (avec un petit feu de recul blanc)
+  const ring = plastic(0x9aa2a8,{metalness:0.6, roughness:0.3});
+  const lamp = (r, m) => { const g = new THREE.Group(); g.add(cylX(r, 0.05, m)); const t = new THREE.Mesh(new THREE.TorusGeometry(r, 0.012, 8, 28), ring); t.rotation.y = Math.PI/2; t.position.x = 0.026; g.add(t); return g; };
   [1,-1].forEach(sg=>{
-    const h=new THREE.Group(); at(h,2.04,0.66,sg*0.57); h.rotation.y = sg*0.5;
-    h.add(box(0.06,0.1,0.3,BODY.trim)); h.add(at(cylX(0.038,0.02,headM),0.03,0,sg*0.05)); h.add(at(cylX(0.03,0.02,headM),0.03,0,-sg*0.07));
-    h.add(at(box(0.065,0.1,0.3,glass(0xeaf2f8,0.25)),0.005,0,0)); h.add(at(box(0.02,0.03,0.06,indM),0.03,-0.03,sg*0.12));
-    put(h,'headlight',C);
-    const fog=at(cylX(0.03,0.02,headM),2.125,0.32,sg*0.55); put(fog,'headlight',C);
-    const t=new THREE.Group(); at(t,-2.04,0.89,sg*0.6); t.rotation.y = -sg*0.35;
-    t.add(box(0.06,0.12,0.26,tailM)); t.add(at(box(0.062,0.04,0.08,revM),0,-0.03,-sg*0.06));
-    put(t,'taillight',C);
-    const sl=new THREE.SpotLight(0xfff3d6, 0, 22, 0.42, 0.5, 1.2); sl.position.set(2.1,0.66,sg*0.57); sl.target.position.set(9,0,sg*0.9); scene.add(sl); scene.add(sl.target); (R.lights.spots=R.lights.spots||[]).push(sl);
+    const h = lamp(0.075, headM); at(h, 2.075, 0.66, sg*0.56); h.rotation.y = sg*0.12; put(h,'headlight',C);
+    const t = lamp(0.06, tailM); at(t, -2.075, 0.9, sg*0.6); t.rotation.y = Math.PI - sg*0.1; put(t,'taillight',C);
+    const r = lamp(0.035, revM); at(r, -2.075, 0.9, sg*0.46); r.rotation.y = Math.PI; put(r,'taillight',C);
+    const sl=new THREE.SpotLight(0xfff3d6, 0, 22, 0.42, 0.5, 1.2); sl.position.set(2.1,0.66,sg*0.56); sl.target.position.set(9,0,sg*0.9); scene.add(sl); scene.add(sl.target); (R.lights.spots=R.lights.spots||[]).push(sl);
   });
   put(at(box(0.03,0.025,0.25,tailM),-1.95,1.235,0),'taillight',C);
 })();
@@ -97,12 +94,114 @@ R.lights = {};
 R.movers=[];
 (function road(){
   const C='road';
-  const rd = new THREE.Mesh(new THREE.PlaneGeometry(50, 4.6).rotateX(-Math.PI/2), new THREE.MeshStandardMaterial({color:0x474d52, roughness:1})); rd.position.set(0,-0.001,0.6); put(rd,'road',C);
+  const rd = new THREE.Mesh(new THREE.PlaneGeometry(50, 6.6).rotateX(-Math.PI/2), new THREE.MeshStandardMaterial({color:0x474d52, roughness:1})); rd.position.set(0,-0.001,1.0); put(rd,'road',C);
   const lm = new THREE.MeshBasicMaterial({color:0xe8e4d4});
-  [-1.6, 2.8].forEach(z=>{ const l=new THREE.Mesh(new THREE.PlaneGeometry(50,0.1).rotateX(-Math.PI/2), lm); l.position.set(0,0.001,z); put(l,'road',C); });
-  for(let i=0;i<18;i++){ const d=new THREE.Mesh(new THREE.PlaneGeometry(1.4,0.1).rotateX(-Math.PI/2), lm); d.position.set(-24+i*2.8,0.002,1.6); put(d,'road',C); R.movers.push(d); }
-  for(let i=0;i<10;i++){ const p=new THREE.Group();
-    p.add(at(cylY(0.03,0.7,new THREE.MeshStandardMaterial({color:0xeeeeea,roughness:0.7})),0,0.35,0));
-    p.add(at(box(0.02,0.1,0.065,new THREE.MeshBasicMaterial({color:0xff5a1f})),0,0.6,0.03));
-    p.position.set(-24+i*5,0,-2.1); put(p,'road',C); R.movers.push(p); }
+  for(let i=0;i<18;i++){ const d=new THREE.Mesh(new THREE.PlaneGeometry(1.4,0.1).rotateX(-Math.PI/2), lm); d.position.set(-24+i*2.8,0.002,1.2); put(d,'road',C); R.movers.push(d); }
+  // trottoirs à la française : bordure en granit, trottoir gris, potelets sombres le long de la bordure
+  const kerbM = plastic(0xb4b6b2,{roughness:0.9}), walkM = plastic(0x8e918c,{roughness:1}), bolM = plastic(0x3b3226,{roughness:0.6});
+  [[-2.3,-5.2],[4.3,7.6]].forEach(([zk, zb])=>{ const sg = Math.sign(zb - zk), w = Math.abs(zb - zk);
+    put(at(box(50, 0.15, 0.18, kerbM), 0, 0.075, zk + sg*0.09), 'road', C);
+    put(at(box(50, 0.13, w - 0.18, walkM), 0, 0.065, zk + sg*(0.18 + (w-0.18)/2)), 'road', C); });
+  for(let i=0;i<34;i++){ const b = new THREE.Group(); b.add(at(cylY(0.05, 0.75, bolM), 0, 0.5, 0)); b.add(at(new THREE.Mesh(new THREE.SphereGeometry(0.06, 10, 8), bolM), 0, 0.88, 0));
+    b.position.set(-25 + i*50/34, 0, -2.55); put(b,'road',C); R.movers.push(b); }
+})();
+
+/* ---------------- Quartier : immeubles, arbres et petit parc, des deux côtés ----------------
+   Une seule texture de fenêtres (teintée par la couleur du mur), des formes simples. */
+const WIN_TEX = (()=>{ const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d');
+  x.fillStyle = '#fff'; x.fillRect(0,0,64,64); x.fillStyle = '#3d4a57'; x.fillRect(14,12,36,30); x.fillStyle = '#5d6b78'; x.fillRect(14,12,36,6);
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; })();
+const BLD_COLS = [0xd9cbb4, 0xc7b9a6, 0xb98f78, 0xa7b0b3, 0xe3ddd0, 0xc49a7f, 0x9fa9a6];
+const roofM = plastic(0x5a5f63,{roughness:0.9});
+function building(w, d, h, col){            // w le long de la rue (x), d en profondeur (z)
+  const wall = (rx, ry) => { const t = WIN_TEX.clone(); t.needsUpdate = true; t.repeat.set(rx, ry); return plastic(col,{map:t, roughness:0.85}); };
+  const fx = wall(Math.round(d/3.2), Math.round(h/3)), fz = wall(Math.round(w/3.2), Math.round(h/3));
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), [fx, fx, roofM, roofM, fz, fz]); m.position.y = h/2; return m;
+}
+const leafM = plastic(0x5f8a4a,{roughness:0.9, flatShading:true}), trunkM = plastic(0x6b5040,{roughness:1});
+function tree(s=1){ const g = new THREE.Group(); g.add(at(cylY(0.12*s, 1.6*s, trunkM), 0, 0.8*s, 0));
+  const f = new THREE.Mesh(new THREE.IcosahedronGeometry(1.1*s, 0), leafM); f.position.y = 2.3*s; g.add(f); return g; }
+let seed = 7; const rnd = ()=>{ seed = (seed*16807) % 2147483647; return (seed-1)/2147483646; };
+// rangée le long de x : immeubles, avec parfois un trou de parc planté d'arbres. add(obj, x) place l'objet.
+function streetRow(x0, x1, zFront, side, add){
+  let x = x0;
+  while(x < x1){
+    if(rnd() < 0.18){ for(let k=0;k<3;k++) add(at(tree(0.8+rnd()*0.5), x + 1.5 + k*2.6, 0, zFront - side*(1.5 + rnd()*3)), x); x += 9; continue; }
+    const w = 6 + rnd()*7, d = 8 + rnd()*4, h = 6 + Math.floor(rnd()*5)*3;
+    const b = building(w, d, h, BLD_COLS[Math.floor(rnd()*BLD_COLS.length)]); b.position.x = x + w/2; b.position.z = zFront - side*d/2; add(b, x);
+    x += w + 0.3;
+  }
+}
+// route qui défile (vue normale) : les immeubles bougent avec les traits de la route, sur 50 m qui bouclent
+(function scenery(){
+  const add = o => { put(o, 'scenery', 'road'); R.movers.push(o); };
+  streetRow(-25, 24, -5.2, 1, add); streetRow(-25, 24, 7.6, -1, add);
+  for(let i=0;i<10;i++) add(at(tree(0.6), -24 + i*5 + 2.5, 0, -4.3));
+})();
+
+// Carrosserie « fil de fer » : les arêtes de la coque et des vitres, affichées seulement dans ce mode
+BODY.wire = new THREE.LineBasicMaterial({color:0x6fa3e8, transparent:true, opacity:0.95});
+BODY.wires = [];
+LEAVES.filter(o=>o.isMesh && (o.material===BODY.paint || o.material===BODY.glass)).forEach(m=>{
+  const l = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry, 6), BODY.wire);
+  l.visible = false; l.raycast = ()=>{}; m.add(l); BODY.wires.push(l);
+});
+
+/* ---------------- Rue des vidéos « se garer » (fixe dans le monde, visible seulement pendant ces vidéos) ----------------
+   Créneau : la voiture part de l'origine, cap +x, à côté de la voiture garée A, et finit garée derrière elle.
+   Bataille : plus loin dans la rue (x ≈ 27-40), 5 places perpendiculaires au trottoir, en retrait.
+   Trottoir côté droit (z négatif). */
+const PARK = { on:false, delta:0, plan:null };       // delta : braquage « vélo » des roues avant (rad, + = à gauche)
+const PARKG = new THREE.Group(); scene.add(PARKG);
+const PARKED_Z = -2.46, KERB_Z = PARKED_Z - 0.88 - 0.25;
+const BAY_W = 2.5, BAY_D = 5, BAY_X0 = 27.5, BAY_N = 5, BAY_KERB = KERB_Z - 3.5;   // places en bataille
+const BAY_X = BAY_X0 + 2.5*BAY_W;                                                   // milieu de la place libre (la 3e)
+const PARK_OBST = [];        // obstacles (rectangles vus de dessus : centre, demi-longueurs, cap) pour les chocs et les radars
+(function street(){
+  const K='parkscene', C='road', add = o => put(o, K, C, undefined, PARKG);
+  const asph = new THREE.MeshStandardMaterial({color:0x474d52, roughness:1});
+  const kerbM = plastic(0x9a9d99,{roughness:1}), walkM = plastic(0x80837e,{roughness:1}), grassM = plastic(0x6c8556,{roughness:1});
+  const plane = (w, d, x, z) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d).rotateX(-Math.PI/2), asph); m.position.set(x, -0.002, z); add(m); };
+  plane(100, 14, 10, KERB_Z + 7);
+  PARK_OBST.push({x:10, z:KERB_Z + 14.5, hx:52, hz:0.5, th:0, wall:true}, {x:-40.5, z:0, hx:0.5, hz:20, th:0, wall:true}, {x:60.5, z:0, hx:0.5, hz:20, th:0, wall:true});   // bords de la rue
+  // bordure, trottoir et pelouse de x1 à x2, bordure en zk
+  function side(x1, x2, zk){ const w = x2-x1, cx = (x1+x2)/2; PARK_OBST.push({x:cx, z:zk-0.08, hx:w/2, hz:0.08, th:0, kerb:true});
+    add(at(box(w, 0.14, 0.16, kerbM), cx, 0.07, zk - 0.08));
+    add(at(box(w, 0.12, 3, walkM), cx, 0.06, zk - 1.66));
+    add(at(box(w, 0.1, 14, grassM), cx, 0.05, zk - 10.16)); }
+  const bx1 = BAY_X0 - 1.5, bx2 = BAY_X0 + BAY_N*BAY_W + 1.5;
+  side(-40, bx1, KERB_Z); side(bx2, 60, KERB_Z); side(bx1, bx2, BAY_KERB);
+  plane(bx2 - bx1, KERB_Z - BAY_KERB, (bx1+bx2)/2, (KERB_Z + BAY_KERB)/2);
+  [bx1, bx2].forEach(x => { add(at(box(0.16, 0.14, KERB_Z - BAY_KERB + 3.2, kerbM), x, 0.07, (KERB_Z + BAY_KERB)/2 - 1.6));
+    PARK_OBST.push({x, z:(KERB_Z + BAY_KERB)/2, hx:0.08, hz:(KERB_Z - BAY_KERB)/2, th:0, kerb:true}); });
+  const paint = new THREE.MeshBasicMaterial({color:0xe8e4d4});
+  const line = (w, d, x, z) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d).rotateX(-Math.PI/2), paint); m.position.set(x, 0.001, z); add(m); };
+  line(bx1 + 40, 0.1, (bx1 - 40)/2, PARKED_Z + 1.2);                                                // limite des places en créneau
+  [-8.6, -2.5, 2.7].forEach(x => line(0.1, 2.0, x, PARKED_Z + 0.2));                                 // séparations
+  for(let i=0;i<=BAY_N;i++) line(0.1, BAY_D, BAY_X0 + i*BAY_W, BAY_KERB + BAY_D/2);                 // places en bataille
+  for(let i=0;i<20;i++) line(1.4, 0.1, -36 + i*5, 2.6);                                              // axe de la rue
+  for(let i=0;i<5;i++){ const lamp = new THREE.Group();                                              // lampadaires
+    lamp.add(at(cylY(0.05, 3.2, plastic(0x3a4045)), 0, 1.6, 0)); lamp.add(at(box(0.5, 0.08, 0.18, plastic(0x3a4045)), 0.2, 3.2, 0.05));
+    at(lamp, -26 + i*12, 0.12, KERB_Z - 0.5); add(lamp); }
+  // voitures garées : génériques, volontairement simples (x, z = centre ; rot = cap)
+  function parkedCar(x, z, col, rot=0){
+    const g = new THREE.Group(), body = plastic(col,{roughness:0.45}), dark = plastic(0x1d2226,{roughness:0.9}), win = plastic(0x27333d,{roughness:0.15});
+    g.add(at(box(4.2, 0.6, 1.74, body), 0, 0.58, 0));
+    g.add(at(box(2.2, 0.46, 1.58, win), -0.3, 1.1, 0));
+    g.add(at(box(2.0, 0.06, 1.5, body), -0.35, 1.35, 0));
+    [[1.28,1],[1.28,-1],[-1.3,1],[-1.3,-1]].forEach(([wx,sg]) => g.add(at(cylZ(0.31, 0.2, dark), wx, 0.31, sg*0.78)));
+    [1,-1].forEach(sg => { g.add(at(box(0.04, 0.1, 0.3, plastic(0xf3f6f8)), 2.1, 0.7, sg*0.6)); g.add(at(box(0.04, 0.12, 0.26, plastic(0x8d1010)), -2.1, 0.78, sg*0.6)); });
+    at(g, x, 0, z); g.rotation.y = rot; add(g);
+    PARK_OBST.push({x, z, hx:2.1, hz:0.87, th:-rot});
+  }
+  // le quartier autour : immeubles derrière le trottoir (avec un parc), et de l'autre côté de la rue
+  seed = 11; streetRow(-40, 58, KERB_Z - 7, 1, o => add(o));
+  add(at(box(100, 0.12, 3, walkM), 10, 0.06, KERB_Z + 15.5)); add(at(box(100, 0.1, 14, grassM), 10, 0.05, KERB_Z + 24));
+  streetRow(-40, 58, KERB_Z + 19, -1, o => add(o));
+  parkedCar(0.02, PARKED_Z, 0x8d969c);      // créneau, A : la voiture de devant (son arrière est en x = -2,08, comme le nôtre au départ)
+  parkedCar(-11.1, PARKED_Z, 0x7a2a2e);     // créneau, B : la voiture de derrière
+  parkedCar(5.4, PARKED_Z, 0x2f4a5c);
+  const bayZ = BAY_KERB + 0.3 + 2.1;        // bataille : nez à 30 cm de la bordure
+  parkedCar(BAY_X - BAY_W, bayZ, 0x7a2a2e, Math.PI/2);   // à droite de la place libre
+  parkedCar(BAY_X + BAY_W, bayZ, 0x8d969c, Math.PI/2);   // à gauche
 })();

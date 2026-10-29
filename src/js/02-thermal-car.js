@@ -134,8 +134,6 @@ function beltPoints(circles){ // circles dans l'ordre anti-horaire ; courroie à
   const pts = beltPoints([BELT.crank, BELT.tens, BELT.cam, BELT.idler]);
   const bm = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts,true), 240, 0.004, 5, true), plastic(0x1f2326,{roughness:0.9}));
   bm.scale.set(1,1,1); put(bm,'belt','internals'); R.belt = bm;
-  const half = pts.slice(0, Math.floor(pts.length*0.45)); half.push(new THREE.Vector3(EN.xc+0.03, 0.3, BELT.z), new THREE.Vector3(EN.xc-0.02, 0.22, BELT.z+0.02));
-  R.beltBroken = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(half), 120, 0.004, 5, false), plastic(0x1f2326,{roughness:0.9})); put(R.beltBroken,'belt','internals');
   const pm = gm('engine', metal(0x9aa3ab));
   R.crankSprocket = at(gearZ(20, TAU*BELT.crank.r/20, 0.024, 0.008, pm), BELT.crank.x, BELT.crank.y, BELT.z); put(R.crankSprocket,'belt','internals');
   R.camPulley = new THREE.Group(); at(R.camPulley, BELT.cam.x, BELT.cam.y, BELT.z);
@@ -406,19 +404,19 @@ function makeWheel(front){
 [[WH.xF,WH.zF,true],[WH.xF,-WH.zF,true],[WH.xR,WH.zR,false],[WH.xR,-WH.zR,false]].forEach(([x,z,front])=>{
   const sg = Math.sign(z);
   const w = makeWheel(front); at(w, x, WH.r, z); if(sg<0) w.rotation.y = Math.PI;   // faces extérieures vers l'extérieur
-  put(w, front?'wheelF':'wheelR', 'wheels'); R.wheels.push({w, sg});
+  put(w, front?'wheelF':'wheelR', 'wheels'); R.wheels.push({w, sg, front});
   const dr = front ? 0.144 : 0.128, dz = z - sg*0.06;
   const disc = new THREE.Group(); at(disc, x, WH.r, dz);
   disc.add(tubeZ(dr, 0.06, front?0.025:0.012, metal(0x8a8f94,{metalness:0.8,roughness:0.5})));
   for(let k=0;k<5;k++){ const a=k/5*TAU; disc.add(at(cylZ(0.004,0.03,M.dark),Math.cos(a)*0.05,Math.sin(a)*0.05,0)); }
   for(let k=0;k<12;k++){ const a=k/12*TAU; disc.add(at(cylZ(0.003,0.03,M.dark),Math.cos(a)*(dr-0.025),Math.sin(a)*(dr-0.025),0)); }
-  put(disc,'brakedisc','wheels'); R.discs.push({g:disc, sg});
+  put(disc,'brakedisc','wheels'); R.discs.push({g:disc, sg, front});
   const cal = new THREE.Group(); at(cal, x, WH.r, dz);
   const calM = metal(0x2a2e31,{metalness:0.4});
   const ang = front ? 160*DEG : 20*DEG, cr = dr-0.02;
   const body = box(0.06, 0.08, 0.06, calM); body.position.set(Math.cos(ang)*cr, Math.sin(ang)*cr, 0); body.rotation.z = ang; cal.add(body);
   const pads=[]; [-1,1].forEach(s=>{ const p=box(0.05,0.035,0.008,metal(0x6b5a48,{roughness:0.9})); p.position.set(Math.cos(ang)*cr, Math.sin(ang)*cr, s*0.02); p.rotation.z=ang; cal.add(p); pads.push(p); });
-  put(cal, 'caliper', 'wheels'); R.calipers.push({g:cal, pads, base:front?0.0205:0.0145});
+  put(cal, 'caliper', 'wheels'); R.calipers.push({g:cal, pads, sg, front, base:front?0.0205:0.0145});
 });
 (function suspension(){
   const C='chassis', sm=metal(0x3d4448), dm=metal(0x8a9298);
@@ -465,8 +463,10 @@ R.cab = {};
   put(seat(-0.05,0.37,0.5),'seat',C); put(seat(-0.05,-0.37,0.5),'seat',C); put(seat(-0.95,0,1.3),'seat',C);
   const dash = at(box(0.22,0.09,1.4,plastic(0x23272a)),0.8,0.9,0); put(dash,'dash',C);
   const swp = new THREE.Group(); at(swp,0.48,0.97,0.37); swp.rotation.z = 0.45;
-  const rimW = new THREE.Mesh(new THREE.TorusGeometry(0.185,0.016,10,40), plastic(0x1b1e20)); rimW.rotation.y = Math.PI/2; swp.add(rimW);
-  swp.add(box(0.02,0.03,0.36,plastic(0x1b1e20))); swp.add(at(cylX(0.05,0.04,plastic(0x23272a)),0,0,0));
+  const spin = new THREE.Group(); swp.add(spin); R.cab.sw = spin;     // tourne autour de la colonne (axe x local)
+  const rimW = new THREE.Mesh(new THREE.TorusGeometry(0.185,0.016,10,40), plastic(0x1b1e20)); rimW.rotation.y = Math.PI/2; spin.add(rimW);
+  spin.add(box(0.02,0.03,0.36,plastic(0x1b1e20))); spin.add(at(cylX(0.05,0.04,plastic(0x23272a)),0,0,0));
+  spin.add(at(box(0.036,0.04,0.03,plastic(0xe8742a)),0,0.185,0));    // repère « midi » : on voit les tours de volant
   put(swp,'steering',C);
   put(between(new THREE.Vector3(0.48,0.97,0.37), new THREE.Vector3(0.9,0.75,0.37), 0.015, M.dark),'steering',C);
   // pédales (bougent avec les vraies pédales)

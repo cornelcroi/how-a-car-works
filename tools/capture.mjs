@@ -1,5 +1,5 @@
 // Regenerates the README screenshots and GIFs in docs/media/ (English UI).
-// Usage: npm run capture   (or: node tools/capture.mjs --linkedin → docs/media/linkedin.mp4, not committed)
+// Usage: npm run capture   (--parking: only the parking GIF; --linkedin: docs/media/linkedin.mp4, not committed)
 // Needs playwright + chromium, and ffmpeg on the PATH)
 import { chromium } from 'playwright';
 import { pathToFileURL } from 'node:url';
@@ -49,14 +49,22 @@ async function shot(name, script) {
   console.log(`${name}.png`);
 }
 
-const LINKEDIN = process.argv.includes('--linkedin');
+const LINKEDIN = process.argv.includes('--linkedin'), PARKING_ONLY = process.argv.includes('--parking');
 
-if (!LINKEDIN) {
+if (!LINKEDIN && !PARKING_ONLY) {
 /* ---------- screenshots ---------- */
 await shot('overview', async p => { await p.keyboard.press('k'); await wait(2500); });
 await shot('show-me', async p => { await playVideo(p, 'shift'); await wait(13000); });
 await shot('electric', async p => { await mode(p, 'ev'); await wait(800); await playVideo(p, 'evtour'); await wait(12000); });
-await shot('garage', async p => { await p.click('#garageBtn'); await wait(2500); });
+await shot('drive-street', async p => {
+  await p.click('#appModes .mode[data-app="drive"]'); await wait(800);
+  await p.keyboard.down('ArrowUp'); await wait(2200); await p.keyboard.up('ArrowUp'); await wait(1500);
+  await p.click('#streetView button[data-v="driver"]'); await wait(1200); });
+await shot('drive-top', async p => {
+  await p.click('#appModes .mode[data-app="drive"]'); await wait(800);
+  await p.keyboard.down('ArrowUp'); await wait(1800); await p.keyboard.down('ArrowLeft'); await wait(900); await p.keyboard.up('ArrowLeft'); await wait(800); await p.keyboard.up('ArrowUp');
+  await p.keyboard.down('ArrowDown'); await wait(1500); await p.keyboard.up('ArrowDown'); await wait(1200);
+  await p.click('#streetView button[data-v="top"]'); await wait(1500); });
 
 /* ---------- GIFs ---------- */
 // A « Show me » video: changing gear in the manual.
@@ -76,27 +84,38 @@ await clip('electric', 0.8, 14, 1.5, async p => { await mode(p, 'ev'); await wai
 
 }
 
-/* ---------- LinkedIn: one square MP4 of the 3D stage (captions included) ---------- */
+/* ---------- Parking GIF (also: node tools/capture.mjs --parking) ---------- */
+// Parking video shots start at 0, 5, 10, 14, 18, 22.5, 27, 31.5, 36, 45.5, 55 … (see parkShots in 05).
+if (!LINKEDIN) await clip('parking', 31.8, 13.5, 1.5, async p => { await playVideo(p, 'parking'); await wait(46000); });
+
+/* ---------- LinkedIn: one square MP4 of the 3D stage (captions included), cut from one session ---------- */
 if (LINKEDIN) {
   const ctx = await browser.newContext({ viewport: { width: 1600, height: 1000 }, recordVideo: { dir: TMP, size: { width: 1600, height: 1000 } } });
   const p = await ctx.newPage();
+  const tStart = Date.now(), mark = () => (Date.now() - tStart) / 1000;
   await p.goto(url); await wait(2500);
-  const t0 = Date.now();
   const box = await p.evaluate(() => { const r = document.getElementById('stage').getBoundingClientRect(); return { x: r.x, y: r.y, w: r.width, h: r.height }; });
-  await p.keyboard.press('k'); await wait(3000);                       // start the engine
+  const D = mark();                                                    // drive: start, 1st, pull away
+  await p.keyboard.press('k'); await wait(3000);
   await p.keyboard.down('c'); await wait(800); await p.keyboard.press('1'); await wait(700);
   await p.keyboard.down('a'); await wait(300); await p.keyboard.up('c'); await wait(4500);
-  await p.keyboard.up('a'); await wait(1500);                          // pulled away in 1st
-  await playVideo(p, 'shift'); await wait(20000);                      // « Show me »: changing gear
-  await p.click('#reelClose'); await mode(p, 'ev'); await wait(800);
-  await playVideo(p, 'evtour'); await wait(18000);                     // the electric car
-  const total = (Date.now() - t0) / 1000;
+  await p.keyboard.up('a'); await wait(500);
+  const G = mark(); await playVideo(p, 'shift'); await wait(15000);     // « Show me »: changing gear
+  await p.click('#reelClose');
+  const P = mark(); await playVideo(p, 'parking'); await wait(112500);  // parallel parking
+  await mode(p, 'ev'); await wait(800);
+  const E = mark(); await playVideo(p, 'evtour'); await wait(13000);    // the electric car
   const webm = await p.video().path();
   await ctx.close();
+  const segs = [[D + 2.5, 9], [G + 0.3, 14],
+    [P + 0.3, 4.2], [P + 27.3, 4], [P + 31.8, 4], [P + 36.4, 8.6], [P + 79, 6.5], [P + 106.8, 4.5],
+    [E + 0.8, 11]];
   const side = Math.floor(Math.min(box.w, box.h)), cx = Math.floor(box.x + (box.w - side) / 2), cy = Math.floor(box.y + (box.h - side) / 2);
-  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-ss', '2.5', '-t', String(total), '-i', webm,
-    '-vf', `crop=${side}:${side}:${cx}:${cy},scale=1080:1080:flags=lanczos,fps=30`,
+  const fc = segs.map(([a, d], i) => `[0:v]trim=start=${a.toFixed(2)}:duration=${d},setpts=PTS-STARTPTS[v${i}]`).join(';')
+    + ';' + segs.map((_, i) => `[v${i}]`).join('') + `concat=n=${segs.length}:v=1:a=0,crop=${side}:${side}:${cx}:${cy},scale=1080:1080:flags=lanczos,fps=30[out]`;
+  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', webm, '-filter_complex', fc, '-map', '[out]',
     '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '20', '-movflags', '+faststart', '-an', `${OUT}/linkedin.mp4`]);
+  const total = segs.reduce((t, [, d]) => t + d, 0);
   console.log(`linkedin.mp4  ${(statSync(`${OUT}/linkedin.mp4`).size / 1e6).toFixed(1)} MB, ${total.toFixed(0)} s`);
 }
 

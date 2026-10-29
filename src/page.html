@@ -1,4 +1,4 @@
-<title>Comment marche une voiture</title>
+<title>Garage &amp; Route</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Saira:wght@500;700;800&display=swap">
 <style>
@@ -18,7 +18,7 @@
 
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;overflow:hidden}
-.app{display:grid;grid-template-columns:minmax(0,1fr) 390px;height:100%}
+.app{display:grid;grid-template-columns:minmax(0,1fr) 400px;height:100%}
 .stage{position:relative;background:radial-gradient(120% 90% at 50% 30%, color-mix(in srgb,var(--stage) 70%, var(--card)) 0%, var(--stage) 70%);overflow:hidden;min-height:0}
 #c{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 #c:active{cursor:grabbing}
@@ -29,7 +29,7 @@ h1{font-family:var(--f-display);font-weight:800;font-size:26px;letter-spacing:.0
 .sec-h{font-family:var(--f-display);font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 
-.say{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.say{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{font-family:var(--f-display);font-weight:700;font-size:12px;letter-spacing:.04em;padding:3px 9px;border-radius:99px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
 .chip b{color:var(--ink)}
@@ -38,8 +38,9 @@ h1{font-family:var(--f-display);font-weight:800;font-size:26px;letter-spacing:.0
 .chip.good{border-color:var(--ok);color:var(--ok)} .chip.good b{color:var(--ok)}
 #say{margin:0;min-height:4.4em;font-size:15px}
 #alert{margin:0;font-weight:700;color:var(--power)}
-.btn{appearance:none;cursor:pointer;border:0;border-radius:8px;background:var(--steel);color:#fff;font-family:var(--f-display);font-weight:700;font-size:14px;padding:7px 12px}
-.btn.alt{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn{appearance:none;cursor:pointer;border:0;border-radius:10px;background:var(--steel);color:#fff;font-family:var(--f-display);font-weight:700;font-size:14px;min-height:36px;padding:0 14px;display:inline-flex;align-items:center;gap:6px;box-shadow:0 1px 0 color-mix(in srgb,var(--ink) 18%,transparent);transition:transform .12s,filter .12s}
+.btn:hover{filter:brightness(1.06)}.btn:active{transform:translateY(1px)}
+.btn.alt{background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:none}.btn.alt:hover{border-color:var(--ink)}
 .btn.warn{background:var(--power)}
 .btn.good{background:var(--ok)}
 .btn.running{background:var(--muted)}
@@ -52,8 +53,8 @@ h1{font-family:var(--f-display);font-weight:800;font-size:26px;letter-spacing:.0
 .soc i{display:block;height:100%;background:var(--ok);border-radius:1px;width:80%}
 .wl.lit.green{background:var(--ok);border-color:var(--ok);color:#fff}
 .sclist{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.sc{appearance:none;cursor:pointer;text-align:left;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:9px 11px;display:flex;flex-direction:column;gap:2px;font:inherit;min-width:0}
-.sc:hover{border-color:var(--power)}
+.sc{appearance:none;cursor:pointer;text-align:left;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:3px;font:inherit;min-width:0;transition:transform .12s,border-color .12s,box-shadow .12s}
+.sc:hover{border-color:var(--power);transform:translateY(-1px);box-shadow:0 4px 14px color-mix(in srgb,var(--ink) 10%,transparent)}
 .sc b{font-family:var(--f-display);font-weight:800;font-size:14px;line-height:1.2}
 .sc span{font-size:12.5px;color:var(--muted);line-height:1.3}
 .sc:first-child{border-color:var(--power);background:color-mix(in srgb,var(--power) 8%,var(--card))}
@@ -66,7 +67,6 @@ h1{font-family:var(--f-display);font-weight:800;font-size:26px;letter-spacing:.0
 .warnlights{display:flex;justify-content:center;gap:10px;margin-top:6px}
 .wl{font-family:var(--f-display);font-weight:800;font-size:10px;letter-spacing:.06em;padding:2px 6px;border-radius:4px;border:1px solid var(--line);color:var(--line)}
 .wl.lit{color:#fff;background:var(--bad);border-color:var(--bad)}
-.wl.lit.amber{background:var(--slip);border-color:var(--slip);color:#1b2326}
 .dial-face{fill:var(--card);stroke:var(--line)}
 .dial-tick{stroke:var(--ink)} .dial-num{fill:var(--ink);font-family:var(--f-display);font-weight:700;font-size:9px;text-anchor:middle}
 .dial-red{stroke:var(--power);fill:none} .dial-needle{stroke:var(--power);stroke-width:2.6;stroke-linecap:round}
@@ -99,11 +99,6 @@ kbd{font-family:var(--f-display);font-size:11px;border:1px solid var(--line);bor
 .autosel{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:start}
 .pr{display:flex;flex-direction:column;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px}
 .pr .gbtn{font-size:20px}
-table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);font-size:12px;font-variant-numeric:tabular-nums}
-.elems th,.elems td{border:1px solid var(--line);text-align:center;padding:2px 3px}
-.elems th{color:var(--muted);font-weight:700}
-.elems td.on{background:var(--ok);color:#fff;font-weight:800}
-.elems tr.cur td,.elems tr.cur th{outline:2px solid var(--power);outline-offset:-2px}
 .note{font-size:13px;color:var(--muted);margin:6px 0 0}
 .gate{width:100%;max-width:240px;height:auto;display:block;margin:0 auto 10px}
 .gate-slot{fill:none;stroke:var(--line);stroke-width:9;stroke-linecap:round}
@@ -117,11 +112,28 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
 .steps li.now::before{border-color:var(--power);color:var(--power)}
 .steps li.done{color:var(--ok)} .steps li.done::before{content:"✓";background:var(--ok);border-color:var(--ok);color:#fff}
 .linkbtn{appearance:none;border:0;background:none;color:var(--steel);font:inherit;font-size:13px;cursor:pointer;padding:0;text-decoration:underline}
-.panel header{position:relative}.panel header h1{padding-right:64px}.lang{position:absolute;top:2px;right:0}
+.panel header{position:relative}.panel header h1{padding-right:84px}
+.lang{position:absolute;top:2px;right:0;text-decoration:none;border:1px solid var(--line);border-radius:99px;padding:3px 10px;font-family:var(--f-display);font-weight:700;font-size:12px;color:var(--ink)}.lang:hover{border-color:var(--ink)}
+/* les deux façons d'utiliser la page : découvrir la voiture, ou la conduire */
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mode{appearance:none;cursor:pointer;text-align:left;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:16px;padding:12px 14px;display:grid;grid-template-columns:auto 1fr;column-gap:10px;row-gap:2px;align-items:center;font:inherit;transition:transform .12s,border-color .12s,box-shadow .12s}
+.mode:hover{transform:translateY(-1px);box-shadow:0 6px 18px color-mix(in srgb,var(--ink) 10%,transparent)}
+.mode .mi{grid-row:span 2;font-size:28px;line-height:1}
+.mode b{font-family:var(--f-display);font-weight:800;font-size:18px;line-height:1.1}
+.mode small{font-size:12.5px;color:var(--muted);line-height:1.25}
+.mode.act{border-color:var(--power);background:color-mix(in srgb,var(--power) 9%,var(--card));box-shadow:0 0 0 3px color-mix(in srgb,var(--power) 16%,transparent)}
+.street{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:2px}
+details.fold{border-top:1px solid var(--line);padding-top:12px}
+details.fold>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::after{content:"＋";color:var(--muted);font-weight:700}
+details.fold[open]>summary::after{content:"－"}
+details.fold>summary .sec-h{margin:0}
+details.fold>*:not(summary){margin-top:10px}
 
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
-.seg button{appearance:none;border:0;background:var(--card);color:var(--ink);font-family:var(--f-display);font-weight:700;font-size:13px;padding:6px 10px;cursor:pointer}
-.seg button+button{border-left:1px solid var(--line)}
+.seg{display:inline-flex;flex-wrap:wrap;gap:3px;padding:3px;border:1px solid var(--line);border-radius:11px;background:var(--card)}
+.seg button{appearance:none;border:0;border-radius:8px;background:transparent;color:var(--ink);font-family:var(--f-display);font-weight:700;font-size:13px;padding:6px 10px;cursor:pointer;transition:background .12s}
+.seg button:hover{background:color-mix(in srgb,var(--ink) 7%,transparent)}
 .seg button.act{background:var(--ink);color:var(--bg)}
 .seg.big button{font-size:15px;padding:8px 14px}
 .opts{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
@@ -134,11 +146,6 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
 .spec td{padding:3px 0;border-bottom:1px solid var(--line);vertical-align:top}
 .spec td:last-child{text-align:right;font-family:var(--f-display);font-weight:700;font-variant-numeric:tabular-nums}
 
-.garage{background:color-mix(in srgb,var(--power) 10%,var(--card));border:1px solid var(--power);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
-.garage h3{margin:0;font-family:var(--f-display);font-weight:800;font-size:17px}
-.garage p{margin:0;font-size:14px}
-.score{display:flex;gap:14px;font-family:var(--f-display);font-weight:700;font-size:13px;font-variant-numeric:tabular-nums;flex-wrap:wrap}
-.stars{font-size:26px;letter-spacing:4px;color:var(--slip)}
 
 /* surimpressions sur la scène */
 .bar{position:absolute;left:max(12px,env(safe-area-inset-left,0px));right:12px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;align-items:center}
@@ -154,11 +161,15 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
 .part::before{content:"";width:12px;height:12px;border-radius:3px;border:1.5px solid var(--muted);background:transparent}
 .part[aria-pressed="true"]::before{background:var(--power);border-color:var(--power);box-shadow:inset 0 0 0 2px var(--card)}
 .part[aria-pressed="false"]{color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--muted) 60%,transparent)}
-.isobar{position:absolute;top:calc(92px + env(safe-area-inset-top,0px));left:max(12px,env(safe-area-inset-left,0px));display:flex;gap:8px;align-items:center;flex-wrap:wrap;right:12px}
+.parts[hidden]{display:none}
+.stage.parts-open .isobar{top:calc(92px + env(safe-area-inset-top,0px))}
+.isobar{position:absolute;top:calc(52px + env(safe-area-inset-top,0px));left:max(12px,env(safe-area-inset-left,0px));display:flex;gap:8px;align-items:center;flex-wrap:wrap;right:12px}
 .isobar .lbl{font-family:var(--f-display);font-weight:800;font-size:14px;background:var(--ink);color:var(--bg);padding:5px 10px;border-radius:8px}
-.tourcap{position:absolute;left:50%;transform:translateX(-50%);bottom:14px;width:min(560px,calc(100% - 24px));background:var(--ink);color:var(--bg);border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:center;box-shadow:0 10px 30px color-mix(in srgb,#000 30%,transparent)}
-.tourcap p{margin:0;flex:1;font-size:15px}
-.tourcap .tn{font-family:var(--f-display);font-weight:800;font-size:13px;opacity:.7;white-space:nowrap}
+.sensors{position:absolute;left:12px;top:44px;z-index:6;display:flex;gap:4px;align-items:flex-end;background:rgba(0,0,0,.6);padding:7px 10px;border-radius:8px;color:#fff;font-family:var(--f-display);font-weight:700;font-size:14px;pointer-events:none}
+.sensors b{width:10px;border-radius:2px;background:rgba(255,255,255,.18)}.sensors b:nth-child(1){height:10px}.sensors b:nth-child(2){height:16px}.sensors b:nth-child(3){height:22px}.sensors span{margin-left:6px}
+.street .seg{margin-top:8px}
+.panel.street-simple #manualBox,.panel.street-simple #autoBox,.panel.street-simple #handRow,.panel.street-simple #lessonSec,.panel:not(.street-simple) #streetDir{display:none!important}.steer{display:flex;align-items:center;gap:10px;margin-top:10px;font-weight:600}.steer input{flex:1}
+.stage.street-on .bar,.stage.street-on .isobar,.stage.street-on .tags,.stage.street-on .hint{display:none!important}
 .stage.reeling .bar,.stage.reeling .hint,.stage.reeling .tags,.stage.reeling .isobar,.stage.reeling .info{display:none!important}
 .reel{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top, rgba(0,0,0,.45), transparent 38%)}
 .reel-bars{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));left:12px;right:96px;display:flex;gap:4px}
@@ -212,8 +223,9 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
       <button class="view" data-v="wheel" data-en="Wheel and brake">Roue et frein</button>
       <button class="view" data-v="cabin" data-en="Cabin">Habitacle</button>
       <button class="view" data-v="below" data-en="Underneath">Dessous</button>
+      <button class="view" id="partsBtn" aria-pressed="false" data-en="🧩 Parts">🧩 Pièces</button>
     </div>
-    <div class="bar parts" id="parts">
+    <div class="bar parts" id="parts" hidden>
       <span class="bar-l" data-en="Show">Afficher</span>
       <button class="part" data-p="casing" aria-pressed="true" data-en="Engine casing">Carter moteur</button>
       <button class="part" data-p="internals" aria-pressed="true" data-en="Pistons and timing">Pistons et distribution</button>
@@ -232,6 +244,7 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
       <button class="btn alt" id="explodeBtn" hidden data-en="Spread the parts">Écarter les pièces</button>
       <button class="btn" id="isoAll" data-en="Show all">Tout voir</button>
     </div>
+    <div class="sensors" id="sensors" hidden><b></b><b></b><b></b><span id="sensTxt"></span></div>
     <div class="reel" id="reel" hidden>
       <div class="reel-bars" id="reelBars"></div>
       <svg class="reel-ptr" aria-hidden="true"><line id="ptrLine"/><circle id="ptrRing"/></svg>
@@ -247,17 +260,21 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
       <p class="state" id="infoState" hidden></p>
       <div class="row">
         <button class="btn" id="infoIso" data-en="Show alone">Voir seule</button>
-        <button class="btn warn" id="infoRepair" hidden data-en="Repair this part">Réparer cette pièce</button>
       </div>
     </div>
   </div>
 
   <aside class="panel">
     <header>
-      <h1 data-en="How a car works">Comment marche une voiture</h1>
-      <button class="linkbtn lang" id="langBtn" aria-label="Langue / Language"></button>
+      <h1 data-en="Garage &amp;amp; Road">Garage &amp; Route</h1>
+      <button class="lang" id="langBtn" aria-label="Langue / Language"></button>
       <p class="sub" id="subTxt"></p>
     </header>
+
+    <nav class="modes" id="appModes" aria-label="Que veux-tu faire ?" data-en-label="What do you want to do?">
+      <button class="mode act" data-app="explore" data-en="&lt;span class=&quot;mi&quot;&gt;🔍&lt;/span&gt;&lt;b&gt;Explore&lt;/b&gt;&lt;small&gt;Open the car up, part by part&lt;/small&gt;"><span class="mi">🔍</span><b>Découvrir</b><small>Ouvre la voiture, pièce par pièce</small></button>
+      <button class="mode" data-app="drive" data-en="&lt;span class=&quot;mi&quot;&gt;🚗&lt;/span&gt;&lt;b&gt;Drive&lt;/b&gt;&lt;small&gt;Drive in the street and park&lt;/small&gt;"><span class="mi">🚗</span><b>Conduire</b><small>Roule dans la rue et gare-toi</small></button>
+    </nav>
 
     <div class="row">
       <div class="seg big modeseg" id="modeSeg" role="group" aria-label="Type de voiture" data-en-label="Car type">
@@ -265,7 +282,19 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
       </div>
     </div>
 
-    <section class="garage" id="garageBox" hidden></section>
+    <section class="street" id="streetBox" hidden>
+      <h2 class="sec-h" data-en="Exercise">Exercice</h2>
+      <div class="seg" id="streetSpot" role="group" aria-label="Exercice" data-en-label="Exercise"><button data-k="par" class="act" data-en="Parallel parking">Créneau</button><button data-k="bay" data-en="Bay parking">Bataille</button></div>
+      <div class="row">
+        <div class="seg" id="streetGear" role="group" aria-label="Boîte" data-en-label="Gearbox"><button data-g="simple" class="act" data-en="Simple: forward / reverse">Simple : avant / arrière</button><button data-g="manual" data-en="Manual gearbox">Boîte manuelle</button></div>
+        <div class="seg" id="streetDir" role="group" aria-label="Conduite" data-en-label="Drive"><button data-k="up" data-en="▲ Forward">▲ Avancer</button><button data-k="brake" data-en="■ Brake">■ Freiner</button><button data-k="down" data-en="▼ Reverse">▼ Reculer</button></div>
+      </div>
+      <div class="seg" id="streetView" role="group" aria-label="Vue" data-en-label="View">
+        <button data-v="driver" data-en="Driver">Conducteur</button><button data-v="behind" class="act" data-en="Behind">Derrière</button><button data-v="front" data-en="Front">Devant</button><button data-v="top" data-en="Above">Dessus</button><button data-v="free" data-en="Free">Libre</button>
+      </div>
+      <label class="steer"><span data-en="Wheel">Volant</span><input type="range" id="steer" min="-100" max="100" value="0"></label>
+      <p class="note" data-en="&lt;kbd&gt;↑&lt;/kbd&gt; forward, &lt;kbd&gt;↓&lt;/kbd&gt; reverse, &lt;kbd&gt;Space&lt;/kbd&gt; brake, &lt;kbd&gt;←&lt;/kbd&gt; &lt;kbd&gt;→&lt;/kbd&gt; steer, &lt;kbd&gt;V&lt;/kbd&gt; view. Park in the green space!"><kbd>↑</kbd> avancer, <kbd>↓</kbd> reculer, <kbd>Espace</kbd> freiner, <kbd>←</kbd> <kbd>→</kbd> tourner, <kbd>V</kbd> vue. Gare-toi dans la place verte !</p>
+    </section>
 
     <section class="say" aria-live="polite">
       <div class="chips">
@@ -277,7 +306,6 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
       <p id="say"></p>
       <div class="row">
         <button class="btn" id="demoBtn" hidden data-en="▶ Show me">▶ Montre-moi</button>
-        <button class="btn warn" id="garageBtn" data-en="🔧 Game: Garage">🔧 Jeu : Garage</button>
       </div>
     </section>
 
@@ -295,9 +323,6 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
       </div>
       <div class="evread" id="evRead" hidden><div class="soc"><i id="socBar"></i></div><span id="socTxt"></span><span id="pwrTxt"></span></div>
       <div class="warnlights">
-        <span class="wl" id="wlBat" data-en="BATTERY">BATTERIE</span>
-        <span class="wl" id="wlEng" data-en="ENGINE">MOTEUR</span>
-        <span class="wl" id="wlBrk" data-en="BRAKES">FREINS</span>
         <span class="wl" id="wlReady" hidden>READY</span>
       </div>
     </section>
@@ -337,23 +362,19 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
         <div class="pr" id="selector">
           <button class="gbtn act" data-s="P">P</button><button class="gbtn" data-s="R">R</button><button class="gbtn" data-s="N">N</button><button class="gbtn" data-s="D">D</button>
         </div>
-        <div id="elemsWrap">
-          <table class="elems" id="elems" aria-label="Embrayages et freins serrés pour chaque rapport" data-en-label="Clutches and brakes applied for each gear"></table>
-          <p class="note" data-en="In green: the clutches (K) and brakes (B) that are applied. Two applied elements are enough for each gear.">En vert : les embrayages (K) et freins (B) serrés. Deux éléments serrés suffisent pour chaque rapport.</p>
-        </div>
       </div>
       <p class="note" id="evSelNote" hidden data-en="No gearbox: in D, the electric motor pushes from 0 to 150 km/h with a single ratio. In R, it simply spins backwards.">Pas de boîte de vitesses : en D, le moteur électrique pousse de 0 à 150 km/h avec un seul rapport. En R, il tourne simplement à l'envers.</p>
       <p class="note" data-en="Keys &lt;kbd&gt;P&lt;/kbd&gt; &lt;kbd&gt;R&lt;/kbd&gt; &lt;kbd&gt;N&lt;/kbd&gt; &lt;kbd&gt;D&lt;/kbd&gt;. To leave P, keep your foot on the brake.">Touches <kbd>P</kbd> <kbd>R</kbd> <kbd>N</kbd> <kbd>D</kbd>. Pour quitter P, garde le pied sur le frein.</p>
     </section>
 
-    <section>
+    <section id="lessonSec">
       <h2 class="sec-h" data-en="Your turn">À toi de jouer</h2>
       <ol class="steps" id="steps"></ol>
       <p class="note"><button class="linkbtn" id="resetBtn" data-en="Start again">Recommencer</button></p>
     </section>
 
-    <section>
-      <h2 class="sec-h" data-en="Display">Affichage</h2>
+    <details class="fold">
+      <summary><h2 class="sec-h" data-en="Display">Affichage</h2></summary>
       <div class="opts">
         <div class="seg" id="slow" role="group" aria-label="Ralenti" data-en-label="Slow motion">
           <button data-s="0.2" data-en="Slow-mo ÷5">Ralenti ÷5</button><button data-s="0.05" class="act">÷20</button><button data-s="0.0167">÷60</button>
@@ -361,7 +382,7 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
       </div>
       <div class="opts" style="margin-top:10px">
         <span class="sec-h" style="margin:0" data-en="Body">Carrosserie</span>
-        <div class="seg" id="bodySeg"><button data-b="ghost" class="act" data-en="See-through">Transparente</button><button data-b="solid" data-en="Solid">Pleine</button><button data-b="off" data-en="Hidden">Masquée</button></div>
+        <div class="seg" id="bodySeg"><button data-b="ghost" class="act" data-en="See-through">Transparente</button><button data-b="wire" data-en="Wireframe">Fil de fer</button><button data-b="off" data-en="Hidden">Masquée</button></div>
       </div>
       <div class="opts" style="margin-top:10px">
         <div class="swatches" id="swatches" aria-label="Couleur" data-en-label="Colour">
@@ -377,12 +398,12 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
         <label class="tog"><input type="checkbox" id="optSound" checked> <span data-en="Engine sound">Bruit du moteur</span></label>
       </div>
       <p class="note" data-en="A real engine spins far too fast to see: the parts move in slow motion. The dials, though, show the real speeds.">Un vrai moteur tourne bien trop vite pour qu'on le voie : les pièces bougent au ralenti. Les cadrans, eux, montrent les vraies vitesses.</p>
-    </section>
+    </details>
 
-    <section>
-      <h2 class="sec-h" data-en="Spec sheet">Fiche technique</h2>
+    <details class="fold">
+      <summary><h2 class="sec-h" data-en="Spec sheet">Fiche technique</h2></summary>
       <table class="spec" id="spec"></table>
       <p class="note" id="specNote"></p>
-    </section>
+    </details>
   </aside>
 </div>

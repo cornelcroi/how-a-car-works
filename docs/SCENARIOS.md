@@ -38,6 +38,21 @@ La page est en français et en anglais : chaque texte affiché (`t`, `d`, `cap`,
 }
 ```
 
+## Plans « se garer » (la voiture qui bouge)
+
+Dans les vidéos de stationnement, toute la voiture se déplace dans une rue fixe, en suivant un trajet calculé d'avance (`PARK_STEPS` pour le créneau, `PERP_STEPS` pour la bataille, dans `05`). Champs en plus :
+
+```js
+park: 3,              // joue l'étape 3 du trajet pendant le plan (ou [9,10] : plusieurs étapes à la suite)
+pose: 4,              // fige la voiture au début de l'étape 4 (pour regarder sous un autre angle)
+pAt: 0.6,             // l'étape démarre 0,6 s après le début du plan
+cam: {p:[x,y,z], t:[x,y,z], p2:[x,y,z]},   // caméra fixe dans la rue (p → p2 pendant le plan), regarde t
+cam: {car:true, p:[...], t:[...]},          // caméra attachée à la voiture (volant, vue de dessus des roues)
+slow: 1,              // temps réel : on voit la voiture rouler à 1,5 km/h
+```
+
+Rejouer la même étape sous un autre angle : deux plans de suite avec le même `park:k` et une `cam` différente. Le premier plan choisit le trajet dans son `act` (`PARK.plan = PLAN_PAR` ou `PLAN_PERP`).
+
 ## Actions disponibles
 
 | Action | Effet |

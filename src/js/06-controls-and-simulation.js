@@ -54,6 +54,7 @@ window.addEventListener('keydown', e=>{
   if(e.target.closest && e.target.closest('.pedal')) return;
   if(e.metaKey||e.ctrlKey||e.altKey) return;
   const k=e.key.toLowerCase();
+  if(STREET.on && STREET.gearbox==='simple' && (k==='arrowup' || k==='arrowdown' || k===' ')) return;
   if(KEYMAP[k] && !(k==='c' && S.mode==='auto')){ const p=KEYMAP[k]; if(!held[p]){ held[p]=true; anim[p]={to: p==='gas'?0.6:1, rate:3.2}; } e.preventDefault(); ensureAudio(); stopDemo(); return; }
   if(e.repeat) return;
   if(k==='k' || k==='enter'){ stopDemo(); pressStart(); return; }
@@ -63,7 +64,7 @@ window.addEventListener('keydown', e=>{
     else if(k==='n' || e.code==='Digit0') { stopDemo(); selectGear('N'); }
   } else if('prnd'.includes(k) && k.length===1){ stopDemo(); selectAuto(k.toUpperCase()); }
 });
-window.addEventListener('keyup', e=>{ const p=KEYMAP[e.key.toLowerCase()]; if(p){ held[p]=false; anim[p]={to:0, rate: p==='clutch'?1.1:3}; } });
+window.addEventListener('keyup', e=>{ const p=KEYMAP[e.key.toLowerCase()]; if(STREET.on && STREET.gearbox==='simple' && (e.key==='ArrowUp' || e.key==='ArrowDown')) return; if(p){ held[p]=false; anim[p]={to:0, rate: p==='clutch'?1.1:3}; } });
 window.addEventListener('blur', ()=>{ for(const p in held) if(held[p]){ held[p]=false; anim[p]={to:0, rate:3}; } });
 
 let nudgeClutchT = 0;
@@ -73,16 +74,11 @@ function pressStart(){
   if(S.cranking>0) return;
   if(S.mode==='ev'){
     if(!(S.sel==='P'||S.sel==='N')){ say(tr('Mets le levier sur P pour allumer la voiture.','Put the lever in P to switch the car on.'),4); return; }
-    gameOnStart();
-    if(FAULT.active && FAULT.kind==='ev12v'){ say(tr('Rien ne s\'allume… La petite batterie 12 V est vide : c\'est elle qui réveille l\'ordinateur de la voiture.','Nothing lights up… The small 12 V battery is flat: it\'s the one that wakes up the car\'s computer.'),5); return; }
     if(S.brake<0.3){ say(tr('Pour allumer une voiture électrique, garde le pied sur le frein en appuyant sur Démarrer.','To switch on an electric car, keep your foot on the brake while you press Start.'),4.5); return; }
     S.engineOn=true; S.runTime=0; say(tr('READY ! La voiture est prête… et complètement silencieuse.','READY! The car is ready… and completely silent.'),4); followAction('engine',3); return;
   }
   if(S.mode==='manual' && S.gear!=='N' && S.clutch < 0.6){ say(tr('Enfonce d\'abord la pédale d\'embrayage à fond (ou mets le point mort). Sinon la voiture ferait un bond au démarrage !','First press the clutch pedal all the way down (or select neutral). Otherwise the car would jump forward when it starts!'),5); nudgeClutchT=4; return; }
   if(S.mode==='auto' && !(S.sel==='P' || S.sel==='N')){ say(tr('Une boîte automatique ne démarre que sur P ou N. Mets le levier sur P.','An automatic only starts in P or N. Put the lever in P.'),4.5); return; }
-  gameOnStart();
-  if(FAULT.active && FAULT.kind==='battery'){ say(tr('Clic… La batterie est vide : elle n\'a plus assez d\'électricité pour faire tourner le démarreur.','Click… The battery is flat: it no longer has enough electricity to turn the starter motor.'),4); return; }
-  if(FAULT.active && FAULT.kind==='starter'){ say(tr('Rien ne tourne… Les phares marchent, donc ce n\'est pas la batterie.','Nothing turns… The headlights work, so it\'s not the battery.'),4); return; }
   S.cranking = 1.1; followAction('engine', 3);
 }
 $('startBtn').onclick = ()=>{ stopDemo(); pressStart(); };
@@ -105,7 +101,6 @@ function updateLever(dt){
 function selectGear(g){
   if(g===(LEV.pending||S.gear)) return;
   if(g!=='N' && S.engineOn && S.clutch < 0.85){ say(tr('Crrrrr ! Ça craque : les pignons tournent à des vitesses différentes. Enfonce l\'embrayage à fond, puis passe la vitesse.','Crrrrr! It grinds: the gears are spinning at different speeds. Press the clutch all the way down, then change gear.'),4.5); nudgeClutchT=4; flashEl($('shifter')); return; }
-  if(g==='3' && FAULT.kind==='synchro'){ gameTrigger(); if(FAULT.active){ say(tr('Crrrrr ! Impossible de passer la 3e, même avec l\'embrayage enfoncé.','Crrrrr! You can\'t get into 3rd, even with the clutch down.'),4); flashEl($('shifter')); return; } }
   if(g==='R' && S.v > 0.8){ say(tr('Arrête la voiture avant de passer la marche arrière.','Stop the car before you select reverse.'),3.5); return; }
   if(g!=='N' && g!=='R' && S.v < -0.8){ say(tr('Arrête la voiture avant de passer une vitesse pour avancer.','Stop the car before you select a forward gear.'),3.5); return; }
   if(S.gear!=='N') S.win = (S.v/WH.r)*RATIO_M[S.gear]*FD;
@@ -120,7 +115,7 @@ function selectAuto(s){
   if(s==='D' && S.v < -0.8){ say(tr('Arrête la voiture avant de passer en D.','Stop the car before you select D.'),3.5); return; }
   if(s==='D' && S.sel!=='D') S.agear = 1;
   S.sel = s; S.shiftT = 0.6;
-  document.querySelectorAll('#selector .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.s===s));
+  document.querySelectorAll('#selector .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.s===s)); 
   followAction('gearbox', 3.5);
 }
 function flashEl(s){ if(s.animate) s.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}],{duration:260}); }
@@ -132,13 +127,13 @@ const handBtn = $('handBtn');
 
 function setMode(m){
   if(m===S.mode) return;
-  stopDemo(); stopTour(); gameQuit();
+  stopDemo(); stopTour();
   Object.assign(S,{mode:m, engineOn:false, cranking:0, we:0, win:0, v:0, clutch:0, gas:0, brake:0, gear:'N', sel:'P', agear:1, lock:false});
   for(const k in anim) anim[k]=null; resetLever();
   document.querySelectorAll('#modeSeg button').forEach(b=>b.classList.toggle('act', b.dataset.m===m));
   const ev = m==='ev'; S.evSOC = 0.8;
   $('manualBox').hidden = m!=='manual'; $('autoBox').hidden = m==='manual';
-  $('elemsWrap').hidden = ev; $('evSelNote').hidden = !ev; $('handRow').hidden = ev; $('evRead').hidden = !ev; $('wlReady').hidden = !ev;
+  $('evSelNote').hidden = !ev; $('handRow').hidden = ev; $('evRead').hidden = !ev; $('wlReady').hidden = !ev;
   $('vTiming').hidden = ev; $('vClutch').hidden = ev; $('vPack').hidden = !ev; $('pEvCat').hidden = !ev;
   ['casing','internals','clutch'].forEach(k=>{ document.querySelector(`.part[data-p="${k}"]`).hidden = ev; });
   setTach(); renderSpec();
@@ -153,7 +148,7 @@ function setMode(m){
 document.querySelectorAll('#modeSeg button').forEach(b=> b.onclick = ()=> setMode(b.dataset.m));
 document.querySelectorAll('#slow button').forEach(b=> b.onclick = ()=>{ S.slow=+b.dataset.s; document.querySelectorAll('#slow button').forEach(x=>x.classList.toggle('act',x===b)); });
 document.querySelectorAll('#bodySeg button').forEach(b=> b.onclick = ()=>{ bodyMode=b.dataset.b; document.querySelectorAll('#bodySeg button').forEach(x=>x.classList.toggle('act',x===b)); applyBodyMode(); });
-document.querySelectorAll('#swatches .sw').forEach(b=> b.onclick = ()=>{ BODY.paint.color.set('#'+b.dataset.c); document.querySelectorAll('#swatches .sw').forEach(x=>x.classList.toggle('act',x===b)); });
+document.querySelectorAll('#swatches .sw').forEach(b=> b.onclick = ()=>{ BODY.paint.color.set('#'+b.dataset.c); applyBodyMode(); document.querySelectorAll('#swatches .sw').forEach(x=>x.classList.toggle('act',x===b)); });
 $('optTags').onchange = e=>{ tagsEl.hidden = !e.target.checked; };
 $('optSound').onchange = e=>{ if(e.target.checked) ensureAudio(); };
 
@@ -163,7 +158,7 @@ $('optSound').onchange = e=>{ if(e.target.checked) ensureAudio(); };
    SIMULATION
    ====================================================================== */
 function carStep(v, Fd, h){
-  let brakeF = 9500*S.brake; if(FAULT.active && FAULT.kind==='pads') brakeF *= 0.18;
+  let brakeF = 9500*S.brake;
   if(S.mode==='ev') brakeF *= 0.6;
   if((S.mode==='auto'||S.mode==='ev') && S.sel==='P') brakeF = 30000;
   const Fres = 160 + brakeF, drag = 0.43*v*Math.abs(v);
@@ -172,13 +167,10 @@ function carStep(v, Fd, h){
   if(Math.sign(nv)!==Math.sign(v) && Math.abs(Fd) < Fres) return 0;
   return nv;
 }
-const misfire = () => FAULT.active && FAULT.kind==='spark';
-const beltBroken = () => FAULT.active && FAULT.kind==='belt';
-const cvBroken = () => FAULT.active && FAULT.kind==='cv';
 let outFree = 0;   // vitesse de l'arbre de sortie quand un cardan est cassé
 function engineTorque(rpm){
   let Te = 0;
-  if(S.engineOn){ if(rpm < 6600) Te = S.gas*torqueCurve(rpm)*(misfire()?0.7:1); Te += clamp(10 + 3*(W_IDLE - S.we), 0, 80); }
+  if(S.engineOn){ if(rpm < 6600) Te = S.gas*torqueCurve(rpm); Te += clamp(10 + 3*(W_IDLE - S.we), 0, 80); }
   if(S.cranking>0) Te += 55*Math.max(0, 1 - S.we/30);
   if(S.hand && !S.engineOn && S.cranking<=0) Te += 40*Math.max(0, 1 - S.we/6.3);
   return Te;
@@ -187,15 +179,14 @@ function simulate(dt){
   for(const k in anim){ const a=anim[k]; if(!a) continue; const d=a.to-S[k], st=a.rate*dt; if(Math.abs(d)<=st){ S[k]=a.to; anim[k]=null; } else S[k]+=Math.sign(d)*st; }
   if(S.mode==='auto') S.clutch = 0;
   if(S.cranking>0){ S.cranking -= dt; if(S.cranking<=0){ S.cranking=0;
-      if(beltBroken()) say(tr('Le démarreur fait tourner le moteur… mais il ne démarre pas. Regarde bien ce qui tourne et ce qui ne tourne pas.','The starter turns the engine… but it doesn\'t start. Look closely at what turns and what doesn\'t.'),5);
-      else { S.engineOn=true; S.runTime=0; } } }
+      S.engineOn=true; S.runTime=0; } }
   if(S.engineOn) S.runTime += dt;
   const n = Math.max(20, Math.ceil(dt/0.0004)), h = dt/n; let slipAcc = 0;
   const ratio = ratioNow();
   if(S.mode==='ev'){ simEV(n,h,dt); }
   else if(S.mode==='manual'){
-    const e = engagement(), C = (FAULT.active && FAULT.kind==='clutch' ? 75 : 330)*Math.pow(e,1.6);
-    const free = !ratio || cvBroken();
+    const e = engagement(), C = 330*Math.pow(e,1.6);
+    const free = !ratio;
     for(let i=0;i<n;i++){
       const Te = engineTorque(S.we*RPM);
       const Tf = S.we > 0.5 ? 8 + 0.03*S.we : S.we*16;
@@ -207,12 +198,11 @@ function simulate(dt){
       slipAcc += Math.abs(S.we - S.win);
     }
     S.slipLast = slipAcc/n;
-    outFree = cvBroken() && ratio ? S.win/ratio : (S.v/WH.r)*FD;
+    outFree = (S.v/WH.r)*FD;
     if(S.engineOn && S.runTime > 0.6 && S.we*RPM < 350){ S.engineOn=false; say(ratio && e>0 ? tr('Le moteur a calé ! L\'embrayage est remonté trop vite. Enfonce l\'embrayage, redémarre, puis relâche-le doucement avec un peu d\'accélérateur.','The engine stalled! The clutch came up too fast. Press the clutch, restart, then let it up gently with a bit of accelerator.') : tr('Le moteur a calé.','The engine stalled.'), 6); }
   } else {
     autoShiftLogic(dt);
-    const drive = (S.sel==='D' || S.sel==='R') && !cvBroken();
-    const tcDead = FAULT.active && FAULT.kind==='converter';
+    const drive = S.sel==='D' || S.sel==='R';
     for(let i=0;i<n;i++){
       const Te = engineTorque(S.we*RPM);
       const Tf = S.we > 0.5 ? 8 + 0.03*S.we : S.we*16;
@@ -220,25 +210,23 @@ function simulate(dt){
       let Tp, Tt;
       if(S.lock){ Tp = Tt = clamp(KC*(S.we - wt), -420, 420); }
       else { Tp = KTC*(S.we*Math.abs(S.we) - wt*Math.abs(wt)); const SR = S.we>1 ? wt/S.we : 1; S.tcSR = SR; Tt = Tp*(Tp>0 && SR<0.85 ? 2 - SR/0.85 : 1); }
-      if(tcDead){ Tp *= 0.35; Tt = 0; }
       S.we = Math.max(0, S.we + (Te - Tf - Tp)/IE*h);
       if(drive){ S.v = carStep(S.v, Tt*ratio*FD/WH.r, h); S.win = (S.v/WH.r)*ratio*FD; }
       else { const Tfi = Math.abs(S.win)>0.5 ? 0.6*Math.sign(S.win)+0.012*S.win : S.win*0.8; S.win += (Tt - Tfi)/IIN*h; S.v = carStep(S.v, 0, h); }
     }
-    outFree = cvBroken() && ratio ? S.win/ratio : (S.v/WH.r)*FD;
+    outFree = (S.v/WH.r)*FD;
     if(S.engineOn && S.runTime > 0.6 && S.we*RPM < 300){ S.engineOn=false; say(tr('Le moteur s\'est arrêté.','The engine stopped.'),4); }
   }
-  if(beltBroken() && S.engineOn){ S.engineOn=false; }
   if(S.msgT>0) S.msgT -= dt;
   if(nudgeClutchT>0) nudgeClutchT -= dt;
 }
 function simEV(n,h,dt){
-  const dir = S.sel==='D'?1:S.sel==='R'?-1:0, dead = FAULT.active && FAULT.kind==='inverter';
+  const dir = S.sel==='D'?1:S.sel==='R'?-1:0;
   let Psum=0, T=0;
   for(let i=0;i<n;i++){
     const wm = (S.v/WH.r)*EV_TOTAL, wa = Math.abs(wm);
     T = 0;
-    if(S.engineOn && dir && !dead && !cvBroken()){
+    if(S.engineOn && dir){
       const Tav = Math.min(EV.Tmax, EV.Pmax/Math.max(wa,1)) * (wa*RPM > EV.rpmMax ? 0 : 1);
       if(S.gas>0.02) T = dir*S.gas*Tav;
       else if(Math.abs(S.v)<1.2){ if(S.brake<0.1) T = dir*30; }
@@ -249,8 +237,7 @@ function simEV(n,h,dt){
   }
   S.evT = T; S.evP = Psum/n;
   S.evSOC = clamp(S.evSOC - (S.evP>0 ? S.evP/0.9 : S.evP*0.7)*dt/(EV.kWh*3.6e6)*40, 0, 1);   // ×40 pour que ça se voie
-  if(cvBroken() && S.engineOn && dir){ S.win += ((dir*S.gas*900) - S.win)*Math.min(1,dt*3); S.we = S.win; outFree = S.win/EV_R1; }
-  else { S.we = (S.v/WH.r)*EV_TOTAL; S.win = S.we; outFree = (S.v/WH.r)*FD; }
+  S.we = (S.v/WH.r)*EV_TOTAL; S.win = S.we; outFree = (S.v/WH.r)*FD;
 }
 let lastAutoShift = 0;
 function autoShiftLogic(dt){

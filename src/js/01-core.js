@@ -18,7 +18,7 @@ const tr = (frText, enText)=> IS_EN ? enText : frText;
 const fr = (x,d=1)=> IS_EN ? x.toFixed(d) : x.toFixed(d).replace('.',',');   // nombre formaté selon la langue
 if(IS_EN){
   document.documentElement.lang = 'en';
-  document.title = 'How a car works';
+  document.title = 'Garage & Road';
   document.querySelectorAll('[data-en]').forEach(el=>{ el.innerHTML = el.dataset.en; });
   document.querySelectorAll('[data-en-label]').forEach(el=>{ el.setAttribute('aria-label', el.dataset.enLabel); });
 }

@@ -1,148 +1,5 @@
 
 /* ======================================================================
-   JEU : GARAGE
-   ====================================================================== */
-const FAULTS = [
-  {k:'spark', modes:['manual','auto'], parts:['spark'], name:tr('Bougie d\'allumage morte','Dead spark plug'),
-   trig:()=> S.engineOn && S.runTime>4,
-   sym:tr('Le moteur tousse et tremble, il a moins de force. Le voyant MOTEUR s\'est allumé.','The engine coughs and shakes, and it has less power. The ENGINE warning light is on.'),
-   hints:[tr('Le problème est à l\'intérieur du moteur : enlève le « Carter moteur » dans la barre Afficher.','The problem is inside the engine: turn off "Engine casing" in the Show bar.'),tr('Regarde les petites flammes orange dans les cylindres : il en manque une. Qu\'est-ce qui fait l\'étincelle ?','Look at the small orange flames in the cylinders: one is missing. What makes the spark?')],
-   fix:tr('Le moteur tourne rond à nouveau.','The engine runs smoothly again.')},
-  {k:'belt', modes:['manual','auto'], parts:['belt'], name:tr('Courroie de distribution cassée','Broken timing belt'),
-   trig:()=> S.engineOn && Math.abs(S.v)*3.6>30,
-   sym:tr('Le moteur s\'est arrêté net en roulant et ne veut plus redémarrer : le démarreur tourne, mais le moteur ne part pas.','The engine stopped dead while driving and won\'t restart: the starter turns, but the engine doesn\'t start.'),
-   hints:[tr('Appuie sur Démarrer et regarde la vue « Distribution » : est-ce que les arbres à cames tournent ?','Press Start and look at the "Timing" view: are the camshafts turning?'),tr('Quelque chose relie le vilebrequin aux arbres à cames, et ce n\'est plus là…','Something links the crankshaft to the camshafts, and it\'s not there any more…')],
-   fix:tr('Les soupapes s\'ouvrent à nouveau au bon moment.','The valves open at the right moment again.')},
-  {k:'battery', modes:['manual','auto'], parts:['battery'], name:tr('Batterie vide','Flat battery'), atStart:true,
-   sym:tr('Quand tu tournes la clé : juste un petit « clic ». Le voyant BATTERIE est allumé et les phares sont tout faibles.','When you turn the key: just a small "click". The BATTERY warning light is on and the headlights are very dim.'),
-   hints:[tr('Qu\'est-ce qui donne l\'électricité au démarreur et aux phares ?','What gives electricity to the starter and the headlights?'),tr('Vue « Moteur » : cherche une boîte noire avec une borne rouge, au-dessus de la boîte de vitesses.','"Engine" view: look for a black box with a red terminal, above the gearbox.')],
-   fix:tr('La batterie est chargée.','The battery is charged.')},
-  {k:'starter', modes:['manual','auto'], parts:['starter'], name:tr('Démarreur en panne','Broken starter'), atStart:true,
-   sym:tr('Quand tu tournes la clé, rien ne tourne. Pourtant les phares s\'allument bien fort : la batterie est bonne.','When you turn the key, nothing turns. Yet the headlights are nice and bright: the battery is fine.'),
-   hints:[tr('Quelle pièce fait tourner le moteur au démarrage ?','Which part turns the engine when you start it?'),tr('Regarde près du volant moteur, entre le moteur et la boîte (vue « Embrayage »).','Look near the flywheel, between the engine and the gearbox ("Clutch" view).')],
-   fix:tr('Le démarreur lance le moteur.','The starter cranks the engine.')},
-  {k:'clutch', modes:['manual'], parts:['disc'], name:tr('Disque d\'embrayage usé','Worn clutch disc'),
-   trig:()=> S.engineOn && S.gear!=='N' && S.gear!=='1' && S.gas>0.35 && engagement()>0.95 && S.slipLast>40,
-   sym:tr('Quand tu accélères, le moteur monte dans les tours mais la voiture n\'accélère presque pas. Ça sent le brûlé !','When you accelerate, the engine revs up but the car barely speeds up. It smells burnt!'),
-   hints:[tr('Le moteur va bien, mais sa force n\'arrive pas jusqu\'à la boîte.','The engine is fine, but its force doesn\'t reach the gearbox.'),tr('Vue « Embrayage », accélère en 3e et regarde : le disque tourne moins vite que le volant moteur…','"Clutch" view: accelerate in 3rd and watch: the disc turns slower than the flywheel…')],
-   fix:tr('L\'embrayage ne patine plus.','The clutch doesn\'t slip any more.')},
-  {k:'pads', parts:['caliper'], name:tr('Plaquettes de frein usées','Worn brake pads'),
-   trig:()=> Math.abs(S.v)*3.6>25 && S.brake>0.3,
-   sym:tr('Tu appuies sur le frein mais la voiture ralentit à peine ! Le voyant FREINS est allumé.','You press the brake but the car barely slows down! The BRAKES warning light is on.'),
-   hints:[tr('Va voir derrière une roue : vue « Roue et frein ».','Go and look behind a wheel: "Wheel and brake" view.'),tr('Ce qui frotte sur le disque est tout usé.','The thing that rubs on the disc is all worn out.')],
-   fix:tr('Les freins mordent à nouveau.','The brakes bite again.')},
-  {k:'cv', parts:['cv'], name:tr('Cardan cassé','Broken driveshaft'),
-   trig:()=> S.engineOn && ratioNow()!==0 && engagement()>0.9 && Math.abs(S.v)*3.6>15,
-   sym:tr('Clac ! La voiture n\'avance plus : le moteur tourne, la vitesse est passée, mais les roues ne sont plus entraînées.','Clunk! The car doesn\'t move any more: the engine runs, a gear is in, but the wheels are no longer driven.'),
-   hints:[tr('La force arrive jusqu\'au différentiel… Regarde la vue « Dessous » en accélérant.','The force reaches the differential… Look at the "Underneath" view while you accelerate.'),tr('Un des deux arbres qui vont aux roues tourne tout seul, très vite, et son soufflet est déchiré.','One of the two shafts going to the wheels spins on its own, very fast, and its CV boot is torn.')],
-   fix:tr('Les deux roues sont à nouveau entraînées.','Both wheels are driven again.')},
-  {k:'converter', modes:['auto'], parts:['tcturbine','tcimpeller','tcstator','tclockup','tcoil'], name:tr('Convertisseur de couple en panne','Broken torque converter'),
-   trig:()=> S.engineOn && S.sel==='D' && S.gas>0.15,
-   sym:tr('En D, le moteur monte dans les tours mais la voiture ne bouge pas.','In D, the engine revs up but the car doesn\'t move.'),
-   hints:[tr('Le moteur va bien. Qu\'est-ce qui remplace l\'embrayage dans une boîte automatique ?','The engine is fine. What replaces the clutch in an automatic gearbox?'),tr('Vue « Convertisseur » : la turbine tourne-t-elle quand la pompe tourne ?','"Converter" view: does the turbine turn when the pump turns?')],
-   fix:tr('La turbine est à nouveau entraînée par l\'huile.','The oil drives the turbine again.')},
-  {k:'synchro', modes:['manual'], parts:['synchro'], name:tr('Synchro de 3e cassé','Broken 3rd-gear synchro'), triggerOnGear3:true,
-   sym:tr('Impossible de passer la 3e : ça craque à chaque fois, même avec l\'embrayage enfoncé.','You can\'t get 3rd: it grinds every time, even with the clutch pressed down.'),
-   hints:[tr('Le problème est dans la boîte de vitesses (vue « Boîte »).','The problem is in the gearbox ("Gearbox" view).'),tr('Qu\'est-ce qui glisse pour verrouiller un pignon sur l\'arbre ? Un des anneaux est abîmé.','What slides along to lock a gear onto the shaft? One of the rings is damaged.')],
-   fix:tr('La 3e passe sans craquer.','3rd goes in without grinding.')},
-];
-FAULTS.push(
-  {k:'ev12v', modes:['ev'], parts:['battery'], name:tr('Batterie 12 V vide','Flat 12 V battery'), atStart:true,
-   sym:tr('Pied sur le frein, tu appuies sur Démarrer… rien ne s\'allume, pas de READY. Le voyant BATTERIE est allumé.','Foot on the brake, you press Start… nothing lights up, no READY. The BATTERY warning light is on.'),
-   hints:[tr('Une voiture électrique a aussi une petite batterie 12 V, comme une voiture à essence.','An electric car also has a small 12 V battery, like a petrol car.'),tr('Vue « Moteur » : cherche une boîte noire avec une borne rouge, à l\'avant.','"Engine" view: look for a black box with a red terminal, at the front.')],
-   fix:tr('La voiture se réveille à nouveau.','The car wakes up again.')},
-  {k:'inverter', modes:['ev'], parts:['inverter'], name:tr('Onduleur en panne','Broken inverter'),
-   trig:()=> S.engineOn && S.sel==='D' && S.gas>0.15,
-   sym:tr('READY est allumé, tu accélères… mais la voiture ne bouge pas, et les bobines du moteur restent éteintes.','READY is on, you accelerate… but the car doesn\'t move, and the motor\'s coils stay dark.'),
-   hints:[tr('La batterie est chargée. Le courant arrive-t-il jusqu\'au moteur ?','The battery is charged. Does the current reach the motor?'),tr('Ce qui transforme le courant de la batterie pour le moteur ne marche plus (au-dessus du moteur).','The thing that converts the battery\'s current for the motor has stopped working (above the motor).')],
-   fix:tr('Le courant arrive à nouveau dans les bobines.','Current reaches the coils again.')});
-const GAME = { state:'off', f:null, t0:0, tFault:0, errors:0, hints:0, verify:null, lastHintT:0 };
-function missionText(){ const f=GAME.f; if(f.k==='synchro') return tr('Démarre, puis roule en passant la 1re, la 2e et la 3e.','Start, then drive through 1st, 2nd and 3rd.');
-  if(f.k==='pads') return tr('Démarre, roule jusqu\'à 50 km/h puis freine pour t\'arrêter.','Start, drive up to 50 km/h, then brake to a stop.');
-  if(S.mode==='ev') return tr('Allume la voiture (pied sur le frein), passe en D et roule jusqu\'à 60 km/h.','Switch the car on (foot on the brake), select D and drive up to 60 km/h.');
-  if(S.mode==='auto') return tr('Démarre, passe en D et roule jusqu\'à 60 km/h.','Start, select D and drive up to 60 km/h.');
-  return tr('Démarre et roule jusqu\'à 60 km/h en passant les vitesses.','Start and drive up to 60 km/h, changing gears.'); }
-function gameStart(){
-  stopDemo(); stopTour(); if(iso) unIsolate();
-  const pool = FAULTS.filter(f=>!f.modes || f.modes.includes(S.mode));
-  const f = pool[Math.floor(Math.random()*pool.length)];
-  Object.assign(S,{engineOn:false, cranking:0, we:0, win:0, v:0, clutch:0, gas:0, brake:0, gear:'N', sel:'P', agear:1, lock:false}); for(const k in anim) anim[k]=null; resetLever();
-  document.querySelectorAll('#shifter .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.g==='N'));
-  document.querySelectorAll('#selector .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.s==='P'));
-  Object.assign(GAME,{state:'drive', f, t0:performance.now(), errors:0, hints:0, verify:null, fastSeen:false});
-  Object.assign(FAULT,{kind:f.k, active:false, cyl:1+Math.floor(Math.random()*3)});
-  resetFaultVisuals(); renderGarage(); $('garageBtn').textContent=tr('✖ Quitter le jeu','✖ Quit the game');
-}
-function gameQuit(){ GAME.state='off'; FAULT.kind=null; FAULT.active=false; resetFaultVisuals(); refreshVis(); $('garageBox').hidden=true; $('garageBtn').textContent=tr('🔧 Jeu : Garage','🔧 Game: Garage'); $('infoRepair').hidden=true; }
-$('garageBtn').onclick = ()=>{ GAME.state==='off' || GAME.state==='done' ? gameStart() : gameQuit(); };
-function gameOnStart(){ if(GAME.state==='drive' && GAME.f.atStart) gameTrigger(); }
-function gameTrigger(){
-  if(GAME.state!=='drive' || FAULT.active) return;
-  FAULT.active = true; GAME.state='fault'; GAME.tFault=performance.now(); GAME.lastHintT=performance.now();
-  applyFaultVisuals(); refreshVis(); renderGarage();
-  if(FAULT.kind==='cv'||FAULT.kind==='belt') say(FAULT.kind==='cv'?tr('CLAC !','CLUNK!'):tr('Le moteur s\'est arrêté net !','The engine stopped dead!'),3);
-}
-function gameRepair(key){
-  if(GAME.state!=='fault') return;
-  if(GAME.f.parts.includes(key)){
-    FAULT.active=false; resetFaultVisuals(); refreshVis();
-    GAME.state='verify'; renderGarage(); say(tr('Réparé ! ','Fixed! ')+GAME.f.fix+tr(' Vérifie maintenant que tout marche.',' Now check that everything works.'),5);
-    $('infoRepair').hidden=true; $('info').hidden=true;
-  } else { GAME.errors++; say(tr(`${INFO[key]?INFO[key].t:'Cette pièce'} : en bon état. Ce n\'est pas elle ! (+1 erreur)`, `${INFO[key]?INFO[key].t:'This part'}: in good shape. It's not this one! (+1 mistake)`),4); renderGarage(); }
-}
-$('infoRepair').onclick = ()=>{ if(infoKey) gameRepair(infoKey); };
-const gameGoal = ()=>{ const f=GAME.f, kmh=Math.abs(S.v)*3.6;
-  if(f.k==='battery'||f.k==='starter'||f.k==='ev12v') return S.engineOn;
-  if(f.k==='synchro') return S.gear==='3' && engagement()>0.9 && kmh>15;
-  if(f.k==='pads') return GAME.fastSeen && kmh<1 || (kmh>30 && (GAME.fastSeen=true) && false);
-  return S.engineOn && kmh>50; };
-function gameTick(){
-  if(GAME.state==='drive' && GAME.f.trig && GAME.f.trig()) gameTrigger();
-  if(GAME.state==='verify'){
-    if(GAME.f.k==='pads' && Math.abs(S.v)*3.6>30) GAME.fastSeen=true;
-    if(gameGoal()){ GAME.state='done'; renderGarage(); }
-  }
-  if(GAME.state==='fault' && GAME.hints < GAME.f.hints.length && performance.now()-GAME.lastHintT > 25000 && !$('hintBtn')?.classList.contains('nudge')) $('hintBtn')?.classList.add('nudge');
-  if(GAME.state==='drive' || GAME.state==='fault' || GAME.state==='verify'){ const el=$('gTime'); if(el) el.textContent = fmtT((performance.now()-GAME.t0)/1000); }
-}
-const fmtT = s => `${Math.floor(s/60)} min ${String(Math.floor(s%60)).padStart(2,'0')} s`;
-function renderGarage(){
-  const box=$('garageBox'); box.hidden=false; const f=GAME.f;
-  const score = `<div class="score"><span>⏱ <span id="gTime">${fmtT((performance.now()-GAME.t0)/1000)}</span></span><span>❌ ${GAME.errors} ${tr('erreur','mistake')}${(IS_EN?GAME.errors!==1:GAME.errors>1)?'s':''}</span><span>💡 ${GAME.hints} ${tr('indice','hint')}${(IS_EN?GAME.hints!==1:GAME.hints>1)?'s':''}</span></div>`;
-  if(GAME.state==='drive') box.innerHTML = `<h3>🔧 Mission</h3><p>${missionText()}</p><p class="note">${tr('Une panne va arriver… À toi de trouver la pièce en cause.','A fault is coming… Your job is to find the part to blame.')}</p>${score}`;
-  else if(GAME.state==='fault'){
-    const hs = f.hints.slice(0,GAME.hints).map(h=>`<p>💡 ${h}</p>`).join('');
-    box.innerHTML = `<h3>${tr('⚠️ Panne !','⚠️ Breakdown!')}</h3><p><b>${f.sym}</b></p><p>${tr('Inspecte la voiture : touche la pièce que tu soupçonnes, puis appuie sur « Réparer cette pièce ».','Inspect the car: tap the part you suspect, then press "Repair this part".')}</p>${hs}
-      <div class="row">${GAME.hints<f.hints.length?'<button class="btn alt" id="hintBtn">'+tr('💡 Indice','💡 Hint')+'</button>':''}</div>${score}`;
-    const hb=$('hintBtn'); if(hb) hb.onclick=()=>{ GAME.hints++; GAME.lastHintT=performance.now(); renderGarage(); };
-  }
-  else if(GAME.state==='verify') box.innerHTML = tr(`<h3>✅ Réparé : ${f.name}</h3><p>Vérifie que tout marche : ${missionText().toLowerCase()}</p>${score}`, `<h3>✅ Fixed: ${f.name}</h3><p>Check that everything works: ${missionText().toLowerCase()}</p>${score}`);
-  else if(GAME.state==='done'){
-    const tt = (performance.now()-GAME.t0)/1000; const stars = GAME.errors===0 && GAME.hints===0 ? 3 : GAME.errors+GAME.hints<=2 ? 2 : 1;
-    box.innerHTML = `<h3>${tr('🏁 Voiture réparée !','🏁 Car fixed!')}</h3><div class="stars">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</div><p>${tr('La panne','The fault')}${tr(' : ',': ')}<b>${f.name}</b>.</p>
-      <div class="score"><span>⏱ ${fmtT(tt)}</span><span>❌ ${GAME.errors} ${tr('erreur','mistake')}${(IS_EN?GAME.errors!==1:GAME.errors>1)?'s':''}</span><span>💡 ${GAME.hints} ${tr('indice','hint')}${(IS_EN?GAME.hints!==1:GAME.hints>1)?'s':''}</span></div>
-      <div class="row"><button class="btn warn" id="againBtn">${tr('Nouvelle panne','New fault')}</button></div>`;
-    $('againBtn').onclick = gameStart; $('garageBtn').textContent=tr('🔧 Jeu : Garage','🔧 Game: Garage');
-  }
-}
-const FV = {};   // visuels de panne
-function applyFaultVisuals(){
-  const k = FAULT.kind;
-  if(k==='spark'){ const tip=R.plugs[FAULT.cyl].children[0]; FV.tip=[tip, tip.material]; tip.material = metal(0x111111,{roughness:1}); }
-  if(k==='clutch'){ const m=R.clutch.disc.children[0].material; FV.disc=[m, m.color.getHex()]; m.color.setHex(0x3a2412); }
-  if(k==='pads'){ FV.pads = []; R.calipers.forEach(c=>c.pads.forEach(p=>{ FV.pads.push(p); p.scale.z=0.3; })); }
-  if(k==='cv'){ const b=R.shafts[0].boot; FV.boot=[b, b.material]; b.material = plastic(0x8c1f1a); b.scale.set(1,0.5,1); }
-  if(k==='synchro'){ const c=R.man.coll['34'].g; FV.coll=[]; c.traverse(o=>{ if(o.isMesh){ FV.coll.push([o,o.material]); o.material = metal(0x8c3a2a,{roughness:0.8}); } }); }
-}
-function resetFaultVisuals(){
-  if(FV.tip){ FV.tip[0].material=FV.tip[1]; FV.tip=null; }
-  if(FV.disc){ FV.disc[0].color.setHex(FV.disc[1]); FV.disc=null; }
-  if(FV.pads){ FV.pads.forEach(p=>p.scale.z=1); FV.pads=null; }
-  if(FV.boot){ FV.boot[0].material=FV.boot[1]; FV.boot[0].scale.set(1,1,1); FV.boot=null; }
-  if(FV.coll){ FV.coll.forEach(([o,m])=>o.material=m); FV.coll=null; }
-}
-
-/* ======================================================================
    EXPLICATIONS, LEÇON, DÉMO
    ====================================================================== */
 const ORD = g => IS_EN ? (g==='R' ? 'reverse' : g+({1:'st',2:'nd',3:'rd'}[g]||'th')) : (g==='R' ? 'marche arrière' : g+(g==='1'||g===1?'re':'e'));
@@ -151,12 +8,12 @@ function narrate(){
   const man = S.mode==='manual';
   const slipping = man && ((e>0 && e<1 && S.slipLast > 6) || (e>0 && S.slipLast > 12));
   const live = S.engineOn || S.cranking>0 || S.hand;
-  const driven = live && ratio && e>0 && !cvBroken();
+  const driven = live && ratio && e>0;
   const ev = S.mode==='ev';
   if(ev){ const regen = S.engineOn && S.evP < -500, push = S.engineOn && S.evP > 500;
     setChip('chE',tr('Voiture','Car'), S.engineOn ? 'READY' : tr('Éteinte','Off'), S.engineOn?'good':'');
     setChip('chC',tr('Moteur électrique','Electric motor'), regen ? tr('Recharge','Charging') : push ? tr('Pousse','Pushing') : tr('Au repos','Resting'), regen?'good':push?'on':'');
-    setChip('chW',tr('Roues','Wheels'), S.engineOn && ratio && !cvBroken() ? tr('Entraînées','Driven') : tr('Libres','Free'), S.engineOn && ratio?'on':''); }
+    setChip('chW',tr('Roues','Wheels'), S.engineOn && ratio ? tr('Entraînées','Driven') : tr('Libres','Free'), S.engineOn && ratio?'on':''); }
   else {
   setChip('chE',tr('Moteur','Engine'), S.cranking>0 ? tr('Démarre…','Starting…') : S.engineOn ? tr('Tourne','Running') : S.hand ? tr('Tourné à la main','Turned by hand') : tr('Arrêté','Stopped'), live?'on':'');
   if(man){ const cs = e===0 ? tr('Débrayé','Disengaged') : slipping ? tr('Patine','Slipping') : tr('Embrayé','Engaged'); setChip('chC',tr('Embrayage','Clutch'), cs, e===0?'':slipping?'slip':'good'); }
@@ -217,17 +74,13 @@ function narrate(){
   pedals.clutch.classList.toggle('nudge', needClutch && !demo);
   pedals.brake.classList.toggle('nudge', !man && !demo && lesson.done===0 && S.brake<0.5);
   const startReady = !S.engineOn && !S.cranking && (man ? (S.gear==='N'||S.clutch>=0.6) && lesson.done>=1 : (S.sel==='P'||S.sel==='N') && lesson.done>=1);
-  $('startBtn').classList.toggle('nudge', !demo && startReady && GAME.state==='off');
+  $('startBtn').classList.toggle('nudge', !demo && startReady);
 
   const gb=$('gearBig'); const gtxt = man ? S.gear : (S.sel==='D' && !ev ? 'D'+S.agear : S.sel);
   if(gb.firstChild.nodeValue!==gtxt) gb.firstChild.nodeValue=gtxt; gb.style.borderColor = driven ? 'var(--power)' : '';
   const sb=$('startBtn'); sb.classList.toggle('running', S.engineOn); sb.firstChild.firstChild.nodeValue = S.engineOn ? (ev?tr('ÉTEINDRE','SWITCH OFF'):tr('COUPER','STOP')) : S.cranking>0 ? '…' : (ev?tr('ALLUMER','SWITCH ON'):tr('DÉMARRER','START'));
-  document.querySelectorAll('#elems tr[data-g]').forEach(row=>row.classList.toggle('cur', !man && ((S.sel==='D' && row.dataset.g===String(S.agear)) || (S.sel==='R' && row.dataset.g==='R'))));
-  $('wlBat').classList.toggle('lit', FAULT.active && (FAULT.kind==='battery'||FAULT.kind==='ev12v'));
   $('wlReady').classList.toggle('lit', ev && S.engineOn); $('wlReady').classList.add('green');
   if(ev){ $('socBar').style.width = Math.round(S.evSOC*100)+'%'; setText('socTxt', Math.round(S.evSOC*100)+tr(' %','%')); const kw=Math.round(S.evP/1000); setText('pwrTxt', (kw>0?'+':'')+kw+' kW'); $('pwrTxt').style.color = kw<0 ? 'var(--ok)' : kw>0 ? 'var(--power)' : ''; }
-  $('wlEng').classList.toggle('lit', FAULT.active && (FAULT.kind==='spark'||FAULT.kind==='belt'||FAULT.kind==='inverter')); $('wlEng').classList.add('amber');
-  $('wlBrk').classList.toggle('lit', FAULT.active && FAULT.kind==='pads');
 }
 function setChip(id, name, val, cls){ const el=$(id); const html=`${name} <b>${val}</b>`; if(el._h!==html){ el.innerHTML=html; el._h=html; } el.className='chip '+cls; }
 function setText(id, t){ const el=$(id); if(el.textContent!==t) el.textContent=t; }
@@ -309,15 +162,17 @@ function ensureAudio(){
 function updateAudio(){
   if(!AC) return;
   const on = $('optSound').checked && (S.engineOn || S.cranking>0);
-  if(S.mode==='ev'){ const t=AC.currentTime, rpmE=Math.abs(S.we*RPM); osc1.type='sine'; osc1.frequency.setTargetAtTime(120+rpmE*0.11, t, 0.05); osc2.frequency.setTargetAtTime(60+rpmE*0.055, t, 0.05);
-    filt.frequency.setTargetAtTime(2500, t, 0.1); gain.gain.setTargetAtTime($('optSound').checked && S.engineOn && rpmE>50 ? 0.01 + Math.min(0.025, Math.abs(S.evP)/4e6) : 0, t, 0.1); return; }
-  osc1.type='sawtooth';
+  if(S.mode==='ev'){   // sifflement électrique doux, une quinte, qui monte avec le moteur ; silence à l'arrêt
+    const t=AC.currentTime, rpmE=Math.abs(S.we*RPM), f = 150 + rpmE*0.075; osc1.type='triangle'; osc2.type='sine';
+    osc1.frequency.setTargetAtTime(f, t, 0.05); osc2.frequency.setTargetAtTime(f*1.5, t, 0.05);
+    filt.frequency.setTargetAtTime(1800, t, 0.1); filt.Q.setTargetAtTime(1, t, 0.1);
+    gain.gain.setTargetAtTime($('optSound').checked && S.engineOn && Math.abs(S.v)>0.05 ? 0.028 + Math.min(0.03, Math.abs(S.evP)/2.5e6) : 0, t, 0.12); return; }
+  osc1.type='sawtooth'; osc2.type='square'; filt.Q.setTargetAtTime(3, AC.currentTime, 0.1);
   const rpm = S.we*RPM, f = Math.max(12, rpm/30), t = AC.currentTime;
   osc1.frequency.setTargetAtTime(f, t, 0.02); osc2.frequency.setTargetAtTime(f*0.5, t, 0.02);
   filt.frequency.setTargetAtTime(300 + S.gas*1500 + rpm*0.14, t, 0.04);
   let g = on ? (S.cranking>0 ? 0.05 : 0.045 + S.gas*0.05) : 0;
-  if(on && misfire()) g *= (Math.sin(t*rpm/120*TAU) > 0.3 ? 0.25 : 1);
-  gain.gain.setTargetAtTime(g, t, misfire()?0.01:0.06);
+  gain.gain.setTargetAtTime(g, t, 0.06);
 }
 
 /* ======================================================================
@@ -331,11 +186,17 @@ R.cams.ex.lobes.forEach(L=>{ L.m.rotation.z = -Math.PI/2 - camExAng(FIRE[L.cyl]+
 const vIn = R.valves.filter(v=>v.kind==='in'), vEx = R.valves.filter(v=>v.kind==='ex');
 const PSI_I_IDL = Math.atan2(RIDL.y-IY, RIDL.x-IX), PSI_IDL_O = Math.atan2(OY-RIDL.y, OX-RIDL.x);
 const OIL_R = 0.086, tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3();
+// Braquage d'une roue avant (épure de Jeantaud / Ackermann : la roue intérieure braque plus)
+function wheelSteer(w){
+  const d = PARK.delta; if(!w.front || Math.abs(d) < 1e-4) return 0;
+  const Rr = PARK_WB/Math.tan(Math.abs(d)), inner = (d>0) === (w.sg>0), t = WH.zF;
+  return Math.sign(d)*Math.atan(PARK_WB/(inner ? Rr - t : Rr + t));
+}
 function animate(dt){
   const vis = (S.hand && !S.engineOn) ? 0.5 : S.slow, dv = dt*vis, e = engagement(), ratio = ratioNow(), man = S.mode==='manual';
   explode += (explodeTarget - explode)*Math.min(1, dt*4); const ex = explode;
   const wW = S.v/WH.r, ringW = outFree/FD;
-  A.e += S.we*dv; if(!beltBroken()) A.cam += S.we*dv; A.in += S.win*dv; A.wheel += wW*dv; A.diff += ringW*dv; A.brk += (2*ringW - wW)*dv;
+  A.e += S.we*dv; A.cam += S.we*dv; A.in += S.win*dv; A.wheel += wW*dv; A.diff += ringW*dv; A.brk += (2*ringW - wW)*dv;
   if(S.cranking>0) A.starter = 1;
   // moteur
   R.crank.rotation.z = -A.e; R.fly.rotation.z = -A.e; R.crankSprocket.rotation.z = -A.e;
@@ -346,7 +207,7 @@ function animate(dt){
     tmpA.set(EN.xc - s, EN.yc + c, z); tmpB.set(EN.xc, py, z);
     R.rods[i].position.copy(tmpA).add(tmpB).multiplyScalar(0.5); R.rods[i].scale.y = EN.L;
     R.rods[i].quaternion.setFromUnitVectors(UPV, tmpB.sub(tmpA).normalize());
-    let f=0; if(S.engineOn && !beltBroken() && !(misfire() && i===FAULT.cyl)){ const d=(((A.e-FIRE[i])%(4*Math.PI))+4*Math.PI)%(4*Math.PI); f = d<0.9 ? 1-d/0.9 : 0; }
+    let f=0; if(S.engineOn){ const d=(((A.e-FIRE[i])%(4*Math.PI))+4*Math.PI)%(4*Math.PI); f = d<0.9 ? 1-d/0.9 : 0; }
     R.flames[i].material.opacity = f*0.85; R.flames[i].scale.set(0.9+f*0.1, 0.15+f*0.5, 0.9+f*0.1);
   });
   const ci = camInAng(A.cam), ce = camExAng(A.cam);
@@ -387,7 +248,7 @@ function animate(dt){
   } else {
     R.aut.inShaft.rotation.z = -A.in; R.aut.outShaft.rotation.z = thO;
     const nIn = S.win, n1 = nIn/A_PG, nR = outFree;
-    const gk = S.sel==='R' ? 'R' : String(S.agear), els = (S.sel==='D'||S.sel==='R') && !cvBroken() ? SHIFT_EL[gk] : [];
+    const gk = S.sel==='R' ? 'R' : String(S.agear), els = (S.sel==='D'||S.sel==='R') ? SHIFT_EL[gk] : [];
     let nC;
     if(els.includes('B2')) nC = 0; else if(els.includes('K2')) nC = nIn;
     else if(els.includes('B1')) nC = (K3*nR)/(1+K3); else if(els.includes('K3')) nC = (n1+K3*nR)/(1+K3); else nC = nR;
@@ -406,8 +267,8 @@ function animate(dt){
   }
   if(S.mode==='ev'){
     const thRot = meshAng(thO, EV.n2, PSI_OI, EV.n1);
-    R.ev.mid.rotation.z = thO; R.ev.rotor.rotation.z = cvBroken() ? -A.in : thRot;
-    const rotA = cvBroken() ? -A.in : thRot, amp = S.engineOn ? clamp(Math.abs(S.evT)/EV.Tmax, 0, 1) : 0, sgnT = Math.sign(S.evT||0);
+    R.ev.mid.rotation.z = thO; R.ev.rotor.rotation.z = thRot;
+    const rotA = thRot, amp = S.engineOn ? clamp(Math.abs(S.evT)/EV.Tmax, 0, 1) : 0, sgnT = Math.sign(S.evT||0);
     const fieldE = rotA*EV.poles + sgnT*Math.PI/2;
     R.ev.coils.forEach(c=>{ const cur = Math.sin(fieldE - c.a*EV.poles - c.ph*TAU/3); c.mat.emissiveIntensity = amp*Math.max(0,cur)*1.6 + (amp>0?0.05:0); });
     const lit = Math.round(S.evSOC*R.ev.mods.length); R.ev.mods.forEach((m,i)=>{ m.emissiveIntensity = i<lit ? 0.25 : 0; });
@@ -418,9 +279,11 @@ function animate(dt){
     setGlow('ev', S.engineOn ? 0.1 + 0.5*amp : 0);
   }
   // cardans, roues, freins
-  R.shafts.forEach(s=>{ s.rot.rotation.y = s.sg>0 ? -(cvBroken() ? A.brk : A.wheel) : A.wheel; });
-  R.wheels.forEach(w=>{ w.w.rotation.z = w.sg>0 ? -A.wheel : A.wheel; });
-  R.discs.forEach(d=>{ d.g.rotation.z = -A.wheel; });
+  R.shafts.forEach(s=>{ s.rot.rotation.y = s.sg>0 ? -A.wheel : A.wheel; });
+  R.wheels.forEach(w=>{ w.w.rotation.z = w.sg>0 ? -A.wheel : A.wheel; w.w.rotation.y = (w.sg>0 ? 0 : Math.PI) - wheelSteer(w); });
+  R.discs.forEach(d=>{ d.g.rotation.z = -A.wheel; d.g.rotation.y = -wheelSteer(d); });
+  R.calipers.forEach(c=>{ c.g.rotation.y = -wheelSteer(c); });
+  R.cab.sw.rotation.x = PARK.delta*STEER_RATIO;      // volant : x positif = sens inverse des aiguilles d'une montre vu du conducteur = à gauche
   R.calipers.forEach(c=>{ const m=c.g.children[0].material; m.emissive.setHex(0xff2a1a); m.emissiveIntensity = S.brake*0.5; });
   // habitacle
   ['clutch','brake','gas'].forEach(k=>{ R.cab.ped[k].rotation.z = 0.35*S[k]; });
@@ -428,9 +291,9 @@ function animate(dt){
   if(man){ updateLever(dt); R.cab.lever.rotation.x = (LEV.col-0.5)*0.14; R.cab.lever.rotation.z = -LEV.row*0.3; }
   else { lz = -({P:1.5,R:0.5,N:-0.5,D:-1.5})[S.sel]*0.14; R.cab.lever.rotation.x = 0; R.cab.lever.rotation.z += (lz - R.cab.lever.rotation.z)*Math.min(1,dt*10); }
   // feux
-  const lightsOn = $('optLights').checked, weak = FAULT.active && FAULT.kind==='battery';
-  R.lights.head.emissiveIntensity = lightsOn ? (weak?0.15:1.3) : 0.05;
-  R.lights.spots.forEach(s=>s.intensity = lightsOn ? (weak?0.25:1.6) : 0);
+  const lightsOn = $('optLights').checked;
+  R.lights.head.emissiveIntensity = lightsOn ? 1.3 : 0.05;
+  R.lights.spots.forEach(s=>s.intensity = lightsOn ? 1.6 : 0);
   R.lights.tail.emissiveIntensity = 0.08 + (lightsOn?0.45:0) + S.brake*1.6;
   R.lights.rev.emissiveIntensity = (man ? S.gear==='R' : S.sel==='R') ? 1.3 : 0;
   R.movers.forEach(m=>{ m.position.x -= S.v*dv; if(m.position.x < -25) m.position.x += 50; if(m.position.x > 25) m.position.x -= 50; });
@@ -440,7 +303,7 @@ function animate(dt){
   setGlow('engine', live ? 0.15 + 0.45*S.gas : 0);
   const ig = man ? live*e*(0.2+0.4*S.gas) : live*(0.2+0.4*S.gas);
   setGlow('input', ig);
-  const og = S.mode==='ev' ? (evDrive ? 0.2+0.4*Math.min(1,Math.abs(S.evT)/150) : 0) : (ratio && !cvBroken() ? ig : 0);
+  const og = S.mode==='ev' ? (evDrive ? 0.2+0.4*Math.min(1,Math.abs(S.evT)/150) : 0) : (ratio ? ig : 0);
   setGlow('output', og); setGlow('collar', man ? og : 0);
   ['pg1','rvc','s2','s3'].forEach(k=>setGlow(k, man ? 0 : og*0.8));
   if(man) for(const g in R.man.gearMat){ const m=R.man.gearMat[g]; m.emissive.copy(POWER); m.emissiveIntensity = g===S.gear ? og*1.4 : 0; }
@@ -465,12 +328,13 @@ buildLesson(); renderScenarios(); applyBodyMode(); refreshVis(); narrate();
 let last = performance.now(), narrT = 0;
 function frame(now){
   const dt = Math.min(0.1, (now-last)/1000); last = now;
-  runDemo(dt); simulate(dt); gameTick(); animate(dt);
+  runDemo(dt); simulate(dt); parkTick(); streetTick(dt); animate(dt);
   tourTick(dt);
   if(follow.back && !tween){ follow.t -= dt; if(follow.t<=0){ flyTo(follow.back.p, follow.back.t); follow.back=null; } }
   if(tween){ tween.t = Math.min(1, tween.t + dt/tween.dur); const k = 1-Math.pow(1-tween.t,3);
     camera.position.lerpVectors(tween.p0, tween.p1, k); controls.target.lerpVectors(tween.t0, tween.t1, k); if(tween.t>=1) tween=null; }
-  if(controls.enabled) controls.update(); else camera.lookAt(controls.target); renderer.render(scene, camera);
+  if(controls.enabled) controls.update(); else camera.lookAt(controls.target);
+  mirrorsPre(); renderer.render(scene, camera); mirrorsPost();
   placeTags(); drawPedals(); updateAudio();
   narrT += dt; if(narrT > 0.12){ narrT = 0; narrate(); }
   requestAnimationFrame(frame);

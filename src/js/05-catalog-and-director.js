@@ -80,7 +80,7 @@ const INFO = {
   pedalbrake:{t:tr('Pédale de frein','Brake pedal'), a:[0.8,0.42,0.37], l:2, p:tr('La pédale du milieu (ou de gauche en boîte auto).','The middle pedal (or the left one in an automatic).')},
   pedalgas:{t:tr('Accélérateur','Accelerator'), a:[0.8,0.42,0.27], l:2, p:tr('Il ouvre le papillon des gaz dans le moteur.','It opens the throttle in the engine.')},
   lever:{t:tr('Levier de vitesses','Gear lever'), a:[0.42,0.8,0], l:2, p:tr('Il bouge comme le levier de l\'écran.','It moves like the lever on the screen.')},
-  body:{t:tr('Carrosserie','Body'), p:tr('La coque en acier : 4,20 m de long, 1,76 m de large et 1,48 m de haut. Choisis « Pleine », « Transparente » ou « Masquée » dans Affichage.','The steel shell: 4.20 m long, 1.76 m wide and 1.48 m high. Choose "Solid", "See-through" or "Hidden" in Display.')},
+  body:{t:tr('Carrosserie','Body'), p:tr('La coque en acier : 4,20 m de long, 1,76 m de large et 1,48 m de haut. Choisis « Transparente », « Fil de fer » ou « Masquée » dans Affichage.','The steel shell: 4.20 m long, 1.76 m wide and 1.48 m high. Choose "See-through", "Wireframe" or "Hidden" in Display.')},
   glass:{t:tr('Vitres','Windows'), p:tr('Pare-brise, vitres latérales et lunette arrière.','Windscreen, side windows and rear window.')},
   headlight:{t:tr('Phares','Headlights'), a:[2.06,0.75,0.57], l:2, p:tr('Allume-les avec « Phares » dans Affichage.','Turn them on with "Headlights" in Display.')},
   taillight:{t:tr('Feux arrière','Rear lights'), a:[-2.04,0.98,0.6], l:2, p:tr('Ils s\'allument plus fort quand tu freines, et le feu blanc de recul s\'allume en marche arrière.','They light up brighter when you brake, and the white reversing light comes on in reverse.')},
@@ -102,7 +102,6 @@ const MASS = 1350, IE = 0.16, IIN = 0.05, KC = 60, W_IDLE = 760/RPM, KTC = 0.003
 const torqueCurve = rpm => rpm<1000 ? 140 : rpm<3500 ? lerp(150,200,(rpm-1000)/2500) : rpm<4500 ? 200 : rpm<6000 ? lerp(200,178,(rpm-4500)/1500) : lerp(178,150,clamp((rpm-6000)/800,0,1));
 const S = { mode:'manual', engineOn:false, cranking:0, runTime:0, we:0, win:0, v:0, gear:'N', sel:'P', agear:1, shiftT:0, lock:false,
   clutch:0, gas:0, brake:0, slow:0.05, msg:'', msgT:0, hand:false, slipLast:0, tcSR:0, evSOC:0.8, evT:0, evP:0 };
-const FAULT = { kind:null, cyl:1, active:false };
 const ratioNow = ()=> S.mode==='manual' ? RATIO_M[S.gear] : S.mode==='ev' ? (S.sel==='D' ? EV_R1 : S.sel==='R' ? -EV_R1 : 0) : (S.sel==='D' ? RATIO_A[S.agear] : S.sel==='R' ? RATIO_A.R : 0);
 const massNow = ()=> S.mode==='ev' ? 1615 : MASS;
 const engagement = () => S.mode==='manual' ? clamp((0.72 - S.clutch)/0.42, 0, 1) : 1;
@@ -125,15 +124,15 @@ function refreshVis(){
     if(u.cat==='body' && bodyMode==='off') v = false;
     if(iso) v = iso.has(u.part) && (!u.mode || u.mode===S.mode);
     if(S.mode==='ev' && iceOnly(u)) v = false;
-    if(o===R.beltBroken) v = v && FAULT.kind==='belt' && FAULT.active;
-    if(o===R.belt) v = v && !(FAULT.kind==='belt' && FAULT.active);
+    if(u.part==='parkscene') v = v && PARK.on; else if(u.cat==='road' && PARK.on) v = false;
     o.visible = v;
   });
 }
 function applyBodyMode(){
-  const ghost = bodyMode==='ghost';
-  BODY.paint.transparent = ghost; BODY.paint.opacity = ghost ? 0.13 : 1; BODY.paint.depthWrite = !ghost;
-  BODY.glass.opacity = ghost ? 0.07 : 0.45;
+  const ghost = bodyMode==='ghost', wire = bodyMode==='wire', see = ghost || wire;
+  BODY.paint.transparent = see; BODY.paint.opacity = ghost ? 0.13 : wire ? 0.05 : 1; BODY.paint.depthWrite = !see;
+  BODY.glass.opacity = ghost ? 0.07 : wire ? 0.03 : 0.45;
+  BODY.wires.forEach(l=>{ l.visible = wire; }); BODY.wire.color.copy(BODY.paint.color).offsetHSL(0, 0.15, 0.3);
   BODY.paint.needsUpdate = true; BODY.glass.needsUpdate = true;
   refreshVis();
 }
@@ -184,7 +183,6 @@ function showInfo(k){
   const v=INFO[k]; if(!v) return; infoKey = k;
   $('infoH').textContent=v.t; $('infoP').textContent=v.p; $('info').hidden=false;
   $('infoIso').hidden = isoKey===k;
-  $('infoRepair').hidden = !(GAME.state==='fault');
 }
 $('infoX').onclick = ()=>{ $('info').hidden=true; };
 $('infoIso').onclick = ()=>{ if(infoKey) isolate(infoKey); $('infoIso').hidden=true; };
@@ -202,6 +200,7 @@ canvas.addEventListener('pointerup', e=>{
 });
 
 /* ---- Afficher / masquer ---- */
+$('partsBtn').onclick = ()=>{ const open = $('parts').hidden; $('parts').hidden = !open; $('partsBtn').setAttribute('aria-pressed', open); stage.classList.toggle('parts-open', open); };
 document.querySelectorAll('.part').forEach(b=>{ const k=b.dataset.p;
   b.onclick = ()=>{ catOn[k]=!catOn[k]; b.setAttribute('aria-pressed', catOn[k]); refreshVis(); }; });
 
@@ -247,7 +246,7 @@ function tourShift(g){ const tok=tour; anim.gas={to:0,rate:3}; anim.clutch={to:1
   setTimeout(()=>{ if(tour!==tok) return; selectGear(g); }, 450);
   setTimeout(()=>{ if(tour!==tok) return; anim.clutch={to:0,rate:0.55}; anim.gas={to:0.3,rate:1}; }, 1500); }
 function resetForTour(){
-  stopDemo(); if(GAME.state!=='off') gameQuit();
+  stopDemo();
   Object.assign(S,{engineOn:false,cranking:0,we:0,win:0,v:0,clutch:0,gas:0,brake:0,gear:'N',sel:'P',agear:1,lock:false}); for(const k in anim) anim[k]=null; resetLever();
   document.querySelectorAll('#shifter .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.g==='N'));
   document.querySelectorAll('#selector .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.s==='P'));
@@ -287,6 +286,7 @@ function reelShots(){
   return common1.concat(auto?autoMid:manualMid, common2);
 }
 function startTour(shotList, title){
+  if(STREET.on) streetStop();
   ensureAudio(); stopDemo(); if(iso) unIsolate(); $('info').hidden=true;
   const shots = shotList || reelShots();
   tour = {i:-1, t:0, shots, paused:false, saved:{slow:S.slow, body:bodyMode, cats:{...catOn}, simple}}; simple=false;
@@ -300,38 +300,48 @@ function stopTour(){
   if(!tour) return; const sv = tour.saved; tour=null;
   S.slow = sv.slow; bodyMode = sv.body; Object.assign(catOn, sv.cats); simple = sv.simple; applyBodyMode();
   controls.enabled = true; stage.classList.remove('reeling'); reelEl.hidden=true; explodeTarget=0;
-  iso=null; isoKey=null; $('isobar').hidden=true; refreshVis();
+  parkOff(); iso=null; isoKey=null; $('isobar').hidden=true; refreshVis();
 }
 function nextShot(){
   tour.i++; tour.t=0;
   if(tour.i >= tour.shots.length){ stopTour(); goView('car'); return; }
   const s = tour.shots[tour.i];
   if(s.act) s.act(); if(s.at) s.at.forEach(a=>a.done=false);
+  parkShot(s);
   S.slow = s.slow || 0.05;
   if(s.body){ bodyMode = s.body; applyBodyMode(); }
   iso = s.iso ? new Set(s.iso) : null; explodeTarget = s.explode ? 1 : 0; refreshVis();
   // cadrage : boîte englobante de la pièce visée
   const bb = new THREE.Box3(), tmp = new THREE.Box3(); let any=false;
   if(s.focus){ LEAVES.forEach(o=>{ if(o.visible && o.userData.part===s.focus && !o.isPoints){ tmp.setFromObject(o); if(!tmp.isEmpty()){ bb.union(tmp); any=true; } } }); }
-  const c = any ? bb.getCenter(new THREE.Vector3()) : new THREE.Vector3(0.3,0.55,0);
+  const c = any ? bb.getCenter(new THREE.Vector3()) : ROOT.localToWorld(new THREE.Vector3(0.3,0.55,0));
   const sz = any ? Math.max(0.12, bb.getSize(new THREE.Vector3()).length()) : 4.6;
-  s._c = c; s._d = Math.max(0.22, sz*1.35); s._p0 = camera.position.clone(); s._t0 = controls.target.clone();
-  s._dir = new THREE.Vector3(...s.dir).normalize();
+  s._c = c; s._cl = ROOT.worldToLocal(c.clone()); s._d = Math.max(0.22, sz*1.35); s._p0 = camera.position.clone(); s._t0 = controls.target.clone();
+  s._dir = new THREE.Vector3(...(s.dir||[1,0.5,0.8])).normalize();
   $('reelCap').innerHTML = cap(s.cap) + (s.sub ? `<em class="reel-sub" style="animation-delay:${s.cap.split(' ').length*0.07+0.15}s">${s.sub}</em>` : '');
   const tagEl = $('reelTag'); tagEl.textContent = s.focus && INFO[s.focus] ? INFO[s.focus].t : ''; tagEl.hidden = !s.focus;
   [...$('reelBars').children].forEach((b,i)=>{ b.firstChild.style.width = i<tour.i ? '100%' : '0%'; });
 }
 const ease = p => p<0.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2;
+const UP_Y = new THREE.Vector3(0,1,0);
 function tourTick(dt){
   if(!tour) return;
   const s = tour.shots[tour.i]; if(!tour.paused) tour.t += dt;
   if(s.at) s.at.forEach(a=>{ if(!a.done && tour.t>=a[0]){ a.done=true; a[1](); } });
   const p = clamp(tour.t/s.dur, 0, 1);
-  const ang = s.orbit*(p-0.5), ca=Math.cos(ang), sa=Math.sin(ang);
-  const d = new THREE.Vector3(s._dir.x*ca + s._dir.z*sa, s._dir.y, -s._dir.x*sa + s._dir.z*ca).normalize();
-  const want = s._c.clone().add(d.multiplyScalar(s._d*lerp(s.zoom[0], s.zoom[1], ease(p))*(tour.zm||1)));
+  s._c = ROOT.localToWorld(s._cl.clone());       // suit la voiture quand elle bouge (créneau)
+  let want, look = s._c;
+  if(s.cam){
+    const P = v => s.cam.car ? ROOT.localToWorld(new THREE.Vector3(...v)) : new THREE.Vector3(...v);
+    want = P(s.cam.p2 ? s.cam.p.map((x,i)=>lerp(x, s.cam.p2[i], ease(p))) : s.cam.p);
+    if(s.cam.t) look = P(s.cam.t);
+  } else {
+    const ang = (s.orbit||0)*(p-0.5), ca=Math.cos(ang), sa=Math.sin(ang);
+    const d = new THREE.Vector3(s._dir.x*ca + s._dir.z*sa, s._dir.y, -s._dir.x*sa + s._dir.z*ca).normalize().applyAxisAngle(UP_Y, ROOT.rotation.y);
+    want = s._c.clone().add(d.multiplyScalar(s._d*lerp(s.zoom[0], s.zoom[1], ease(p))*(tour.zm||1)));
+  }
   const k = clamp(tour.t/0.9, 0, 1), kk = k*k*(3-2*k);
-  camera.position.lerpVectors(s._p0, want, kk); controls.target.lerpVectors(s._t0, s._c, kk);
+  camera.position.lerpVectors(s._p0, want, kk); controls.target.lerpVectors(s._t0, look, kk);
   $('reelBars').children[tour.i].firstChild.style.width = (p*100)+'%';
   // pointeur
   const ring=$('ptrRing'), line=$('ptrLine'), tag=$('reelTag');
@@ -395,6 +405,8 @@ const SCENARIOS = {
     ]},
     {id:'stroke', t:tr('Les 4 temps du moteur','The engine\'s 4 strokes'), d:tr('Admission, compression, explosion, échappement','Intake, compression, power, exhaust'), shots:()=>strokeShots()},
     {id:'tour', t:tr('Tout le chemin de la force','The whole path of the force'), d:tr('La grande visite, du piston à la route','The big tour, from piston to road'), shots:()=>reelShots()},
+    {id:'parking', t:tr('Le créneau','Parallel parking'), d:tr('Se garer entre deux voitures, sous tous les angles','Parking between two cars, from every angle'), shots:()=>parkShots()},
+    {id:'bay', t:tr('Se garer en bataille','Bay parking'), d:tr('Nez vers le trottoir, en deux manœuvres','Nose-in, in two moves'), shots:()=>bayShots()},
   ],
   auto: [
     {id:'prnd', t:'P, R, N, D', d:tr('Moteur allumé, que se passe-t-il dans la boîte ?','Engine on: what happens in the gearbox?'), shots:()=>[
@@ -412,6 +424,8 @@ const SCENARIOS = {
     ]},
     {id:'stroke', t:tr('Les 4 temps du moteur','The engine\'s 4 strokes'), d:tr('Admission, compression, explosion, échappement','Intake, compression, power, exhaust'), shots:()=>strokeShots()},
     {id:'tour', t:tr('Tout le chemin de la force','The whole path of the force'), d:tr('La grande visite, du piston à la route','The big tour, from piston to road'), shots:()=>reelShots()},
+    {id:'parking', t:tr('Le créneau','Parallel parking'), d:tr('Se garer entre deux voitures, sous tous les angles','Parking between two cars, from every angle'), shots:()=>parkShots()},
+    {id:'bay', t:tr('Se garer en bataille','Bay parking'), d:tr('Nez vers le trottoir, en deux manœuvres','Nose-in, in two moves'), shots:()=>bayShots()},
   ],
   ev: [
     {id:'evtour', t:tr('Comment avance une voiture électrique','How an electric car moves'), d:tr('De la batterie aux roues','From the battery to the wheels'), shots:()=>[
@@ -439,6 +453,8 @@ const SCENARIOS = {
       {focus:'reducer', iso:['evrotor','reducer','diff','cv','wheelF'], dir:[0.6,0.6,0.9], zoom:[1.3,1.0], orbit:0.4, dur:7, cap:tr('Un *seul* rapport suffit de 0 à 150 km/h','A *single* ratio is enough from 0 to 150 km/h'), sub:tr('Regarde le compteur monter sans aucune coupure','Watch the speedometer climb without a single break')},
       {focus:null, body:'ghost', dir:[0.9,0.35,-0.9], zoom:[1.15,1.3], orbit:0.6, dur:5, cap:tr('Pas d\'embrayage, *pas de calage*','No clutch, no *stalling*'), sub:tr('Et en marche arrière, le moteur tourne juste à l\'envers','And in reverse, the motor just spins backwards'), act:()=>{ anim.gas={to:0,rate:2}; anim.brake={to:0.5,rate:1}; }},
     ]},
+    {id:'parking', t:tr('Le créneau','Parallel parking'), d:tr('Se garer entre deux voitures, sous tous les angles','Parking between two cars, from every angle'), shots:()=>parkShots()},
+    {id:'bay', t:tr('Se garer en bataille','Bay parking'), d:tr('Nez vers le trottoir, en deux manœuvres','Nose-in, in two moves'), shots:()=>bayShots()},
   ],
 };
 function strokeShots(){
@@ -492,9 +508,209 @@ function renderSpec(){
   $('spec').innerHTML = (S.mode==='ev'?evRows:rows).map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('');
   $('specNote').textContent = S.mode==='ev' ? tr('Valeurs proches d\'une compacte électrique de 2017 (100 kW, 35,8 kWh). Les formes sont simplifiées.','Values close to a 2017 compact electric car (100 kW, 35.8 kWh). The shapes are simplified.') : tr('Moteur et dimensions : valeurs d\'une compacte 2.0 essence de 150 ch des années 2000. Boîte auto : vrai schéma à trains épicycloïdaux, dentures choisies pour retrouver ses rapports. Boîte manuelle : rapports approchés. Les formes sont simplifiées.','Engine and dimensions: values of a 2000s compact 2.0 petrol with 150 hp. Automatic: a real planetary gearset layout, with tooth counts chosen to match its ratios. Manual gearbox: approximate ratios. The shapes are simplified.');
   $('subTxt').textContent = S.mode==='ev' ? tr('Voiture électrique : batterie sous le plancher, moteur électrique à l\'avant, un seul rapport. Démarre, roule, et regarde l\'énergie aller… et revenir quand tu freines.','Electric car: battery under the floor, electric motor at the front, a single ratio. Switch on, drive, and watch the energy go… and come back when you brake.') : S.mode==='auto' ? tr('Moteur 4 cylindres essence et boîte automatique 6 vitesses, traction avant. Pas de pédale d\'embrayage : la boîte fait tout.','4-cylinder petrol engine and 6-speed automatic gearbox, front-wheel drive. No clutch pedal: the gearbox does it all.') : tr('Moteur 4 cylindres essence et boîte manuelle 6 vitesses, traction avant. Démarre, passe les vitesses et suis la force jusqu\'aux roues.','4-cylinder petrol engine and 6-speed manual gearbox, front-wheel drive. Start the engine, change gear and follow the force to the wheels.');
-
-  const els=['K1','K2','K3','B1','B2'];
-  $('elems').innerHTML = `<tr><th></th>${els.map(e=>`<th>${e}</th>`).join('')}<th>×</th></tr>` +
-    ['1','2','3','4','5','6','R'].map(g=>`<tr data-g="${g}"><th>${g==='R'?'R':g}</th>${els.map(e=>`<td class="${SHIFT_EL[g].includes(e)?'on':''}">${SHIFT_EL[g].includes(e)?'●':''}</td>`).join('')}<td>${fr(Math.abs(RATIO_A[g]),2)}</td></tr>`).join('');
 }
 renderSpec();
+
+/* ---- Le créneau : un trajet calculé d'avance (modèle « vélo » autour de l'essieu arrière), rejouable sous tous les angles ----
+   Braquage à fond à droite jusqu'à 45°, un peu de ligne droite, braquage à fond à gauche jusqu'à être parallèle.
+   Les longueurs sont calculées pour finir à 25 cm du trottoir (PARKED_Z, 04). Un plan joue une étape avec `park:k`
+   (ou `park:[k0,k1]`), ou fige la voiture au début de l'étape k avec `pose:k`. */
+const PARK_WB = WH.xF - WH.xR, PARK_DMAX = 34*DEG, PARK_R = PARK_WB/Math.tan(PARK_DMAX), PARK_ALPHA = 45*DEG;
+const PARK_D3 = (-PARKED_Z - 2*PARK_R*(1-Math.cos(PARK_ALPHA)))/Math.sin(PARK_ALPHA);
+const STEER_RATIO = 15.5;                 // 34° aux roues ≈ 1,5 tour de volant
+const PARK_STEPS = [
+  {g:'R', T:0.8},                         // 0 marche arrière
+  {ds:-0.75},                             // 1 recule droit : la roue arrière arrive au pare-chocs de la voiture de devant
+  {steer:-PARK_DMAX, T:2.4},              // 2 braque à fond à droite
+  {ds:-PARK_R*PARK_ALPHA},                // 3 recule jusqu'à 45°
+  {steer:0, T:2.4},                       // 4 roues droites
+  {ds:-PARK_D3},                          // 5 recule droit : l'avant dépasse la voiture de devant
+  {steer:PARK_DMAX, T:2.4},               // 6 braque à fond à gauche
+  {ds:-PARK_R*PARK_ALPHA},                // 7 recule jusqu'à être parallèle
+  {steer:0, T:2.4},                       // 8 roues droites
+  {g:'F', T:0.8},                         // 9 1re (ou D)
+  {ds:0.9},                               // 10 avance pour se centrer
+];
+// Bataille, nez vers le trottoir : avance braqué à droite jusqu'à 45°, recule braqué vers la voiture de gauche
+// jusqu'à être face à la place, puis entre tout droit. Départ calculé à rebours depuis la place.
+const PERP_STEPS = [
+  {g:'F', T:0.8},                         // 0 1re (ou D)
+  {ds:4, sp:1.2},                         // 1 avance le long des places
+  {steer:-PARK_DMAX, T:2.4},              // 2 braque à fond à droite
+  {ds:PARK_R*PARK_ALPHA},                 // 3 avance jusqu'à 45°
+  {g:'R', T:0.8},                         // 4 marche arrière
+  {steer:PARK_DMAX, T:2.4},               // 5 braque à fond à gauche, vers la voiture de gauche
+  {ds:-PARK_R*PARK_ALPHA},                // 6 recule jusqu'à être face à la place
+  {steer:0, T:2.4},                       // 7 roues droites
+  {g:'F', T:0.8},                         // 8 1re (ou D)
+  {ds:7, sp:0.8},                         // 9 entre tout droit
+];
+[PARK_STEPS, PERP_STEPS].forEach(L=>L.forEach(st=>{ if(st.ds!==undefined) st.T = Math.max(2, Math.abs(st.ds)/(st.sp||0.4)); }));   // ~1,5 km/h
+// Avance l'essieu arrière (x, z, cap th) de ds mètres avec le braquage d.
+function parkArc(p, d, ds){
+  const kap = Math.tan(d)/PARK_WB;
+  if(Math.abs(kap)<1e-6) return {x:p.x + ds*Math.cos(p.th), z:p.z + ds*Math.sin(p.th), th:p.th};
+  const th2 = p.th + ds*kap;
+  return {x:p.x + (Math.sin(th2)-Math.sin(p.th))/kap, z:p.z - (Math.cos(th2)-Math.cos(p.th))/kap, th:th2};
+}
+const PLAN_PAR = {steps:PARK_STEPS, x:WH.xR, z:0, th:0};    // départ : essieu arrière
+const PLAN_PERP = (()=>{
+  const th = -Math.PI/2; let p = {x:BAY_X, z:BAY_KERB + 0.3 + 2.14 - WH.xR, th};    // garée : pare-chocs à 30 cm de la bordure
+  for(let i=PERP_STEPS.length-1; i>=0; i--){ const st = PERP_STEPS[i];               // on rejoue le trajet à l'envers
+    if(st.ds===undefined) continue;
+    let d = 0; for(let j=i-1; j>=0; j--) if(PERP_STEPS[j].steer!==undefined){ d = PERP_STEPS[j].steer; break; }
+    p = parkArc(p, d, -st.ds); }
+  return {steps:PERP_STEPS, x:p.x, z:p.z, th:p.th};
+})();
+const sEase = u => (1-Math.cos(Math.PI*u))/2;
+// État au début de l'étape k, avancé de u (0..1) : origine de la voiture, cap, braquage, rapport, vitesse.
+function parkState(k, u=0){
+  const P = PARK.plan; let p = {x:P.x, z:P.z, th:P.th}, d=0, g='N', v=0;     // p : milieu de l'essieu arrière
+  for(let i=0; i<=k && i<P.steps.length; i++){
+    const st = P.steps[i], f = i<k ? 1 : u; if(f<=0) break;
+    if(st.g) g = st.g;
+    else if(st.steer!==undefined) d = lerp(d, st.steer, sEase(f));
+    else { p = parkArc(p, d, st.ds*sEase(f)); if(i===k && f<1) v = st.ds*Math.PI/2*Math.sin(Math.PI*f)/st.T; }
+  }
+  return { x: p.x - WH.xR*Math.cos(p.th), z: p.z - WH.xR*Math.sin(p.th), th:p.th, d, g, v };
+}
+let parkLastG = null, parkLastPed = null;
+function parkGear(g){
+  if(S.mode==='manual'){ const mg = g==='F' ? '1' : g; S.gear = mg; if(GATE[mg]){ LEV.col=GATE[mg][0]; LEV.row=GATE[mg][1]; }
+    document.querySelectorAll('#shifter .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.g===mg)); }
+  else { const sel = g==='F' ? 'D' : g==='R' ? 'R' : 'N'; S.sel = sel; if(sel==='D') S.agear = 1;
+    document.querySelectorAll('#selector .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.s===sel)); }
+}
+function parkApply(st){
+  ROOT.position.set(st.x, 0, st.z); ROOT.rotation.y = -st.th; ROOT.updateMatrixWorld(true);
+  PARK.delta = st.d; S.v = st.v;           // la simulation suit : moteur au ralenti, embrayage ou convertisseur qui patine
+  if(st.g !== parkLastG){ parkLastG = st.g; parkGear(st.g); }
+  const man = S.mode==='manual', ped = Math.abs(st.v) > 0.01 ? (man ? [0.62,0] : [0,0.12]) : (man ? [1,0.7] : [0,0.8]);   // [embrayage, frein]
+  if(ped.join() !== parkLastPed){ parkLastPed = ped.join(); if(man) anim.clutch = {to:ped[0], rate:2}; anim.brake = {to:ped[1], rate:2}; }
+}
+function parkShot(s){
+  if(s.park===undefined && s.pose===undefined) return;
+  if(!PARK.on){ PARK.on = true; parkLastG = parkLastPed = null; scene.fog.near = 30; scene.fog.far = 80; refreshVis(); }
+  parkApply(parkState(s.park!==undefined ? [].concat(s.park)[0] : s.pose, 0));
+}
+function parkTick(){
+  if(!PARK.on || !tour) return;
+  const s = tour.shots[tour.i]; if(!s) return;
+  if(s.park===undefined){ if(s.pose!==undefined){ const st = parkState(s.pose, 0); parkApply(st); parkMarks(s.pose, 0, st); } return; }
+  const ks = [].concat(s.park); let t = tour.t - (s.pAt ?? 0.6), k = ks[0];
+  const ST = PARK.plan.steps;
+  for(; k < (ks[1] ?? ks[0]); k++){ if(t < ST[k].T) break; t -= ST[k].T; }
+  const u = clamp(t/ST[k].T, 0, 1), st = parkState(k, u);
+  parkApply(st); parkMarks(k, u, st); sensorsTick(st);
+}
+function parkOff(){
+  if(!PARK.on) return;
+  PARK.on = false; PARK.delta = 0; S.v = 0; $('sensors').hidden = true; scene.fog.near = 10; scene.fog.far = 26; ROOT.position.set(0,0,0); ROOT.rotation.y = 0; ROOT.updateMatrixWorld(true); refreshVis();
+}
+function parkShots(){
+  const man = S.mode==='manual', END = PARK_STEPS.length;
+  const TOP = {p:[-2.8,17,1.2], t:[-2.8,0,-0.3]}, TOP_IN = {p:[-3.6,11,2.2], p2:[-4.6,7.5,0.4], t:[-4.6,0,-2]};
+  const STREET = {p:[-2.5,2.6,8.5], t:[-3,0.4,-2]}, STREET0 = {p:[1.5,3.0,9.5], t:[-0.6,0.4,-1.4]}, PAVEMENT = {p:[-4.5,1.6,-7.8], t:[-4,0.5,-1]};
+  const BEHIND = {p:[-17,2.2,-0.5], t:[-4,0.5,-1.6]}, CORNER = {p:[1.8,3.4,2.6], t:[-2.8,0.3,-1.5]};
+  const REF = {p:[-2.6,5.5,1.8], t:[-2.1,0,-1.2]};
+  const STEER = {car:true, p:[-0.1,1.25,-0.15], t:[0.48,0.97,0.37]}, WHEELS = {car:true, p:[-0.9,9,0], t:[-0.2,0,0]};
+  const creep = man ? tr('Embrayage au point de patinage, sans accélérer','Clutch at the biting point, no accelerator')
+                    : tr('Relâche doucement le frein : elle recule toute seule','Ease off the brake: it rolls back on its own');
+  return [
+    {pose:0, body:'wire', cam:TOP, slow:1, dur:5, cap:tr('Le *créneau* : se garer entre deux voitures','*Parallel* parking: between two cars'), sub:tr('Étape par étape, sous tous les angles','Step by step, from every angle'), act:()=>{ setupState({engineOn:true, we:W_IDLE}); PARK.plan = PLAN_PAR; }},
+    {pose:0, body:'wire', cam:STREET0, slow:1, dur:5, cap:tr('Arrête-toi à *côté* de la voiture de devant','Stop *alongside* the car in front'), sub:tr('À 50 cm – 1 m d\'elle, arrières alignés, clignotant à droite','50 cm – 1 m away, rear ends level, right indicator on')},
+    {park:0, focus:'lever', body:'ghost', dir:[-0.5,0.9,-0.6], zoom:[1.4,1.0], slow:1, dur:4, cap:man ? tr('Passe la marche *arrière*','Select *reverse*') : tr('Mets le levier sur *R*','Move the lever to *R*'), sub:man ? tr('Embrayage enfoncé, levier sur R','Clutch down, lever to R') : tr('Pied sur le frein, levier sur R','Foot on the brake, lever to R')},
+    {pose:1, focus:'taillight', body:'wire', dir:[-1,0.35,0.5], zoom:[2.6,2.0], slow:1, dur:4, cap:tr('Les feux de *recul* s\'allument','The *reversing* lights come on'), sub:tr('Les autres savent que tu recules','Others know you are backing up')},
+    {park:1, body:'wire', cam:TOP, slow:1, dur:4.5, cap:tr('Recule *doucement*, tout droit','Reverse *slowly*, straight back'), sub:creep},
+    {park:1, body:'ghost', cam:REF, slow:1, dur:4.5, cap:tr('*Stop* : ta roue arrière arrive au niveau de son pare-chocs','*Stop*: your rear wheel is level with its bumper'), sub:tr('Repère simplifié : chaque moniteur a le sien','A simplified reference: every instructor has their own')},
+    {park:2, focus:'steering', body:'ghost', cam:STEER, slow:1, dur:4.5, cap:tr('Braque à *fond* à droite','Turn the wheel *fully* to the right'), sub:tr('Environ un tour et demi de volant','About one and a half turns')},
+    {park:2, focus:'wheelF', body:'wire', cam:WHEELS, slow:1, dur:4.5, cap:tr('Les roues avant *tournent* à droite','The front wheels *turn* right'), sub:tr('Celle de l\'intérieur tourne un peu plus','The inner one turns a little more')},
+    {park:3, body:'wire', cam:TOP, slow:1, dur:9.5, cap:tr('L\'arrière *rentre* dans la place','The rear *swings* into the space'), sub:tr('Recule doucement, volant braqué','Reverse slowly, wheel on full lock')},
+    {park:3, body:'wire', cam:BEHIND, slow:1, dur:9.5, cap:tr('L\'avant *s\'écarte* vers la rue','The front *swings* out into the street'), sub:tr('Regarde autour : personne ne doit arriver','Look around: nobody should be coming')},
+    {pose:4, body:'wire', cam:PAVEMENT, slow:1, dur:4.5, cap:tr('*Stop* à 45° environ','*Stop* at about 45°'), sub:tr('La voiture est en diagonale','The car is at an angle')},
+    {park:4, focus:'steering', body:'ghost', cam:STEER, slow:1, dur:4.5, cap:tr('Remets les roues *droites*','Straighten the *wheels*'), sub:tr('Un tour et demi dans l\'autre sens','One and a half turns back')},
+    {park:5, body:'wire', cam:CORNER, slow:1, dur:4.5, cap:tr('Recule jusqu\'à *dépasser* la voiture de devant','Reverse until you *clear* the car in front'), sub:tr('Ton coin avant droit passe derrière elle','Your front right corner passes behind it')},
+    {park:6, focus:'steering', body:'ghost', cam:STEER, slow:1, dur:4.5, cap:tr('Braque à *fond* à gauche','Turn *fully* to the left'), sub:tr('Encore un tour et demi','One and a half turns again')},
+    {park:6, focus:'wheelF', body:'wire', cam:WHEELS, slow:1, dur:4.5, cap:tr('Les roues pointent vers la *rue*','The wheels point to the *street*'), sub:tr('L\'avant va venir se ranger','The front will now tuck in')},
+    {park:7, body:'wire', cam:TOP, slow:1, dur:9.5, cap:tr('L\'avant se *range* le long du trottoir','The front *tucks* in along the kerb'), sub:tr('Recule doucement jusqu\'à être parallèle','Reverse slowly until you are parallel')},
+    {park:7, body:'wire', cam:PAVEMENT, slow:1, dur:9.5, cap:tr('Ne *touche* pas le trottoir','Don\'t *touch* the kerb'), sub:tr('Vise 20 à 30 cm entre le pneu et la bordure','Aim for 20 to 30 cm between tyre and kerb')},
+    {park:8, focus:'steering', body:'ghost', cam:STEER, slow:1, dur:4.5, cap:tr('Volant au *centre*','Wheel back to the *centre*'), sub:tr('Les roues sont droites','The wheels are straight')},
+    {park:[9,10], body:'wire', cam:STREET, slow:1, dur:5.5, cap:man ? tr('Passe la *1re* et avance un peu','Select *1st* and move forward a little') : tr('Mets *D* et avance un peu','Select *D* and move forward a little'), sub:tr('Pour te centrer dans la place','To centre the car in the space')},
+    {pose:END, body:'wire', cam:TOP_IN, slow:1, dur:5.5, cap:tr('*Bravo*, la voiture est garée !','*Done*, the car is parked!'), sub:man ? tr('Frein à main serré, moteur coupé','Handbrake on, engine off') : tr('Levier sur P, frein à main serré','Lever to P, handbrake on')},
+  ];
+}
+
+function bayShots(){
+  const man = S.mode==='manual', END = PERP_STEPS.length, X = BAY_X;
+  const TOP = {p:[X-0.5,17,4.5], t:[X-0.5,0,-1.2]}, TOP_IN = {p:[X,12,2.5], p2:[X,8,-0.5], t:[X,0,-4]};
+  const BEHIND = {p:[X-12,2.4,4.2], t:[X-1,0.5,-0.5]}, FACING = {p:[X,3.2,10.5], t:[X,0.4,-3]};
+  const SIDE = {p:[X+7.5,1.8,0.5], t:[X,0.5,-2]}, PAVEMENT = {p:[X+0.4,1.7,BAY_KERB-6], t:[X,0.6,BAY_KERB+2]};
+  const STEER = {car:true, p:[-0.1,1.25,-0.15], t:[0.48,0.97,0.37]}, WHEELS = {car:true, p:[-0.9,9,0], t:[-0.2,0,0]};
+  const W = 'wire';
+  return [
+    {pose:0, body:W, cam:TOP, slow:1, dur:5, cap:tr('Se garer en *bataille*, en marche avant','Nose-in *bay* parking'), sub:tr('Entre deux voitures, l\'avant vers le trottoir','Between two cars, front towards the kerb'), act:()=>{ setupState({engineOn:true, we:W_IDLE}); PARK.plan = PLAN_PERP; }},
+    {park:[0,1], body:W, cam:BEHIND, slow:1, dur:5.5, cap:tr('Avance *doucement* le long des places','Drive *slowly* past the bays'), sub:tr('La place libre est à ta droite','The free bay is on your right')},
+    {park:2, focus:'steering', body:W, cam:STEER, slow:1, dur:4.5, cap:tr('Braque à *fond* à droite','Turn the wheel *fully* to the right'), sub:tr('Environ un tour et demi de volant','About one and a half turns')},
+    {park:2, focus:'wheelF', body:W, cam:WHEELS, slow:1, dur:4.5, cap:tr('Les roues avant *tournent* à droite','The front wheels *turn* right'), sub:tr('La voiture va pivoter vers la place','The car will pivot towards the bay')},
+    {park:3, body:W, cam:TOP, slow:1, dur:8.5, cap:tr('L\'avant *tourne* vers la place','The front *turns* towards the bay'), sub:tr('Mais le virage est trop large pour entrer d\'un coup','But the turn is too wide to get in at once')},
+    {park:3, body:W, cam:FACING, slow:1, dur:8.5, cap:tr('Vue d\'en *face*','The view from *opposite*'), sub:tr('Elle arrive en biais : elle toucherait la voiture de droite','It comes in at an angle: it would hit the car on the right')},
+    {park:[4,5], focus:'steering', body:W, cam:STEER, slow:1, dur:5, cap:tr('Marche arrière, volant à *gauche*','Reverse, wheel to the *left*'), sub:tr('Vers la voiture garée à ta gauche','Towards the parked car on your left')},
+    {park:5, focus:'wheelF', body:W, cam:WHEELS, slow:1, dur:4.5, cap:tr('Les roues pointent à *gauche*','The wheels point *left*'), sub:tr('En reculant, l\'avant va se placer face à la place','Reversing brings the front round to face the bay')},
+    {park:6, body:W, cam:TOP, slow:1, dur:8.5, cap:tr('Recule : la voiture se *redresse*','Reverse: the car *straightens* up'), sub:tr('Elle se met face à la place','It lines up with the bay')},
+    {park:6, body:W, cam:SIDE, slow:1, dur:8.5, cap:tr('Regarde *derrière* en reculant','Look *behind* while reversing'), sub:tr('L\'arrière recule dans la rue','The rear swings out into the street')},
+    {park:7, focus:'steering', body:W, cam:STEER, slow:1, dur:4.5, cap:tr('Volant au *centre*','Wheel back to the *centre*'), sub:tr('Les roues sont droites','The wheels are straight')},
+    {park:[8,9], body:W, cam:TOP, slow:1, dur:11, cap:man ? tr('Passe la *1re* et avance tout droit','Select *1st* and drive straight in') : tr('Mets *D* et avance tout droit','Select *D* and drive straight in'), sub:tr('Autant de place à gauche qu\'à droite','The same space on the left and on the right')},
+    {park:9, body:W, cam:PAVEMENT, slow:1, dur:10, cap:tr('Arrête-toi avant le *trottoir*','Stop before the *kerb*'), sub:tr('Le pare-chocs à 30 cm de la bordure','The bumper 30 cm from the kerb')},
+    {pose:END, body:W, cam:TOP_IN, slow:1, dur:5.5, cap:tr('*Bravo*, la voiture est garée !','*Done*, the car is parked!'), sub:man ? tr('Frein à main serré, moteur coupé','Handbrake on, engine off') : tr('Levier sur P, frein à main serré','Lever to P, handbrake on')},
+  ];
+}
+
+/* ---- Traces au sol pendant les vidéos « se garer » ----
+   Traces des pneus (où la voiture est passée) et, en marche arrière, les lignes de guidage
+   comme sur l'écran de la caméra de recul (où les coins arrière vont passer avec ce braquage). */
+function ribbon(max, color, w, y, opacity=0.85){
+  const g = new THREE.BufferGeometry(), pos = new Float32Array(max*6), idx = [];
+  for(let i=0;i<max-1;i++){ const a=2*i; idx.push(a,a+1,a+2, a+1,a+3,a+2); }
+  g.setAttribute('position', new THREE.BufferAttribute(pos,3)); g.setIndex(idx); g.setDrawRange(0,0);
+  const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({color, transparent:true, opacity, side:THREE.DoubleSide, depthWrite:false}));
+  m.frustumCulled = false; put(m, 'parkscene', 'road', undefined, PARKG);
+  return { m, set(pts){
+    const n = Math.min(pts.length, max);
+    for(let i=0;i<n;i++){
+      const a = pts[Math.max(0,i-1)], b = pts[Math.min(n-1,i+1)];
+      let tx = b[0]-a[0], tz = b[1]-a[1]; const l = Math.hypot(tx,tz) || 1; tx/=l; tz/=l;
+      pos[i*6]   = pts[i][0] - tz*w/2; pos[i*6+1] = y; pos[i*6+2] = pts[i][1] + tx*w/2;
+      pos[i*6+3] = pts[i][0] + tz*w/2; pos[i*6+4] = y; pos[i*6+5] = pts[i][1] - tx*w/2;
+    }
+    g.attributes.position.needsUpdate = true; g.setDrawRange(0, n>1 ? (n-1)*6 : 0);
+  }};
+}
+const WHEEL_PTS = [[WH.xF, WH.zF], [WH.xF, -WH.zF], [WH.xR, WH.zR], [WH.xR, -WH.zR]];
+const TRACKS = WHEEL_PTS.map((_,i)=>ribbon(600, i<2 ? 0xf08a24 : 0x4f8fe0, 0.16, 0.004, 0.75));
+const GUIDE_BANDS = [[0,1,0xe0402a],[1,2,0xf0b429],[2,3,0x3cc46a]];          // 0-1 m rouge, 1-2 m orange, 2-3 m vert
+const GUIDES = [1,-1].flatMap(sg=>GUIDE_BANDS.map(([a,b,c])=>({sg, a, b, r:ribbon(24, c, 0.06, 0.006, 0.95)})));
+const toWorld = (o, lx, lz) => [o.x + lx*Math.cos(o.th) - lz*Math.sin(o.th), o.z + lx*Math.sin(o.th) + lz*Math.cos(o.th)];
+function parkSamples(){                         // le trajet complet, échantillonné une fois par plan
+  const P = PARK.plan; if(P._samples) return P._samples;
+  P._samples = [];
+  P.steps.forEach((st,i)=>{ if(st.ds===undefined) return; const n = Math.max(6, Math.ceil(Math.abs(st.ds)/0.08));
+    for(let j=0;j<=n;j++) P._samples.push({key:i+j/n, o:parkState(i, j/n)}); });
+  return P._samples;
+}
+function parkMarks(k, u, st){
+  const now = k + u, past = parkSamples().filter(s=>s.key <= now).map(s=>s.o).concat([st]);
+  TRACKS.forEach((t,i)=>t.set(past.map(o=>toWorld(o, WHEEL_PTS[i][0], WHEEL_PTS[i][1]))));
+  drawGuides(st);
+}
+// st : origine de la voiture {x, z, th}, braquage d, rapport g
+function drawGuides(st){
+  const rev = st.g==='R';
+  GUIDES.forEach(G=>{
+    G.r.m.visible = rev; if(!rev) return;
+    const pts = [], ra = {x:st.x + WH.xR*Math.cos(st.th), z:st.z + WH.xR*Math.sin(st.th), th:st.th};   // essieu arrière
+    for(let j=0;j<=12;j++){ const s = G.a + (G.b-G.a)*j/12, p = parkArc(ra, st.d, -s);
+      const o = {x:p.x - WH.xR*Math.cos(p.th), z:p.z - WH.xR*Math.sin(p.th), th:p.th};
+      pts.push(toWorld(o, -2.08, G.sg*0.88)); }
+    G.r.set(pts);
+  });
+}

@@ -13,9 +13,9 @@ const html = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Modèle 3D interactif pour comprendre une voiture : moteur thermique (boîte manuelle ou automatique) et électrique, avec des vidéos guidées.">
-<meta property="og:title" content="Comment marche une voiture">
-<meta property="og:description" content="Démarre le moteur, passe les vitesses et suis la force jusqu'aux roues. Thermique et électrique, en 3D.">
+<meta name="description" content="Garage &amp; Route : ouvre une voiture en 3D pour comprendre comment elle marche, puis prends le volant et gare-toi dans la rue. Thermique et électrique, en français et en anglais.">
+<meta property="og:title" content="Garage &amp; Route">
+<meta property="og:description" content="Comprends comment marche une voiture, puis conduis-la et gare-toi. Gratuit, dans le navigateur.">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 ${head.trim()}
 </head>

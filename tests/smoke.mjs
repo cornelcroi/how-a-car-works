@@ -27,6 +27,15 @@ for (const lang of ['fr', 'en']) {
     if (!cap) errors.push(`${lang} ${mode}/${sc} : aucun sous-titre`);
     await page.click('#reelClose');
   }
+  // mode « Conduire » : on avance 2 s avec ↑, la voiture doit rouler
+  await page.click('#appModes .mode[data-app="drive"]');
+  await page.waitForTimeout(800);
+  await page.keyboard.down('ArrowUp'); await page.waitForTimeout(2000);
+  const kmh = await page.evaluate(() => +document.querySelector('#speedo .dial-read').textContent);
+  await page.keyboard.up('ArrowUp');
+  console.log(`${lang} drive → ${kmh} km/h`);
+  if (!(kmh > 5)) errors.push(`${lang} drive: la voiture ne roule pas (${kmh} km/h)`);
+  await page.click('#appModes .mode[data-app="explore"]');
   if (lang === 'en') {
     // Repère grossier d'oubli de traduction : accents français dans le panneau.
     const leak = await page.evaluate(() => (document.querySelector('.panel').innerText.replace(document.getElementById('langBtn').innerText, '').match(/[^\n]*[éèêàçù][^\n]*/g) || []).slice(0, 5));
