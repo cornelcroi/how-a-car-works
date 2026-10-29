@@ -1,0 +1,15 @@
+{
+  "name": "comment-marche-une-voiture",
+  "version": "1.0.0",
+  "description": "Modèle 3D interactif pour comprendre une voiture thermique et électrique, avec vidéos guidées « Montre-moi ».",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node build.mjs && node tests/smoke.mjs",
+    "serve": "npx --yes http-server -c-1 -p 8080 ."
+  },
+  "devDependencies": {
+    "playwright": "^1.47.0"
+  }
+}
