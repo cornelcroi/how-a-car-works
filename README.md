@@ -10,7 +10,7 @@ English and French. The page picks your browser language. Switch with the button
 
 ## What is it?
 
-A 3D car for teenagers, learner drivers and anyone curious. It started with one question from a parent: *"how do I explain to my son what happens when you press the clutch and change gear?"*
+A 3D car for anyone curious about how a car works and how to drive it: learner drivers, teenagers, people who like engines as a hobby. And a base that could be used professionally, by driving schools, theory-test apps or garages (see [Where this could go](#where-this-could-go)).
 
 Two tabs:
 
@@ -144,17 +144,6 @@ Built in conversation with **Claude** (Anthropic) through Claude Code: I directe
 1. More driving videos: stopping distance and the 2-second rule, overtaking a cyclist, a lorry's blind spots, yield to the right.
 2. Videos as plain JSON (`scenarios/*.json`), then a small command API and an MCP server, so an assistant can direct the page live.
 3. A "type a fault code" mode on the generic car.
-
-## About me
-
-I'm **Corneliu Croitoru**. Staff GenAI Solutions Architect at Betclic, before that seven years at AWS (Solutions Architect, then Senior GenAI Prototyping Architect, 30+ GenAI prototypes with customers across EMEA). Twenty years of shipping software. The last few, shipping with AI.
-
-I co-founded [StreetLens](https://streetlensapp.com), GPS audio guides written and narrated in eight languages, and [Back From My Trip](https://backfrommytrip.com). I co-authored [Agent Squad](https://github.com/awslabs/agent-squad), an open-source multi-agent framework.
-
-This project is what I do when a real question comes up at home: build the smallest thing that answers it, and see if it's useful to others.
-
-- GitHub: [@cornelcroi](https://github.com/cornelcroi)
-- LinkedIn: [corneliucroitoru](https://www.linkedin.com/in/corneliucroitoru)
 
 ## Licence
 
