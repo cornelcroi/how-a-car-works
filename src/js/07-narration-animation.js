@@ -273,7 +273,7 @@ function animate(dt){
     R.ev.coils.forEach(c=>{ const cur = Math.sin(fieldE - c.a*EV.poles - c.ph*TAU/3); c.mat.emissiveIntensity = amp*Math.max(0,cur)*1.6 + (amp>0?0.05:0); });
     const lit = Math.round(S.evSOC*R.ev.mods.length); R.ev.mods.forEach((m,i)=>{ m.emissiveIntensity = i<lit ? 0.25 : 0; });
     const fl = R.ev.flow, P = S.engineOn ? S.evP : 0, sp = clamp(P/60000, -1.2, 1.2);
-    fl.pm.opacity = Math.abs(P) > 300 ? 0.95 : 0; fl.pm.color.setHex(P < 0 ? 0x3ee07a : 0xffb347);
+    fl.pm.opacity = Math.abs(P) > 300 ? 0.95 : 0; fl.pm.color.setHex(P < 0 ? 0x3ee07a : 0xffd27a);
     fl.u.forEach((u,i)=>{ let nu = u + sp*dt*0.5; nu = ((nu%1)+1)%1; fl.u[i]=nu; const pth = fl.paths[i%2], p = pth.getPoint(nu); fl.pos[i*3]=p.x; fl.pos[i*3+1]=p.y; fl.pos[i*3+2]=p.z; });
     fl.pts.geometry.attributes.position.needsUpdate = true;
     setGlow('ev', S.engineOn ? 0.1 + 0.5*amp : 0);

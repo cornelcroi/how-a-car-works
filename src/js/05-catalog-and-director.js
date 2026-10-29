@@ -620,7 +620,7 @@ function parkOff(){
 }
 function parkShots(){
   const man = S.mode==='manual', END = PARK_STEPS.length;
-  const TOP = {p:[-2.8,17,1.2], t:[-2.8,0,-0.3]}, TOP_IN = {p:[-3.6,11,2.2], p2:[-4.6,7.5,0.4], t:[-4.6,0,-2]};
+  const TOP = {p:[-2.8,17,1.2], t:[-2.8,0,-0.3]}, TOP_IN = {p:[-5.4,14,1.6], p2:[-5.4,9,0.9], t:[-5.4,0,-2.2]};   // descend tout droit, même angle que TOP : pas de rotation
   const STREET = {p:[-2.5,2.6,8.5], t:[-3,0.4,-2]}, STREET0 = {p:[1.5,3.0,9.5], t:[-0.6,0.4,-1.4]}, PAVEMENT = {p:[-4.5,1.6,-7.8], t:[-4,0.5,-1]};
   const BEHIND = {p:[-17,2.2,-0.5], t:[-4,0.5,-1.6]}, CORNER = {p:[1.8,3.4,2.6], t:[-2.8,0.3,-1.5]};
   const REF = {p:[-2.6,5.5,1.8], t:[-2.1,0,-1.2]};

@@ -84,7 +84,7 @@ function streetCam(dt, o){
   STREET.lastO = null;
   const k = 1 - Math.exp(-dt*7);
   let want, look;
-  if(STREET.view==='top'){ want = new THREE.Vector3(o.x, 22, o.z + 1.8); look = new THREE.Vector3(o.x, 0, o.z - 0.3); }
+  if(STREET.view==='top'){ want = new THREE.Vector3(o.x, 22, o.z + 4); look = new THREE.Vector3(o.x, 0, o.z - 0.5); }   // un peu incliné : l'image a toujours le même sens
   else { const v = STREET_VIEWS[STREET.view]; want = ROOT.localToWorld(new THREE.Vector3(...v.p)); look = ROOT.localToWorld(new THREE.Vector3(...v.t)); }
   if(STREET.view==='driver'){ camera.position.copy(want); controls.target.copy(look); }   // assis dans la voiture : pas de retard
   else { camera.position.lerp(want, k); controls.target.lerp(look, k); }
@@ -141,7 +141,7 @@ function streetStart(spot){
   bodyMode = 'wire'; applyBodyMode(); refreshVis(); drawSpot();
   stage.classList.add('street-on'); $('driveCtl').hidden = false; appTab('drive'); document.querySelector('.panel').classList.add('driving');
   document.querySelectorAll('#tryRow .btn').forEach(b=>b.classList.toggle('act', b.dataset.try===spot));
-  setSteer(0); streetPlace();
+  setSteer(0); streetPlace(); setStreetView(STREET.view);   // remet la caméra libre en accord avec la vue (une vidéo la réactive)
   const go = simple ? tr('↑ pour avancer, ↓ pour reculer, Espace pour freiner, ← → pour tourner. ','↑ to go forward, ↓ to reverse, Space to brake, ← → to steer. ')
                     : tr('Démarre et passe la 1re. ','Start the engine and select 1st. ');
   say(go + (spot==='par' ? tr('Gare-toi en créneau dans la place verte, derrière la voiture grise.','Parallel park in the green space, behind the grey car.')
@@ -210,7 +210,7 @@ function streetTick(dt){
 // Onglets : « Découvrir » (la voiture ouverte) et « Conduire » (les vidéos pour se garer, puis on essaie)
 function appTab(m){ document.querySelectorAll('#appModes .mode').forEach(b=>b.classList.toggle('act', b.dataset.app===m)); document.querySelector('.panel').classList.toggle('tab-drive', m==='drive'); }
 document.querySelectorAll('#appModes .mode').forEach(b=> b.onclick = ()=>{ if(b.dataset.app==='explore') streetStop(); appTab(b.dataset.app); });
-document.querySelectorAll('#tryRow .btn').forEach(b=> b.onclick = ()=>{ ensureAudio(); streetStart(b.dataset.try); });
+document.querySelectorAll('#tryRow .btn').forEach(b=> b.onclick = ()=>{ ensureAudio(); streetStart(b.dataset.try); b.blur(); });   // sinon Espace « re-clique » le bouton
 $('streetStop').onclick = streetStop;
 document.querySelectorAll('#streetGear button').forEach(b=> b.onclick = ()=>{ STREET.gearbox = b.dataset.g; streetStart(STREET.spot); });
 function streetDirUI(){ document.querySelectorAll('#streetDir button').forEach(b=>b.classList.toggle('act', !!STREET.keys[b.dataset.k])); }
@@ -236,4 +236,4 @@ window.addEventListener('keydown', e=>{
   else if(e.key.toLowerCase()==='v' && !e.repeat){ const L = ['driver','behind','front','top','free']; setStreetView(L[(L.indexOf(STREET.view)+1) % L.length]); }
 });
 window.addEventListener('keyup', e=>{ if(e.key==='ArrowLeft' || e.key==='ArrowRight') STREET.steerKey = 0;
-  const SK = {ArrowUp:'up', ArrowDown:'down', ' ':'brake'}[e.key]; if(SK) STREET.keys[SK] = false; });
+  const SK = {ArrowUp:'up', ArrowDown:'down', ' ':'brake'}[e.key]; if(SK){ STREET.keys[SK] = false; if(STREET.on) e.preventDefault(); } });

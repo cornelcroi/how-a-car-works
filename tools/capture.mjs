@@ -1,5 +1,5 @@
 // Regenerates the README screenshots and GIFs in docs/media/ (English UI).
-// Usage: npm run capture   (--parking: only the parking GIF; --linkedin / --youtube: docs/media/linkedin.mp4 / youtube.mp4, not committed)
+// Usage: npm run capture   (--parking: only the parking GIF). The LinkedIn and YouTube videos: tools/render-video.mjs
 // Needs playwright + chromium, and ffmpeg on the PATH)
 import { chromium } from 'playwright';
 import { pathToFileURL } from 'node:url';
@@ -49,9 +49,9 @@ async function shot(name, script) {
   console.log(`${name}.png`);
 }
 
-const LINKEDIN = process.argv.includes('--linkedin') || process.argv.includes('--youtube'), PARKING_ONLY = process.argv.includes('--parking');
+const PARKING_ONLY = process.argv.includes('--parking');
 
-if (!LINKEDIN && !PARKING_ONLY) {
+if (!PARKING_ONLY) {
 /* ---------- screenshots ---------- */
 await shot('overview', async p => { await p.keyboard.press('k'); await wait(2500); });
 await shot('show-me', async p => { await playVideo(p, 'shift'); await wait(13000); });
@@ -86,79 +86,9 @@ await clip('electric', 0.8, 14, 1.5, async p => { await mode(p, 'ev'); await wai
 
 /* ---------- Parking GIF (also: node tools/capture.mjs --parking) ---------- */
 // Parking video shots start at 0, 5, 10, 14, 18, 22.5, 27, 31.5, 36, 45.5, 55 … (see parkShots in 05).
-if (!LINKEDIN) await clip('parking', 31.8, 13.5, 1.5, async p => { await playVideo(p, 'parking'); await wait(46000); });
+await clip('parking', 31.8, 13.5, 1.5, async p => { await playVideo(p, 'parking'); await wait(46000); });
 // Joining the motorway: the shoulder check, then the car in the blind spot (shots start at 0, 5, 10, 15.5, 20.5 s)
-if (!LINKEDIN && !PARKING_ONLY) await clip('motorway', 15.8, 10, 1.25, async p => { await playVideo(p, 'merge'); await wait(27000); });
-
-/* ---------- LinkedIn: one square MP4 of the 3D stage (captions included), cut from one session ---------- */
-if (process.argv.includes('--linkedin')) {
-  const ctx = await browser.newContext({ viewport: { width: 1600, height: 1000 }, recordVideo: { dir: TMP, size: { width: 1600, height: 1000 } } });
-  const p = await ctx.newPage();
-  const tStart = Date.now(), mark = () => (Date.now() - tStart) / 1000;
-  await p.goto(url); await wait(2500);
-  const box = await p.evaluate(() => { const r = document.getElementById('stage').getBoundingClientRect(); return { x: r.x, y: r.y, w: r.width, h: r.height }; });
-  const D = mark();                                                    // Explore: start, 1st, pull away
-  await p.keyboard.press('k'); await wait(3000);
-  await p.keyboard.down('c'); await wait(800); await p.keyboard.press('1'); await wait(700);
-  await p.keyboard.down('a'); await wait(300); await p.keyboard.up('c'); await wait(4000);
-  await p.keyboard.up('a'); await wait(300);
-  const G = mark(); await playVideo(p, 'shift'); await wait(15000);     // « Show me »: changing gear
-  await p.click('#reelClose');
-  const P = mark(); await playVideo(p, 'parking'); await wait(45500);   // parallel parking (shots at 27, 31.5, 36 s)
-  await p.click('#reelClose');
-  const M = mark(); await playVideo(p, 'merge'); await wait(47500);     // joining the motorway (shots at 0, 27, 32, 42 s)
-  await p.click('#reelClose');
-  await p.click('#tryRow .btn[data-try="par"]'); await wait(800);       // Drive it yourself, driver's view with mirrors
-  await p.click('#streetView button[data-v="driver"]');
-  const S2 = mark(); await p.keyboard.down('ArrowUp'); await wait(2600); await p.keyboard.up('ArrowUp'); await wait(1500);
-  await p.keyboard.down('ArrowRight'); await p.keyboard.down('ArrowUp'); await wait(1400); await p.keyboard.up('ArrowRight'); await p.keyboard.up('ArrowUp'); await wait(1200);
-  const webm = await p.video().path();
-  await ctx.close();
-  const segs = [[D + 2.5, 6], [G + 9, 8],
-    [P + 27.3, 4], [P + 31.8, 4], [P + 36.4, 8],
-    [M + 0.5, 5], [M + 27.3, 4.5], [M + 32.3, 4.5], [M + 42.3, 4.5],
-    [S2, 6.5]];
-  const side = Math.floor(Math.min(box.w, box.h)), cx = Math.floor(box.x + (box.w - side) / 2), cy = Math.floor(box.y + (box.h - side) / 2);
-  const fc = segs.map(([a, d], i) => `[0:v]trim=start=${a.toFixed(2)}:duration=${d},setpts=PTS-STARTPTS[v${i}]`).join(';')
-    + ';' + segs.map((_, i) => `[v${i}]`).join('') + `concat=n=${segs.length}:v=1:a=0,crop=${side}:${side}:${cx}:${cy},scale=1080:1080:flags=lanczos,fps=30[out]`;
-  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', webm, '-filter_complex', fc, '-map', '[out]',
-    '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '20', '-movflags', '+faststart', '-an', `${OUT}/linkedin.mp4`]);
-  const total = segs.reduce((t, [, d]) => t + d, 0);
-  console.log(`linkedin.mp4  ${(statSync(`${OUT}/linkedin.mp4`).size / 1e6).toFixed(1)} MB, ${total.toFixed(0)} s`);
-}
-
-/* ---------- YouTube demo: the whole page (panel included), 16:9, about 2 minutes ---------- */
-if (process.argv.includes('--youtube')) {
-  const ctx = await browser.newContext({ viewport: { width: 1600, height: 900 }, recordVideo: { dir: TMP, size: { width: 1600, height: 900 } } });
-  const p = await ctx.newPage();
-  const t0 = Date.now(), mark = () => (Date.now() - t0) / 1000;
-  await p.goto(url); await wait(2500);
-  const A = mark();                                                     // Explore: start, 1st, pull away
-  await p.keyboard.press('k'); await wait(2500);
-  await p.keyboard.down('c'); await wait(700); await p.keyboard.press('1'); await wait(600);
-  await p.keyboard.down('a'); await wait(300); await p.keyboard.up('c'); await wait(4000); await p.keyboard.up('a'); await wait(600);
-  const G = mark(); await playVideo(p, 'shift'); await wait(21000); await p.click('#reelClose');
-  await mode(p, 'ev'); await wait(800);
-  const E = mark(); await playVideo(p, 'evtour'); await wait(12000); await p.click('#reelClose');
-  await mode(p, 'auto'); await wait(500);
-  const P = mark(); await playVideo(p, 'parking'); await wait(46000); await p.click('#reelClose');
-  const M = mark(); await playVideo(p, 'merge'); await wait(48000); await p.click('#reelClose');
-  const L = mark(); await playVideo(p, 'lanechange'); await wait(17000); await p.click('#reelClose');
-  const D = mark(); await p.click('#tryRow .btn[data-try="par"]'); await wait(900);  // drive it yourself
-  await p.keyboard.down('ArrowUp'); await wait(2600); await p.keyboard.up('ArrowUp'); await wait(1200);
-  await p.click('#streetView button[data-v="driver"]'); await p.keyboard.down('ArrowUp'); await wait(1800);
-  await p.keyboard.down('ArrowRight'); await wait(900); await p.keyboard.up('ArrowRight'); await p.keyboard.up('ArrowUp'); await wait(1500);
-  await p.click('#streetView button[data-v="top"]'); await p.keyboard.down('ArrowDown'); await wait(2500); await p.keyboard.up('ArrowDown'); await wait(1800);
-  const webm = await p.video().path();
-  await ctx.close();
-  const segs = [[A, 9], [G + 0.3, 20], [E + 0.3, 11], [P + 0.3, 9], [P + 27.3, 18],
-    [M + 0.3, 16], [M + 21.8, 15], [M + 37.3, 10], [L + 5.8, 11], [D, 15]];
-  const fc = segs.map(([a, d], i) => `[0:v]trim=start=${a.toFixed(2)}:duration=${d},setpts=PTS-STARTPTS[v${i}]`).join(';')
-    + ';' + segs.map((_, i) => `[v${i}]`).join('') + `concat=n=${segs.length}:v=1:a=0,scale=1920:1080:flags=lanczos,fps=30[out]`;
-  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', webm, '-filter_complex', fc, '-map', '[out]',
-    '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '20', '-movflags', '+faststart', '-an', `${OUT}/youtube.mp4`]);
-  console.log(`youtube.mp4  ${(statSync(`${OUT}/youtube.mp4`).size / 1e6).toFixed(1)} MB, ${segs.reduce((t, [, d]) => t + d, 0).toFixed(0)} s`);
-}
+if (!PARKING_ONLY) await clip('motorway', 15.8, 10, 1.25, async p => { await playVideo(p, 'merge'); await wait(27000); });
 
 await browser.close();
 rmSync(TMP, { recursive: true, force: true });

@@ -57,8 +57,10 @@ R.ev = {coils:[]};
   const path2 = new THREE.CatmullRomCurve3([new THREE.Vector3(0.86,0.2,-0.1), new THREE.Vector3(1.07,0.22,-0.14), new THREE.Vector3(1.2,0.45,-0.18), new THREE.Vector3(1.26,0.62,-0.08)]);
   put(new THREE.Mesh(new THREE.TubeGeometry(path2,40,0.012,8,false), plastic(0xff7a1a,{roughness:0.5})),'hvcable',C,MODE);
   const n=36, pos=new Float32Array(n*3), geo=new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
-  const pm = new THREE.PointsMaterial({color:0xffb347, size:0.03, transparent:true, opacity:0, depthWrite:false});
-  const pts = new THREE.Points(geo, pm); put(pts,'hvcable',C,MODE);
+  const disc = document.createElement('canvas'); disc.width = disc.height = 32;                                     // des points ronds, pas carrés
+  { const g = disc.getContext('2d'); g.fillStyle = '#fff'; g.beginPath(); g.arc(16, 16, 14, 0, TAU); g.fill(); }
+  const pm = new THREE.PointsMaterial({color:0xffd27a, size:0.045, map:new THREE.CanvasTexture(disc), alphaTest:0.5, transparent:true, opacity:0, depthWrite:false, depthTest:false});   // au-dessus du câble qu'ils parcourent
+  const pts = new THREE.Points(geo, pm); pts.frustumCulled = false; put(pts,'hvcable',C,MODE);   // ses positions bougent : sa boîte calculée au départ (tout en 0) le ferait disparaître
   R.ev.flow = {pts, pos, pm, paths:[path,path2], u:Array.from({length:n},(_,i)=>i/n)};
   // prise de recharge (à l'arrière droit)
   const port = new THREE.Group(); at(port, -1.62, 0.93, -0.86);

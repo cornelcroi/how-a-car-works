@@ -1126,8 +1126,10 @@ R.ev = {coils:[]};
   const path2 = new THREE.CatmullRomCurve3([new THREE.Vector3(0.86,0.2,-0.1), new THREE.Vector3(1.07,0.22,-0.14), new THREE.Vector3(1.2,0.45,-0.18), new THREE.Vector3(1.26,0.62,-0.08)]);
   put(new THREE.Mesh(new THREE.TubeGeometry(path2,40,0.012,8,false), plastic(0xff7a1a,{roughness:0.5})),'hvcable',C,MODE);
   const n=36, pos=new Float32Array(n*3), geo=new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
-  const pm = new THREE.PointsMaterial({color:0xffb347, size:0.03, transparent:true, opacity:0, depthWrite:false});
-  const pts = new THREE.Points(geo, pm); put(pts,'hvcable',C,MODE);
+  const disc = document.createElement('canvas'); disc.width = disc.height = 32;                                     // des points ronds, pas carrés
+  { const g = disc.getContext('2d'); g.fillStyle = '#fff'; g.beginPath(); g.arc(16, 16, 14, 0, TAU); g.fill(); }
+  const pm = new THREE.PointsMaterial({color:0xffd27a, size:0.045, map:new THREE.CanvasTexture(disc), alphaTest:0.5, transparent:true, opacity:0, depthWrite:false, depthTest:false});   // au-dessus du câble qu'ils parcourent
+  const pts = new THREE.Points(geo, pm); pts.frustumCulled = false; put(pts,'hvcable',C,MODE);   // ses positions bougent : sa boîte calculée au départ (tout en 0) le ferait disparaître
   R.ev.flow = {pts, pos, pm, paths:[path,path2], u:Array.from({length:n},(_,i)=>i/n)};
   // prise de recharge (à l'arrière droit)
   const port = new THREE.Group(); at(port, -1.62, 0.93, -0.86);
@@ -2052,7 +2054,7 @@ function parkOff(){
 }
 function parkShots(){
   const man = S.mode==='manual', END = PARK_STEPS.length;
-  const TOP = {p:[-2.8,17,1.2], t:[-2.8,0,-0.3]}, TOP_IN = {p:[-3.6,11,2.2], p2:[-4.6,7.5,0.4], t:[-4.6,0,-2]};
+  const TOP = {p:[-2.8,17,1.2], t:[-2.8,0,-0.3]}, TOP_IN = {p:[-5.4,14,1.6], p2:[-5.4,9,0.9], t:[-5.4,0,-2.2]};   // descend tout droit, même angle que TOP : pas de rotation
   const STREET = {p:[-2.5,2.6,8.5], t:[-3,0.4,-2]}, STREET0 = {p:[1.5,3.0,9.5], t:[-0.6,0.4,-1.4]}, PAVEMENT = {p:[-4.5,1.6,-7.8], t:[-4,0.5,-1]};
   const BEHIND = {p:[-17,2.2,-0.5], t:[-4,0.5,-1.6]}, CORNER = {p:[1.8,3.4,2.6], t:[-2.8,0.3,-1.5]};
   const REF = {p:[-2.6,5.5,1.8], t:[-2.1,0,-1.2]};
@@ -2607,7 +2609,7 @@ function streetCam(dt, o){
   STREET.lastO = null;
   const k = 1 - Math.exp(-dt*7);
   let want, look;
-  if(STREET.view==='top'){ want = new THREE.Vector3(o.x, 22, o.z + 1.8); look = new THREE.Vector3(o.x, 0, o.z - 0.3); }
+  if(STREET.view==='top'){ want = new THREE.Vector3(o.x, 22, o.z + 4); look = new THREE.Vector3(o.x, 0, o.z - 0.5); }   // un peu incliné : l'image a toujours le même sens
   else { const v = STREET_VIEWS[STREET.view]; want = ROOT.localToWorld(new THREE.Vector3(...v.p)); look = ROOT.localToWorld(new THREE.Vector3(...v.t)); }
   if(STREET.view==='driver'){ camera.position.copy(want); controls.target.copy(look); }   // assis dans la voiture : pas de retard
   else { camera.position.lerp(want, k); controls.target.lerp(look, k); }
@@ -2664,7 +2666,7 @@ function streetStart(spot){
   bodyMode = 'wire'; applyBodyMode(); refreshVis(); drawSpot();
   stage.classList.add('street-on'); $('driveCtl').hidden = false; appTab('drive'); document.querySelector('.panel').classList.add('driving');
   document.querySelectorAll('#tryRow .btn').forEach(b=>b.classList.toggle('act', b.dataset.try===spot));
-  setSteer(0); streetPlace();
+  setSteer(0); streetPlace(); setStreetView(STREET.view);   // remet la caméra libre en accord avec la vue (une vidéo la réactive)
   const go = simple ? tr('↑ pour avancer, ↓ pour reculer, Espace pour freiner, ← → pour tourner. ','↑ to go forward, ↓ to reverse, Space to brake, ← → to steer. ')
                     : tr('Démarre et passe la 1re. ','Start the engine and select 1st. ');
   say(go + (spot==='par' ? tr('Gare-toi en créneau dans la place verte, derrière la voiture grise.','Parallel park in the green space, behind the grey car.')
@@ -2733,7 +2735,7 @@ function streetTick(dt){
 // Onglets : « Découvrir » (la voiture ouverte) et « Conduire » (les vidéos pour se garer, puis on essaie)
 function appTab(m){ document.querySelectorAll('#appModes .mode').forEach(b=>b.classList.toggle('act', b.dataset.app===m)); document.querySelector('.panel').classList.toggle('tab-drive', m==='drive'); }
 document.querySelectorAll('#appModes .mode').forEach(b=> b.onclick = ()=>{ if(b.dataset.app==='explore') streetStop(); appTab(b.dataset.app); });
-document.querySelectorAll('#tryRow .btn').forEach(b=> b.onclick = ()=>{ ensureAudio(); streetStart(b.dataset.try); });
+document.querySelectorAll('#tryRow .btn').forEach(b=> b.onclick = ()=>{ ensureAudio(); streetStart(b.dataset.try); b.blur(); });   // sinon Espace « re-clique » le bouton
 $('streetStop').onclick = streetStop;
 document.querySelectorAll('#streetGear button').forEach(b=> b.onclick = ()=>{ STREET.gearbox = b.dataset.g; streetStart(STREET.spot); });
 function streetDirUI(){ document.querySelectorAll('#streetDir button').forEach(b=>b.classList.toggle('act', !!STREET.keys[b.dataset.k])); }
@@ -2759,7 +2761,7 @@ window.addEventListener('keydown', e=>{
   else if(e.key.toLowerCase()==='v' && !e.repeat){ const L = ['driver','behind','front','top','free']; setStreetView(L[(L.indexOf(STREET.view)+1) % L.length]); }
 });
 window.addEventListener('keyup', e=>{ if(e.key==='ArrowLeft' || e.key==='ArrowRight') STREET.steerKey = 0;
-  const SK = {ArrowUp:'up', ArrowDown:'down', ' ':'brake'}[e.key]; if(SK) STREET.keys[SK] = false; });
+  const SK = {ArrowUp:'up', ArrowDown:'down', ' ':'brake'}[e.key]; if(SK){ STREET.keys[SK] = false; if(STREET.on) e.preventDefault(); } });
 
 /* ===== 07-narration-animation.js ===== */
 
@@ -3037,7 +3039,7 @@ function animate(dt){
     R.ev.coils.forEach(c=>{ const cur = Math.sin(fieldE - c.a*EV.poles - c.ph*TAU/3); c.mat.emissiveIntensity = amp*Math.max(0,cur)*1.6 + (amp>0?0.05:0); });
     const lit = Math.round(S.evSOC*R.ev.mods.length); R.ev.mods.forEach((m,i)=>{ m.emissiveIntensity = i<lit ? 0.25 : 0; });
     const fl = R.ev.flow, P = S.engineOn ? S.evP : 0, sp = clamp(P/60000, -1.2, 1.2);
-    fl.pm.opacity = Math.abs(P) > 300 ? 0.95 : 0; fl.pm.color.setHex(P < 0 ? 0x3ee07a : 0xffb347);
+    fl.pm.opacity = Math.abs(P) > 300 ? 0.95 : 0; fl.pm.color.setHex(P < 0 ? 0x3ee07a : 0xffd27a);
     fl.u.forEach((u,i)=>{ let nu = u + sp*dt*0.5; nu = ((nu%1)+1)%1; fl.u[i]=nu; const pth = fl.paths[i%2], p = pth.getPoint(nu); fl.pos[i*3]=p.x; fl.pos[i*3+1]=p.y; fl.pos[i*3+2]=p.z; });
     fl.pts.geometry.attributes.position.needsUpdate = true;
     setGlow('ev', S.engineOn ? 0.1 + 0.5*amp : 0);
