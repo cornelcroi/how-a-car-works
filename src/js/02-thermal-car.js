@@ -352,7 +352,7 @@ R.aut = {};
   R.aut.outShaft = new THREE.Group(); at(R.aut.outShaft, OX, OY, 0);
   const om = gm('output', M.steel);
   const os = cylZ(0.016, 0.12, om); os.position.z = 0.39; R.aut.outShaft.add(os);
-  const tr = gearZ(31, P62, 0.016, 0.012, om); tr.position.z = 0.345; R.aut.outShaft.add(tr);
+  const trg = gearZ(31, P62, 0.016, 0.012, om); trg.position.z = 0.345; R.aut.outShaft.add(trg);
   const pin = gearZ(FD_N[0], PFD, 0.028, 0.01, om); pin.position.z = 0.44; R.aut.outShaft.add(pin);
   put(R.aut.outShaft,'transfer',C,MODE);
 })();

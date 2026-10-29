@@ -4,11 +4,13 @@ Guide for AI coding agents (Claude Code, Codex…) working on this repository.
 
 ## What this is
 
-**« Comment marche une voiture »**: a single-page, dependency-free 3D explainer of how a car works, in French, for teenagers and learner drivers. Three cars share one scene:
+**« Comment marche une voiture »**: a single-page, dependency-free 3D explainer of how a car works, in French and English, for teenagers and learner drivers. Three cars share one scene:
 
 - `manual`: petrol 4-cylinder with a clutch and a 6-speed manual gearbox.
 - `auto`: the same engine with a torque converter and a 6-speed planetary automatic.
 - `ev`: an electric car with a battery, inverter, permanent-magnet motor and single-speed reducer.
+
+Live at https://cornelcroi.github.io/how-a-car-works/ (repo `cornelcroi/how-a-car-works`).
 
 Features: click any part for an explanation, isolate it, explode the clutch, auto-directed « Montre-moi » videos (camera, pointer, captions, the car driving itself), a simple view, a guided lesson, and a « Garage » game where you diagnose and repair a random fault.
 
@@ -85,7 +87,7 @@ When adding one:
 
 ## Conventions
 
-- **UI text is French.** Use a friendly « tu », short sentences, and real numbers (rpm, km/h, teeth). Code comments may be in French or English.
+- **UI text is French and English.** Every visible string goes through `tr('français','English')` (01-core). Static HTML in `src/page.html` carries `data-en` (innerHTML) or `data-en-label` (aria-label). Language: `?lang=` > saved choice > browser; switching reloads the page. Numbers go through `fr(x,d)`, which picks the decimal separator. French: friendly « tu ». English: plain, friendly « you ». Short sentences, real numbers (rpm, km/h, teeth). Code comments may be in French or English. Note: `EN` is the engine geometry object, not the language (`IS_EN` is).
 - **No brand names, logos or copies of real car designs.** The body is a generic compact hatchback. Specs are described as « une compacte 2.0 essence de 150 ch » and « une compacte électrique 100 kW / 35,8 kWh ».
 - **Single static file, no build-time dependencies.** three.js r128 (UMD) and OrbitControls come from a CDN. Don't introduce a bundler or framework unless there's a strong reason.
 - **Colours**: CSS tokens in `src/page.html`. Light and dark themes are both supported, so don't hard-code colours in components. Video overlays deliberately use fixed white text.
@@ -101,4 +103,5 @@ When adding one:
 1. Move `SCENARIOS` to plain JSON files (`scenarios/*.json`) with the actions as named commands. AI agents could then write videos without touching JS.
 2. Expose the director as a small command API (`focus`, `isolate`, `zoom`, `caption`, `action`), then as an **MCP server**, so an assistant can drive the page live (« montre-moi l'embrayage »).
 3. More learner-driver videos: see the list at the end of `docs/SCENARIOS.md`.
-4. A hybrid car, a short quiz after each video, and an English translation (keep French as default).
+4. A hybrid car and a short quiz after each video.
+5. A « fault code » mode: type an OBD-II `P0xxx` code, highlight the part on the generic car (lookup table, no model). See README.

@@ -9,8 +9,10 @@ Une vidéo « Montre-moi » est une **liste de plans** (« shots »). Le réalis
 Dans `SCENARIOS` (fichier `src/js/05-catalog-and-director.js`), dans la liste de la bonne voiture : `manual`, `auto` ou `ev`.
 
 ```js
-{ id:'enginebrake', t:'Le frein moteur', d:'Lever le pied en vitesse ralentit la voiture', shots:()=>[ /* plans */ ] },
+{ id:'enginebrake', t:tr('Le frein moteur','Engine braking'), d:tr('Lever le pied en vitesse ralentit la voiture','Lifting off in gear slows the car'), shots:()=>[ /* plans */ ] },
 ```
+
+La page est en français et en anglais : chaque texte affiché (`t`, `d`, `cap`, `sub`) s'écrit `tr('français','English')`. Dans `cap`, un seul mot `*surligné*` dans chaque langue.
 
 - `id` : identifiant unique (sert aussi au test, `#scList .sc[data-sc="id"]`).
 - `t` : titre de la carte, `d` : une ligne de description.

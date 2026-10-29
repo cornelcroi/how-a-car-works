@@ -3,65 +3,65 @@
    JEU : GARAGE
    ====================================================================== */
 const FAULTS = [
-  {k:'spark', modes:['manual','auto'], parts:['spark'], name:'Bougie d\'allumage morte',
+  {k:'spark', modes:['manual','auto'], parts:['spark'], name:tr('Bougie d\'allumage morte','Dead spark plug'),
    trig:()=> S.engineOn && S.runTime>4,
-   sym:'Le moteur tousse et tremble, il a moins de force. Le voyant MOTEUR s\'est allumé.',
-   hints:['Le problème est à l\'intérieur du moteur : enlève le « Carter moteur » dans la barre Afficher.','Regarde les petites flammes orange dans les cylindres : il en manque une. Qu\'est-ce qui fait l\'étincelle ?'],
-   fix:'Le moteur tourne rond à nouveau.'},
-  {k:'belt', modes:['manual','auto'], parts:['belt'], name:'Courroie de distribution cassée',
+   sym:tr('Le moteur tousse et tremble, il a moins de force. Le voyant MOTEUR s\'est allumé.','The engine coughs and shakes, and it has less power. The ENGINE warning light is on.'),
+   hints:[tr('Le problème est à l\'intérieur du moteur : enlève le « Carter moteur » dans la barre Afficher.','The problem is inside the engine: turn off "Engine casing" in the Show bar.'),tr('Regarde les petites flammes orange dans les cylindres : il en manque une. Qu\'est-ce qui fait l\'étincelle ?','Look at the small orange flames in the cylinders: one is missing. What makes the spark?')],
+   fix:tr('Le moteur tourne rond à nouveau.','The engine runs smoothly again.')},
+  {k:'belt', modes:['manual','auto'], parts:['belt'], name:tr('Courroie de distribution cassée','Broken timing belt'),
    trig:()=> S.engineOn && Math.abs(S.v)*3.6>30,
-   sym:'Le moteur s\'est arrêté net en roulant et ne veut plus redémarrer : le démarreur tourne, mais le moteur ne part pas.',
-   hints:['Appuie sur Démarrer et regarde la vue « Distribution » : est-ce que les arbres à cames tournent ?','Quelque chose relie le vilebrequin aux arbres à cames, et ce n\'est plus là…'],
-   fix:'Les soupapes s\'ouvrent à nouveau au bon moment.'},
-  {k:'battery', modes:['manual','auto'], parts:['battery'], name:'Batterie vide', atStart:true,
-   sym:'Quand tu tournes la clé : juste un petit « clic ». Le voyant BATTERIE est allumé et les phares sont tout faibles.',
-   hints:['Qu\'est-ce qui donne l\'électricité au démarreur et aux phares ?','Vue « Moteur » : cherche une boîte noire avec une borne rouge, au-dessus de la boîte de vitesses.'],
-   fix:'La batterie est chargée.'},
-  {k:'starter', modes:['manual','auto'], parts:['starter'], name:'Démarreur en panne', atStart:true,
-   sym:'Quand tu tournes la clé, rien ne tourne. Pourtant les phares s\'allument bien fort : la batterie est bonne.',
-   hints:['Quelle pièce fait tourner le moteur au démarrage ?','Regarde près du volant moteur, entre le moteur et la boîte (vue « Embrayage »).'],
-   fix:'Le démarreur lance le moteur.'},
-  {k:'clutch', modes:['manual'], parts:['disc'], name:'Disque d\'embrayage usé',
+   sym:tr('Le moteur s\'est arrêté net en roulant et ne veut plus redémarrer : le démarreur tourne, mais le moteur ne part pas.','The engine stopped dead while driving and won\'t restart: the starter turns, but the engine doesn\'t start.'),
+   hints:[tr('Appuie sur Démarrer et regarde la vue « Distribution » : est-ce que les arbres à cames tournent ?','Press Start and look at the "Timing" view: are the camshafts turning?'),tr('Quelque chose relie le vilebrequin aux arbres à cames, et ce n\'est plus là…','Something links the crankshaft to the camshafts, and it\'s not there any more…')],
+   fix:tr('Les soupapes s\'ouvrent à nouveau au bon moment.','The valves open at the right moment again.')},
+  {k:'battery', modes:['manual','auto'], parts:['battery'], name:tr('Batterie vide','Flat battery'), atStart:true,
+   sym:tr('Quand tu tournes la clé : juste un petit « clic ». Le voyant BATTERIE est allumé et les phares sont tout faibles.','When you turn the key: just a small "click". The BATTERY warning light is on and the headlights are very dim.'),
+   hints:[tr('Qu\'est-ce qui donne l\'électricité au démarreur et aux phares ?','What gives electricity to the starter and the headlights?'),tr('Vue « Moteur » : cherche une boîte noire avec une borne rouge, au-dessus de la boîte de vitesses.','"Engine" view: look for a black box with a red terminal, above the gearbox.')],
+   fix:tr('La batterie est chargée.','The battery is charged.')},
+  {k:'starter', modes:['manual','auto'], parts:['starter'], name:tr('Démarreur en panne','Broken starter'), atStart:true,
+   sym:tr('Quand tu tournes la clé, rien ne tourne. Pourtant les phares s\'allument bien fort : la batterie est bonne.','When you turn the key, nothing turns. Yet the headlights are nice and bright: the battery is fine.'),
+   hints:[tr('Quelle pièce fait tourner le moteur au démarrage ?','Which part turns the engine when you start it?'),tr('Regarde près du volant moteur, entre le moteur et la boîte (vue « Embrayage »).','Look near the flywheel, between the engine and the gearbox ("Clutch" view).')],
+   fix:tr('Le démarreur lance le moteur.','The starter cranks the engine.')},
+  {k:'clutch', modes:['manual'], parts:['disc'], name:tr('Disque d\'embrayage usé','Worn clutch disc'),
    trig:()=> S.engineOn && S.gear!=='N' && S.gear!=='1' && S.gas>0.35 && engagement()>0.95 && S.slipLast>40,
-   sym:'Quand tu accélères, le moteur monte dans les tours mais la voiture n\'accélère presque pas. Ça sent le brûlé !',
-   hints:['Le moteur va bien, mais sa force n\'arrive pas jusqu\'à la boîte.','Vue « Embrayage », accélère en 3e et regarde : le disque tourne moins vite que le volant moteur…'],
-   fix:'L\'embrayage ne patine plus.'},
-  {k:'pads', parts:['caliper'], name:'Plaquettes de frein usées',
+   sym:tr('Quand tu accélères, le moteur monte dans les tours mais la voiture n\'accélère presque pas. Ça sent le brûlé !','When you accelerate, the engine revs up but the car barely speeds up. It smells burnt!'),
+   hints:[tr('Le moteur va bien, mais sa force n\'arrive pas jusqu\'à la boîte.','The engine is fine, but its force doesn\'t reach the gearbox.'),tr('Vue « Embrayage », accélère en 3e et regarde : le disque tourne moins vite que le volant moteur…','"Clutch" view: accelerate in 3rd and watch: the disc turns slower than the flywheel…')],
+   fix:tr('L\'embrayage ne patine plus.','The clutch doesn\'t slip any more.')},
+  {k:'pads', parts:['caliper'], name:tr('Plaquettes de frein usées','Worn brake pads'),
    trig:()=> Math.abs(S.v)*3.6>25 && S.brake>0.3,
-   sym:'Tu appuies sur le frein mais la voiture ralentit à peine ! Le voyant FREINS est allumé.',
-   hints:['Va voir derrière une roue : vue « Roue et frein ».','Ce qui frotte sur le disque est tout usé.'],
-   fix:'Les freins mordent à nouveau.'},
-  {k:'cv', parts:['cv'], name:'Cardan cassé',
+   sym:tr('Tu appuies sur le frein mais la voiture ralentit à peine ! Le voyant FREINS est allumé.','You press the brake but the car barely slows down! The BRAKES warning light is on.'),
+   hints:[tr('Va voir derrière une roue : vue « Roue et frein ».','Go and look behind a wheel: "Wheel and brake" view.'),tr('Ce qui frotte sur le disque est tout usé.','The thing that rubs on the disc is all worn out.')],
+   fix:tr('Les freins mordent à nouveau.','The brakes bite again.')},
+  {k:'cv', parts:['cv'], name:tr('Cardan cassé','Broken driveshaft'),
    trig:()=> S.engineOn && ratioNow()!==0 && engagement()>0.9 && Math.abs(S.v)*3.6>15,
-   sym:'Clac ! La voiture n\'avance plus : le moteur tourne, la vitesse est passée, mais les roues ne sont plus entraînées.',
-   hints:['La force arrive jusqu\'au différentiel… Regarde la vue « Dessous » en accélérant.','Un des deux arbres qui vont aux roues tourne tout seul, très vite, et son soufflet est déchiré.'],
-   fix:'Les deux roues sont à nouveau entraînées.'},
-  {k:'converter', modes:['auto'], parts:['tcturbine','tcimpeller','tcstator','tclockup','tcoil'], name:'Convertisseur de couple en panne',
+   sym:tr('Clac ! La voiture n\'avance plus : le moteur tourne, la vitesse est passée, mais les roues ne sont plus entraînées.','Clunk! The car doesn\'t move any more: the engine runs, a gear is in, but the wheels are no longer driven.'),
+   hints:[tr('La force arrive jusqu\'au différentiel… Regarde la vue « Dessous » en accélérant.','The force reaches the differential… Look at the "Underneath" view while you accelerate.'),tr('Un des deux arbres qui vont aux roues tourne tout seul, très vite, et son soufflet est déchiré.','One of the two shafts going to the wheels spins on its own, very fast, and its CV boot is torn.')],
+   fix:tr('Les deux roues sont à nouveau entraînées.','Both wheels are driven again.')},
+  {k:'converter', modes:['auto'], parts:['tcturbine','tcimpeller','tcstator','tclockup','tcoil'], name:tr('Convertisseur de couple en panne','Broken torque converter'),
    trig:()=> S.engineOn && S.sel==='D' && S.gas>0.15,
-   sym:'En D, le moteur monte dans les tours mais la voiture ne bouge pas.',
-   hints:['Le moteur va bien. Qu\'est-ce qui remplace l\'embrayage dans une boîte automatique ?','Vue « Convertisseur » : la turbine tourne-t-elle quand la pompe tourne ?'],
-   fix:'La turbine est à nouveau entraînée par l\'huile.'},
-  {k:'synchro', modes:['manual'], parts:['synchro'], name:'Synchro de 3e cassé', triggerOnGear3:true,
-   sym:'Impossible de passer la 3e : ça craque à chaque fois, même avec l\'embrayage enfoncé.',
-   hints:['Le problème est dans la boîte de vitesses (vue « Boîte »).','Qu\'est-ce qui glisse pour verrouiller un pignon sur l\'arbre ? Un des anneaux est abîmé.'],
-   fix:'La 3e passe sans craquer.'},
+   sym:tr('En D, le moteur monte dans les tours mais la voiture ne bouge pas.','In D, the engine revs up but the car doesn\'t move.'),
+   hints:[tr('Le moteur va bien. Qu\'est-ce qui remplace l\'embrayage dans une boîte automatique ?','The engine is fine. What replaces the clutch in an automatic gearbox?'),tr('Vue « Convertisseur » : la turbine tourne-t-elle quand la pompe tourne ?','"Converter" view: does the turbine turn when the pump turns?')],
+   fix:tr('La turbine est à nouveau entraînée par l\'huile.','The oil drives the turbine again.')},
+  {k:'synchro', modes:['manual'], parts:['synchro'], name:tr('Synchro de 3e cassé','Broken 3rd-gear synchro'), triggerOnGear3:true,
+   sym:tr('Impossible de passer la 3e : ça craque à chaque fois, même avec l\'embrayage enfoncé.','You can\'t get 3rd: it grinds every time, even with the clutch pressed down.'),
+   hints:[tr('Le problème est dans la boîte de vitesses (vue « Boîte »).','The problem is in the gearbox ("Gearbox" view).'),tr('Qu\'est-ce qui glisse pour verrouiller un pignon sur l\'arbre ? Un des anneaux est abîmé.','What slides along to lock a gear onto the shaft? One of the rings is damaged.')],
+   fix:tr('La 3e passe sans craquer.','3rd goes in without grinding.')},
 ];
 FAULTS.push(
-  {k:'ev12v', modes:['ev'], parts:['battery'], name:'Batterie 12 V vide', atStart:true,
-   sym:'Pied sur le frein, tu appuies sur Démarrer… rien ne s\'allume, pas de READY. Le voyant BATTERIE est allumé.',
-   hints:['Une voiture électrique a aussi une petite batterie 12 V, comme une voiture à essence.','Vue « Moteur » : cherche une boîte noire avec une borne rouge, à l\'avant.'],
-   fix:'La voiture se réveille à nouveau.'},
-  {k:'inverter', modes:['ev'], parts:['inverter'], name:'Onduleur en panne',
+  {k:'ev12v', modes:['ev'], parts:['battery'], name:tr('Batterie 12 V vide','Flat 12 V battery'), atStart:true,
+   sym:tr('Pied sur le frein, tu appuies sur Démarrer… rien ne s\'allume, pas de READY. Le voyant BATTERIE est allumé.','Foot on the brake, you press Start… nothing lights up, no READY. The BATTERY warning light is on.'),
+   hints:[tr('Une voiture électrique a aussi une petite batterie 12 V, comme une voiture à essence.','An electric car also has a small 12 V battery, like a petrol car.'),tr('Vue « Moteur » : cherche une boîte noire avec une borne rouge, à l\'avant.','"Engine" view: look for a black box with a red terminal, at the front.')],
+   fix:tr('La voiture se réveille à nouveau.','The car wakes up again.')},
+  {k:'inverter', modes:['ev'], parts:['inverter'], name:tr('Onduleur en panne','Broken inverter'),
    trig:()=> S.engineOn && S.sel==='D' && S.gas>0.15,
-   sym:'READY est allumé, tu accélères… mais la voiture ne bouge pas, et les bobines du moteur restent éteintes.',
-   hints:['La batterie est chargée. Le courant arrive-t-il jusqu\'au moteur ?','Ce qui transforme le courant de la batterie pour le moteur ne marche plus (au-dessus du moteur).'],
-   fix:'Le courant arrive à nouveau dans les bobines.'});
+   sym:tr('READY est allumé, tu accélères… mais la voiture ne bouge pas, et les bobines du moteur restent éteintes.','READY is on, you accelerate… but the car doesn\'t move, and the motor\'s coils stay dark.'),
+   hints:[tr('La batterie est chargée. Le courant arrive-t-il jusqu\'au moteur ?','The battery is charged. Does the current reach the motor?'),tr('Ce qui transforme le courant de la batterie pour le moteur ne marche plus (au-dessus du moteur).','The thing that converts the battery\'s current for the motor has stopped working (above the motor).')],
+   fix:tr('Le courant arrive à nouveau dans les bobines.','Current reaches the coils again.')});
 const GAME = { state:'off', f:null, t0:0, tFault:0, errors:0, hints:0, verify:null, lastHintT:0 };
-function missionText(){ const f=GAME.f; if(f.k==='synchro') return 'Démarre, puis roule en passant la 1re, la 2e et la 3e.';
-  if(f.k==='pads') return 'Démarre, roule jusqu\'à 50 km/h puis freine pour t\'arrêter.';
-  if(S.mode==='ev') return 'Allume la voiture (pied sur le frein), passe en D et roule jusqu\'à 60 km/h.';
-  if(S.mode==='auto') return 'Démarre, passe en D et roule jusqu\'à 60 km/h.';
-  return 'Démarre et roule jusqu\'à 60 km/h en passant les vitesses.'; }
+function missionText(){ const f=GAME.f; if(f.k==='synchro') return tr('Démarre, puis roule en passant la 1re, la 2e et la 3e.','Start, then drive through 1st, 2nd and 3rd.');
+  if(f.k==='pads') return tr('Démarre, roule jusqu\'à 50 km/h puis freine pour t\'arrêter.','Start, drive up to 50 km/h, then brake to a stop.');
+  if(S.mode==='ev') return tr('Allume la voiture (pied sur le frein), passe en D et roule jusqu\'à 60 km/h.','Switch the car on (foot on the brake), select D and drive up to 60 km/h.');
+  if(S.mode==='auto') return tr('Démarre, passe en D et roule jusqu\'à 60 km/h.','Start, select D and drive up to 60 km/h.');
+  return tr('Démarre et roule jusqu\'à 60 km/h en passant les vitesses.','Start and drive up to 60 km/h, changing gears.'); }
 function gameStart(){
   stopDemo(); stopTour(); if(iso) unIsolate();
   const pool = FAULTS.filter(f=>!f.modes || f.modes.includes(S.mode));
@@ -71,24 +71,24 @@ function gameStart(){
   document.querySelectorAll('#selector .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.s==='P'));
   Object.assign(GAME,{state:'drive', f, t0:performance.now(), errors:0, hints:0, verify:null, fastSeen:false});
   Object.assign(FAULT,{kind:f.k, active:false, cyl:1+Math.floor(Math.random()*3)});
-  resetFaultVisuals(); renderGarage(); $('garageBtn').textContent='✖ Quitter le jeu';
+  resetFaultVisuals(); renderGarage(); $('garageBtn').textContent=tr('✖ Quitter le jeu','✖ Quit the game');
 }
-function gameQuit(){ GAME.state='off'; FAULT.kind=null; FAULT.active=false; resetFaultVisuals(); refreshVis(); $('garageBox').hidden=true; $('garageBtn').textContent='🔧 Jeu : Garage'; $('infoRepair').hidden=true; }
+function gameQuit(){ GAME.state='off'; FAULT.kind=null; FAULT.active=false; resetFaultVisuals(); refreshVis(); $('garageBox').hidden=true; $('garageBtn').textContent=tr('🔧 Jeu : Garage','🔧 Game: Garage'); $('infoRepair').hidden=true; }
 $('garageBtn').onclick = ()=>{ GAME.state==='off' || GAME.state==='done' ? gameStart() : gameQuit(); };
 function gameOnStart(){ if(GAME.state==='drive' && GAME.f.atStart) gameTrigger(); }
 function gameTrigger(){
   if(GAME.state!=='drive' || FAULT.active) return;
   FAULT.active = true; GAME.state='fault'; GAME.tFault=performance.now(); GAME.lastHintT=performance.now();
   applyFaultVisuals(); refreshVis(); renderGarage();
-  if(FAULT.kind==='cv'||FAULT.kind==='belt') say(FAULT.kind==='cv'?'CLAC !':'Le moteur s\'est arrêté net !',3);
+  if(FAULT.kind==='cv'||FAULT.kind==='belt') say(FAULT.kind==='cv'?tr('CLAC !','CLUNK!'):tr('Le moteur s\'est arrêté net !','The engine stopped dead!'),3);
 }
 function gameRepair(key){
   if(GAME.state!=='fault') return;
   if(GAME.f.parts.includes(key)){
     FAULT.active=false; resetFaultVisuals(); refreshVis();
-    GAME.state='verify'; renderGarage(); say('Réparé ! '+GAME.f.fix+' Vérifie maintenant que tout marche.',5);
+    GAME.state='verify'; renderGarage(); say(tr('Réparé ! ','Fixed! ')+GAME.f.fix+tr(' Vérifie maintenant que tout marche.',' Now check that everything works.'),5);
     $('infoRepair').hidden=true; $('info').hidden=true;
-  } else { GAME.errors++; say(`${INFO[key]?INFO[key].t:'Cette pièce'} : en bon état. Ce n\'est pas elle ! (+1 erreur)`,4); renderGarage(); }
+  } else { GAME.errors++; say(tr(`${INFO[key]?INFO[key].t:'Cette pièce'} : en bon état. Ce n\'est pas elle ! (+1 erreur)`, `${INFO[key]?INFO[key].t:'This part'}: in good shape. It's not this one! (+1 mistake)`),4); renderGarage(); }
 }
 $('infoRepair').onclick = ()=>{ if(infoKey) gameRepair(infoKey); };
 const gameGoal = ()=>{ const f=GAME.f, kmh=Math.abs(S.v)*3.6;
@@ -108,21 +108,21 @@ function gameTick(){
 const fmtT = s => `${Math.floor(s/60)} min ${String(Math.floor(s%60)).padStart(2,'0')} s`;
 function renderGarage(){
   const box=$('garageBox'); box.hidden=false; const f=GAME.f;
-  const score = `<div class="score"><span>⏱ <span id="gTime">${fmtT((performance.now()-GAME.t0)/1000)}</span></span><span>❌ ${GAME.errors} erreur${GAME.errors>1?'s':''}</span><span>💡 ${GAME.hints} indice${GAME.hints>1?'s':''}</span></div>`;
-  if(GAME.state==='drive') box.innerHTML = `<h3>🔧 Mission</h3><p>${missionText()}</p><p class="note">Une panne va arriver… À toi de trouver la pièce en cause.</p>${score}`;
+  const score = `<div class="score"><span>⏱ <span id="gTime">${fmtT((performance.now()-GAME.t0)/1000)}</span></span><span>❌ ${GAME.errors} ${tr('erreur','mistake')}${(IS_EN?GAME.errors!==1:GAME.errors>1)?'s':''}</span><span>💡 ${GAME.hints} ${tr('indice','hint')}${(IS_EN?GAME.hints!==1:GAME.hints>1)?'s':''}</span></div>`;
+  if(GAME.state==='drive') box.innerHTML = `<h3>🔧 Mission</h3><p>${missionText()}</p><p class="note">${tr('Une panne va arriver… À toi de trouver la pièce en cause.','A fault is coming… Your job is to find the part to blame.')}</p>${score}`;
   else if(GAME.state==='fault'){
     const hs = f.hints.slice(0,GAME.hints).map(h=>`<p>💡 ${h}</p>`).join('');
-    box.innerHTML = `<h3>⚠️ Panne !</h3><p><b>${f.sym}</b></p><p>Inspecte la voiture : touche la pièce que tu soupçonnes, puis appuie sur « Réparer cette pièce ».</p>${hs}
-      <div class="row">${GAME.hints<f.hints.length?'<button class="btn alt" id="hintBtn">💡 Indice</button>':''}</div>${score}`;
+    box.innerHTML = `<h3>${tr('⚠️ Panne !','⚠️ Breakdown!')}</h3><p><b>${f.sym}</b></p><p>${tr('Inspecte la voiture : touche la pièce que tu soupçonnes, puis appuie sur « Réparer cette pièce ».','Inspect the car: tap the part you suspect, then press "Repair this part".')}</p>${hs}
+      <div class="row">${GAME.hints<f.hints.length?'<button class="btn alt" id="hintBtn">'+tr('💡 Indice','💡 Hint')+'</button>':''}</div>${score}`;
     const hb=$('hintBtn'); if(hb) hb.onclick=()=>{ GAME.hints++; GAME.lastHintT=performance.now(); renderGarage(); };
   }
-  else if(GAME.state==='verify') box.innerHTML = `<h3>✅ Réparé : ${f.name}</h3><p>Vérifie que tout marche : ${missionText().toLowerCase()}</p>${score}`;
+  else if(GAME.state==='verify') box.innerHTML = tr(`<h3>✅ Réparé : ${f.name}</h3><p>Vérifie que tout marche : ${missionText().toLowerCase()}</p>${score}`, `<h3>✅ Fixed: ${f.name}</h3><p>Check that everything works: ${missionText().toLowerCase()}</p>${score}`);
   else if(GAME.state==='done'){
     const tt = (performance.now()-GAME.t0)/1000; const stars = GAME.errors===0 && GAME.hints===0 ? 3 : GAME.errors+GAME.hints<=2 ? 2 : 1;
-    box.innerHTML = `<h3>🏁 Voiture réparée !</h3><div class="stars">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</div><p>La panne : <b>${f.name}</b>.</p>
-      <div class="score"><span>⏱ ${fmtT(tt)}</span><span>❌ ${GAME.errors} erreur${GAME.errors>1?'s':''}</span><span>💡 ${GAME.hints} indice${GAME.hints>1?'s':''}</span></div>
-      <div class="row"><button class="btn warn" id="againBtn">Nouvelle panne</button></div>`;
-    $('againBtn').onclick = gameStart; $('garageBtn').textContent='🔧 Jeu : Garage';
+    box.innerHTML = `<h3>${tr('🏁 Voiture réparée !','🏁 Car fixed!')}</h3><div class="stars">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</div><p>${tr('La panne','The fault')}${tr(' : ',': ')}<b>${f.name}</b>.</p>
+      <div class="score"><span>⏱ ${fmtT(tt)}</span><span>❌ ${GAME.errors} ${tr('erreur','mistake')}${(IS_EN?GAME.errors!==1:GAME.errors>1)?'s':''}</span><span>💡 ${GAME.hints} ${tr('indice','hint')}${(IS_EN?GAME.hints!==1:GAME.hints>1)?'s':''}</span></div>
+      <div class="row"><button class="btn warn" id="againBtn">${tr('Nouvelle panne','New fault')}</button></div>`;
+    $('againBtn').onclick = gameStart; $('garageBtn').textContent=tr('🔧 Jeu : Garage','🔧 Game: Garage');
   }
 }
 const FV = {};   // visuels de panne
@@ -145,7 +145,7 @@ function resetFaultVisuals(){
 /* ======================================================================
    EXPLICATIONS, LEÇON, DÉMO
    ====================================================================== */
-const ORD = g => g==='R' ? 'marche arrière' : g+(g==='1'||g===1?'re':'e');
+const ORD = g => IS_EN ? (g==='R' ? 'reverse' : g+({1:'st',2:'nd',3:'rd'}[g]||'th')) : (g==='R' ? 'marche arrière' : g+(g==='1'||g===1?'re':'e'));
 function narrate(){
   const e = engagement(), rpm = S.we*RPM, kmh = Math.abs(S.v)*3.6, ratio = ratioNow();
   const man = S.mode==='manual';
@@ -154,56 +154,57 @@ function narrate(){
   const driven = live && ratio && e>0 && !cvBroken();
   const ev = S.mode==='ev';
   if(ev){ const regen = S.engineOn && S.evP < -500, push = S.engineOn && S.evP > 500;
-    setChip('chE','Voiture', S.engineOn ? 'READY' : 'Éteinte', S.engineOn?'good':'');
-    setChip('chC','Moteur électrique', regen ? 'Recharge' : push ? 'Pousse' : 'Au repos', regen?'good':push?'on':'');
-    setChip('chW','Roues', S.engineOn && ratio && !cvBroken() ? 'Entraînées' : 'Libres', S.engineOn && ratio?'on':''); }
+    setChip('chE',tr('Voiture','Car'), S.engineOn ? 'READY' : tr('Éteinte','Off'), S.engineOn?'good':'');
+    setChip('chC',tr('Moteur électrique','Electric motor'), regen ? tr('Recharge','Charging') : push ? tr('Pousse','Pushing') : tr('Au repos','Resting'), regen?'good':push?'on':'');
+    setChip('chW',tr('Roues','Wheels'), S.engineOn && ratio && !cvBroken() ? tr('Entraînées','Driven') : tr('Libres','Free'), S.engineOn && ratio?'on':''); }
   else {
-  setChip('chE','Moteur', S.cranking>0 ? 'Démarre…' : S.engineOn ? 'Tourne' : S.hand ? 'Tourné à la main' : 'Arrêté', live?'on':'');
-  if(man){ const cs = e===0 ? 'Débrayé' : slipping ? 'Patine' : 'Embrayé'; setChip('chC','Embrayage', cs, cs==='Patine'?'slip':cs==='Embrayé'?'good':''); }
-  else { const cs = S.lock ? 'Ponté' : (S.engineOn ? (S.tcSR<0.85 && (S.sel==='D'||S.sel==='R') ? 'Glisse' : 'Entraîne') : 'Arrêté'); setChip('chC','Convertisseur', cs, cs==='Glisse'?'slip':cs==='Arrêté'?'':'good'); }
-  setChip('chW','Roues', driven ? (ratio<0?'Entraînées en arrière':'Entraînées') : 'Libres', driven?'on':'');
+  setChip('chE',tr('Moteur','Engine'), S.cranking>0 ? tr('Démarre…','Starting…') : S.engineOn ? tr('Tourne','Running') : S.hand ? tr('Tourné à la main','Turned by hand') : tr('Arrêté','Stopped'), live?'on':'');
+  if(man){ const cs = e===0 ? tr('Débrayé','Disengaged') : slipping ? tr('Patine','Slipping') : tr('Embrayé','Engaged'); setChip('chC',tr('Embrayage','Clutch'), cs, e===0?'':slipping?'slip':'good'); }
+  else { const tcOff = !S.lock && !S.engineOn, tcSlip = !S.lock && S.engineOn && S.tcSR<0.85 && (S.sel==='D'||S.sel==='R');
+    const cs = S.lock ? tr('Ponté','Locked') : tcOff ? tr('Arrêté','Stopped') : tcSlip ? tr('Glisse','Slipping') : tr('Entraîne','Driving'); setChip('chC',tr('Convertisseur','Converter'), cs, tcSlip?'slip':tcOff?'':'good'); }
+  setChip('chW',tr('Roues','Wheels'), driven ? (ratio<0?tr('Entraînées en arrière','Driven backwards'):tr('Entraînées','Driven')) : tr('Libres','Free'), driven?'on':'');
   }
 
   let t;
   if(ev){
     const kw = Math.round(S.evP/1000);
-    if(!S.engineOn) t = kmh>1 ? 'La voiture est éteinte et roule encore : freine.' : 'La voiture est éteinte. Pied sur le frein, appuie sur Démarrer : READY s\'allume, sans aucun bruit de moteur.';
-    else if(S.sel==='P') t = 'READY : tout est prêt, mais rien ne tourne. Le moteur électrique ne tourne que quand on roule : pas de ralenti ! Garde le frein et passe en D.';
-    else if(S.sel==='N') t = 'N : le moteur ne reçoit pas de courant. La voiture roule librement.';
-    else if(S.evP > 500) t = `L'onduleur envoie ${kw} kW de la batterie vers le moteur. Les bobines s'allument chacune leur tour et entraînent les aimants du rotor. Un seul rapport : le moteur fait ${fr(EV_TOTAL)} tours pour 1 tour de roue.`;
-    else if(S.evP < -500) t = `Tu as levé le pied${S.brake>0.1?' et tu freines':''} : le moteur devient une dynamo. Il ralentit la voiture et renvoie ${-kw} kW dans la batterie (points verts).`;
-    else if(kmh<2 && S.brake>0.1) t = 'En D, frein appuyé : la voiture attend. Lâche le frein, elle avance doucement toute seule.';
-    else t = 'En D. Appuie sur l\'accélérateur : la force arrive tout de suite, même à l\'arrêt.';
+    if(!S.engineOn) t = kmh>1 ? tr('La voiture est éteinte et roule encore : freine.','The car is off and still rolling: brake.') : tr('La voiture est éteinte. Pied sur le frein, appuie sur Démarrer : READY s\'allume, sans aucun bruit de moteur.','The car is off. Foot on the brake, press Start: READY lights up, with no engine noise at all.');
+    else if(S.sel==='P') t = tr('READY : tout est prêt, mais rien ne tourne. Le moteur électrique ne tourne que quand on roule : pas de ralenti ! Garde le frein et passe en D.','READY: everything is ready, but nothing turns. The electric motor only turns when the car moves: no idling! Keep the brake on and select D.');
+    else if(S.sel==='N') t = tr('N : le moteur ne reçoit pas de courant. La voiture roule librement.','N: the motor gets no current. The car rolls freely.');
+    else if(S.evP > 500) t = tr(`L'onduleur envoie ${kw} kW de la batterie vers le moteur. Les bobines s'allument chacune leur tour et entraînent les aimants du rotor. Un seul rapport : le moteur fait ${fr(EV_TOTAL)} tours pour 1 tour de roue.`, `The inverter sends ${kw} kW from the battery to the motor. The coils light up one after another and pull the rotor's magnets along. A single ratio: the motor turns ${fr(EV_TOTAL)} times for 1 turn of the wheel.`);
+    else if(S.evP < -500) t = tr(`Tu as levé le pied${S.brake>0.1?' et tu freines':''} : le moteur devient une dynamo. Il ralentit la voiture et renvoie ${-kw} kW dans la batterie (points verts).`, `You lifted your foot${S.brake>0.1?' and you are braking':''}: the motor becomes a generator. It slows the car down and sends ${-kw} kW back into the battery (green dots).`);
+    else if(kmh<2 && S.brake>0.1) t = tr('En D, frein appuyé : la voiture attend. Lâche le frein, elle avance doucement toute seule.','In D, brake pressed: the car waits. Let go of the brake and it creeps forward on its own.');
+    else t = tr('En D. Appuie sur l\'accélérateur : la force arrive tout de suite, même à l\'arrêt.','In D. Press the accelerator: the force comes straight away, even from a standstill.');
   }
   else if(S.hand && !S.engineOn){
-    t = 'Tu fais tourner le moteur à la main. Les pistons montent et descendent, les soupapes s\'ouvrent. ';
-    if(man){ if(e===0) t += 'L\'embrayage est enfoncé : la boîte ne bouge pas.'; else if(!ratio) t += 'L\'embrayage est serré : l\'arbre primaire tourne et fait tourner tous les pignons, mais au point mort aucun n\'est verrouillé : les roues ne bougent pas.';
-      else t += `L'embrayage est serré et la ${ORD(S.gear)} est verrouillée par un baladeur bleu : regarde les roues avancer tout doucement !`; }
-    else t += S.sel==='P' ? 'Sur P, la sortie de la boîte est bloquée.' : 'L\'huile du convertisseur commence à entraîner la turbine.';
+    t = tr('Tu fais tourner le moteur à la main. Les pistons montent et descendent, les soupapes s\'ouvrent. ','You are turning the engine by hand. The pistons go up and down, the valves open. ');
+    if(man){ if(e===0) t += tr('L\'embrayage est enfoncé : la boîte ne bouge pas.','The clutch is pressed down: the gearbox doesn\'t move.'); else if(!ratio) t += tr('L\'embrayage est serré : l\'arbre primaire tourne et fait tourner tous les pignons, mais au point mort aucun n\'est verrouillé : les roues ne bougent pas.','The clutch is engaged: the input shaft turns and spins all the gears, but in neutral none of them is locked: the wheels don\'t move.');
+      else t += tr(`L'embrayage est serré et la ${ORD(S.gear)} est verrouillée par un baladeur bleu : regarde les roues avancer tout doucement !`, `The clutch is engaged and ${ORD(S.gear)} gear is locked by a blue selector collar: watch the wheels creep forward!`); }
+    else t += S.sel==='P' ? tr('Sur P, la sortie de la boîte est bloquée.','In P, the gearbox output is locked.') : tr('L\'huile du convertisseur commence à entraîner la turbine.','The converter\'s oil starts to drive the turbine.');
   }
-  else if(S.cranking>0) t = 'Le démarreur fait tourner le volant moteur. Les pistons bougent, les bougies font des étincelles… et le moteur part tout seul.';
+  else if(S.cranking>0) t = tr('Le démarreur fait tourner le volant moteur. Les pistons bougent, les bougies font des étincelles… et le moteur part tout seul.','The starter turns the flywheel. The pistons move, the spark plugs spark… and the engine runs on its own.');
   else if(!S.engineOn){
-    if(kmh>1) t = 'Le moteur est arrêté et la voiture roule encore. Utilise le frein.';
-    else if(man) t = (S.clutch>=0.6 || S.gear==='N') ? 'Le moteur est arrêté. Appuie sur Démarrer. Astuce : passe une vitesse et maintiens « Tourner le moteur à la main » pour voir ce qui est relié.' : 'Le moteur est arrêté. Avant de démarrer, enfonce l\'embrayage à fond pour séparer le moteur des roues.';
-    else t = (S.sel==='P'||S.sel==='N') ? 'Le moteur est arrêté, le levier est sur '+S.sel+'. Appuie sur Démarrer.' : 'Pour démarrer, mets le levier sur P.';
+    if(kmh>1) t = tr('Le moteur est arrêté et la voiture roule encore. Utilise le frein.','The engine is off and the car is still rolling. Use the brake.');
+    else if(man) t = (S.clutch>=0.6 || S.gear==='N') ? tr('Le moteur est arrêté. Appuie sur Démarrer. Astuce : passe une vitesse et maintiens « Tourner le moteur à la main » pour voir ce qui est relié.','The engine is off. Press Start. Tip: put it in gear and hold "Turn the engine by hand" to see what is connected.') : tr('Le moteur est arrêté. Avant de démarrer, enfonce l\'embrayage à fond pour séparer le moteur des roues.','The engine is off. Before starting, press the clutch all the way down to separate the engine from the wheels.');
+    else t = (S.sel==='P'||S.sel==='N') ? tr('Le moteur est arrêté, le levier est sur ','The engine is off, the lever is in ')+S.sel+tr('. Appuie sur Démarrer.','. Press Start.') : tr('Pour démarrer, mets le levier sur P.','To start, put the lever in P.');
   }
   else if(man){
-    if(e===0){ t = 'Pédale enfoncée : le diaphragme a libéré le disque d\'embrayage, le moteur tourne tout seul et rien n\'arrive à la boîte. C\'est le moment de changer de vitesse.'; if(S.gear==='N' && kmh<1) t+=' Passe la 1re.'; }
-    else if(!ratio) t = `Ralenti à ${Math.round(rpm/10)*10} tr/min. L'embrayage est serré : l'arbre primaire et tous les pignons tournent. Mais au point mort, aucun baladeur ne verrouille de pignon : les roues ne reçoivent rien.`;
-    else if(slipping) t = 'L\'embrayage patine : le disque frotte contre le volant moteur et transmet la force petit à petit. Continue à relâcher doucement en accélérant un peu.';
-    else { t = `Tout est relié ! En ${ORD(S.gear)}, le moteur fait ${fr(Math.abs(ratio*FD))} tours pour 1 tour de roue.`;
-      if(ratio>0 && rpm>3300 && S.gear!=='6') t += ' Le moteur tourne vite : passe la vitesse supérieure.';
-      else if(ratio>0 && rpm<1300 && S.gear!=='1') t += ' Le moteur peine : rétrograde.';
-      if(S.brake>0.2 && kmh<15) t += ' Débraye avant de t\'arrêter, sinon le moteur va caler.'; }
+    if(e===0){ t = tr('Pédale enfoncée : le diaphragme a libéré le disque d\'embrayage, le moteur tourne tout seul et rien n\'arrive à la boîte. C\'est le moment de changer de vitesse.','Pedal down: the diaphragm spring has freed the clutch disc, the engine spins on its own and nothing reaches the gearbox. Now is the time to change gear.'); if(S.gear==='N' && kmh<1) t+=tr(' Passe la 1re.',' Select 1st.'); }
+    else if(!ratio) t = tr(`Ralenti à ${Math.round(rpm/10)*10} tr/min. L'embrayage est serré : l'arbre primaire et tous les pignons tournent. Mais au point mort, aucun baladeur ne verrouille de pignon : les roues ne reçoivent rien.`, `Idling at ${Math.round(rpm/10)*10} rpm. The clutch is engaged: the input shaft and all the gears turn. But in neutral, no selector collar locks a gear: the wheels get nothing.`);
+    else if(slipping) t = tr('L\'embrayage patine : le disque frotte contre le volant moteur et transmet la force petit à petit. Continue à relâcher doucement en accélérant un peu.','The clutch is slipping: the disc rubs against the flywheel and passes the force on little by little. Keep releasing gently while giving a little gas.');
+    else { t = tr(`Tout est relié ! En ${ORD(S.gear)}, le moteur fait ${fr(Math.abs(ratio*FD))} tours pour 1 tour de roue.`, `Everything is connected! In ${ORD(S.gear)}, the engine turns ${fr(Math.abs(ratio*FD))} times for 1 turn of the wheel.`);
+      if(ratio>0 && rpm>3300 && S.gear!=='6') t += tr(' Le moteur tourne vite : passe la vitesse supérieure.',' The engine is revving high: shift up.');
+      else if(ratio>0 && rpm<1300 && S.gear!=='1') t += tr(' Le moteur peine : rétrograde.',' The engine is labouring: shift down.');
+      if(S.brake>0.2 && kmh<15) t += tr(' Débraye avant de t\'arrêter, sinon le moteur va caler.',' Press the clutch before you stop, or the engine will stall.'); }
   } else {
-    if(S.sel==='P') t = 'P : un cliquet bloque la sortie de la boîte, la voiture ne peut pas rouler. Garde le frein et passe en D.';
-    else if(S.sel==='N') t = 'N : aucun embrayage ni frein de la boîte n\'est serré. La turbine tourne mais rien n\'arrive aux roues.';
+    if(S.sel==='P') t = tr('P : un cliquet bloque la sortie de la boîte, la voiture ne peut pas rouler. Garde le frein et passe en D.','P: a pawl locks the gearbox output, so the car can\'t roll. Keep the brake on and select D.');
+    else if(S.sel==='N') t = tr('N : aucun embrayage ni frein de la boîte n\'est serré. La turbine tourne mais rien n\'arrive aux roues.','N: none of the gearbox clutches or brakes is applied. The turbine turns but nothing reaches the wheels.');
     else { const gk = S.sel==='R' ? 'R' : String(S.agear);
-      t = `${S.sel==='R'?'Marche arrière':'D, '+ORD(S.agear)} : ${SHIFT_EL[gk].join(' et ')} sont serrés. Le moteur fait ${fr(Math.abs(RATIO_A[gk]*FD))} tours pour 1 tour de roue.`;
-      if(kmh<3 && S.brake>0.2) t += ' Le frein retient la voiture, mais le convertisseur glisse : le moteur ne cale pas.';
-      else if(kmh<8 && S.gas<0.05) t += ' Sans accélérer, l\'huile du convertisseur pousse doucement : la voiture avance toute seule.';
-      else if(S.lock) t += ' L\'embrayage de pontage est collé : plus de glissement.';
-      else t += ' La boîte changera de vitesse toute seule.'; }
+      t = tr(`${S.sel==='R'?'Marche arrière':'D, '+ORD(S.agear)} : ${SHIFT_EL[gk].join(' et ')} sont serrés. Le moteur fait ${fr(Math.abs(RATIO_A[gk]*FD))} tours pour 1 tour de roue.`, `${S.sel==='R'?'Reverse':'D, '+ORD(S.agear)}: ${SHIFT_EL[gk].join(' and ')} are applied. The engine turns ${fr(Math.abs(RATIO_A[gk]*FD))} times for 1 turn of the wheel.`);
+      if(kmh<3 && S.brake>0.2) t += tr(' Le frein retient la voiture, mais le convertisseur glisse : le moteur ne cale pas.',' The brake holds the car, but the converter slips: the engine doesn\'t stall.');
+      else if(kmh<8 && S.gas<0.05) t += tr(' Sans accélérer, l\'huile du convertisseur pousse doucement : la voiture avance toute seule.',' Without accelerating, the converter\'s oil pushes gently: the car creeps forward on its own.');
+      else if(S.lock) t += tr(' L\'embrayage de pontage est collé : plus de glissement.',' The lock-up clutch is closed: no more slipping.');
+      else t += tr(' La boîte changera de vitesse toute seule.',' The gearbox will change gear on its own.'); }
   }
   setText('say', t);
   const a=$('alert'); if(S.msgT>0){ a.hidden=false; setText('alert', S.msg); } else a.hidden=true;
@@ -220,11 +221,11 @@ function narrate(){
 
   const gb=$('gearBig'); const gtxt = man ? S.gear : (S.sel==='D' && !ev ? 'D'+S.agear : S.sel);
   if(gb.firstChild.nodeValue!==gtxt) gb.firstChild.nodeValue=gtxt; gb.style.borderColor = driven ? 'var(--power)' : '';
-  const sb=$('startBtn'); sb.classList.toggle('running', S.engineOn); sb.firstChild.firstChild.nodeValue = S.engineOn ? (ev?'ÉTEINDRE':'COUPER') : S.cranking>0 ? '…' : (ev?'ALLUMER':'DÉMARRER');
-  document.querySelectorAll('#elems tr[data-g]').forEach(tr=>tr.classList.toggle('cur', !man && ((S.sel==='D' && tr.dataset.g===String(S.agear)) || (S.sel==='R' && tr.dataset.g==='R'))));
+  const sb=$('startBtn'); sb.classList.toggle('running', S.engineOn); sb.firstChild.firstChild.nodeValue = S.engineOn ? (ev?tr('ÉTEINDRE','SWITCH OFF'):tr('COUPER','STOP')) : S.cranking>0 ? '…' : (ev?tr('ALLUMER','SWITCH ON'):tr('DÉMARRER','START'));
+  document.querySelectorAll('#elems tr[data-g]').forEach(row=>row.classList.toggle('cur', !man && ((S.sel==='D' && row.dataset.g===String(S.agear)) || (S.sel==='R' && row.dataset.g==='R'))));
   $('wlBat').classList.toggle('lit', FAULT.active && (FAULT.kind==='battery'||FAULT.kind==='ev12v'));
   $('wlReady').classList.toggle('lit', ev && S.engineOn); $('wlReady').classList.add('green');
-  if(ev){ $('socBar').style.width = Math.round(S.evSOC*100)+'%'; setText('socTxt', Math.round(S.evSOC*100)+' %'); const kw=Math.round(S.evP/1000); setText('pwrTxt', (kw>0?'+':'')+kw+' kW'); $('pwrTxt').style.color = kw<0 ? 'var(--ok)' : kw>0 ? 'var(--power)' : ''; }
+  if(ev){ $('socBar').style.width = Math.round(S.evSOC*100)+'%'; setText('socTxt', Math.round(S.evSOC*100)+tr(' %','%')); const kw=Math.round(S.evP/1000); setText('pwrTxt', (kw>0?'+':'')+kw+' kW'); $('pwrTxt').style.color = kw<0 ? 'var(--ok)' : kw>0 ? 'var(--power)' : ''; }
   $('wlEng').classList.toggle('lit', FAULT.active && (FAULT.kind==='spark'||FAULT.kind==='belt'||FAULT.kind==='inverter')); $('wlEng').classList.add('amber');
   $('wlBrk').classList.toggle('lit', FAULT.active && FAULT.kind==='pads');
 }
@@ -235,26 +236,26 @@ const lesson = {done:0, fast:false, items:[], conds:[]};
 function buildLesson(){
   const kmh = ()=>Math.abs(S.v)*3.6;
   const L = S.mode==='ev' ? [
-    ['Appuie sur le frein', ()=>S.brake>0.5],
-    ['Allume la voiture : READY s\'allume, sans bruit', ()=>S.engineOn],
-    ['Garde le frein et passe en D', ()=>S.sel==='D'],
-    ['Accélère jusqu\'à 50 km/h : regarde les points orange dans les câbles', ()=>S.sel==='D' && kmh()>50],
-    ['Lève le pied : les points deviennent verts, la batterie se recharge', ()=>S.engineOn && S.evP < -2000],
-    ['Arrête-toi, puis remets sur P', ()=>kmh()<0.5 && S.sel==='P' && lesson.fastEv],
+    [tr('Appuie sur le frein','Press the brake'), ()=>S.brake>0.5],
+    [tr('Allume la voiture : READY s\'allume, sans bruit','Switch the car on: READY lights up, silently'), ()=>S.engineOn],
+    [tr('Garde le frein et passe en D','Keep the brake on and select D'), ()=>S.sel==='D'],
+    [tr('Accélère jusqu\'à 50 km/h : regarde les points orange dans les câbles','Accelerate to 50 km/h: watch the orange dots in the cables'), ()=>S.sel==='D' && kmh()>50],
+    [tr('Lève le pied : les points deviennent verts, la batterie se recharge','Lift your foot: the dots turn green, the battery recharges'), ()=>S.engineOn && S.evP < -2000],
+    [tr('Arrête-toi, puis remets sur P','Stop, then put it back in P'), ()=>kmh()<0.5 && S.sel==='P' && lesson.fastEv],
   ] : S.mode==='manual' ? [
-    ['Enfonce la pédale d\'embrayage à fond', ()=>S.clutch>=0.85],
-    ['Démarre le moteur', ()=>S.engineOn],
-    ['Passe la 1re', ()=>S.gear==='1'],
-    ['Accélère un peu et relâche l\'embrayage doucement jusqu\'à ce que la voiture avance', ()=>S.gear==='1' && kmh()>4 && engagement()>0.95 && S.engineOn],
-    ['Passe la 2e puis la 3e : embrayage, vitesse, relâche. Regarde le compte-tours redescendre !', ()=>S.gear==='3' && engagement()>0.95 && kmh()>10 && S.engineOn],
-    ['Freine jusqu\'à l\'arrêt sans caler (débraye juste avant)', ()=>{ if(kmh()>10) lesson.fast=true; return lesson.fast && kmh()<0.5 && S.engineOn; }],
+    [tr('Enfonce la pédale d\'embrayage à fond','Press the clutch pedal all the way down'), ()=>S.clutch>=0.85],
+    [tr('Démarre le moteur','Start the engine'), ()=>S.engineOn],
+    [tr('Passe la 1re','Select 1st'), ()=>S.gear==='1'],
+    [tr('Accélère un peu et relâche l\'embrayage doucement jusqu\'à ce que la voiture avance','Give a little gas and release the clutch gently until the car moves'), ()=>S.gear==='1' && kmh()>4 && engagement()>0.95 && S.engineOn],
+    [tr('Passe la 2e puis la 3e : embrayage, vitesse, relâche. Regarde le compte-tours redescendre !','Shift to 2nd then 3rd: clutch, gear, release. Watch the rev counter drop!'), ()=>S.gear==='3' && engagement()>0.95 && kmh()>10 && S.engineOn],
+    [tr('Freine jusqu\'à l\'arrêt sans caler (débraye juste avant)','Brake to a stop without stalling (press the clutch just before)'), ()=>{ if(kmh()>10) lesson.fast=true; return lesson.fast && kmh()<0.5 && S.engineOn; }],
   ] : [
-    ['Appuie sur le frein', ()=>S.brake>0.5],
-    ['Démarre le moteur (le levier est sur P)', ()=>S.engineOn],
-    ['Garde le frein et passe en D', ()=>S.sel==='D'],
-    ['Relâche le frein : la voiture avance toute seule', ()=>S.sel==='D' && kmh()>2 && S.brake<0.1],
-    ['Accélère : la boîte passe les vitesses toute seule jusqu\'en 3e', ()=>S.sel==='D' && S.agear>=3],
-    ['Freine jusqu\'à l\'arrêt, puis remets sur P', ()=>{ if(kmh()>10) lesson.fast=true; return lesson.fast && kmh()<0.5 && S.sel==='P'; }],
+    [tr('Appuie sur le frein','Press the brake'), ()=>S.brake>0.5],
+    [tr('Démarre le moteur (le levier est sur P)','Start the engine (the lever is in P)'), ()=>S.engineOn],
+    [tr('Garde le frein et passe en D','Keep the brake on and select D'), ()=>S.sel==='D'],
+    [tr('Relâche le frein : la voiture avance toute seule','Release the brake: the car moves on its own'), ()=>S.sel==='D' && kmh()>2 && S.brake<0.1],
+    [tr('Accélère : la boîte passe les vitesses toute seule jusqu\'en 3e','Accelerate: the gearbox shifts on its own up to 3rd'), ()=>S.sel==='D' && S.agear>=3],
+    [tr('Freine jusqu\'à l\'arrêt, puis remets sur P','Brake to a stop, then put it back in P'), ()=>{ if(kmh()>10) lesson.fast=true; return lesson.fast && kmh()<0.5 && S.sel==='P'; }],
   ];
   $('steps').innerHTML = L.map(l=>`<li>${l[0]}</li>`).join('');
   lesson.items=[...document.querySelectorAll('#steps li')]; lesson.conds=L.map(l=>l[1]); lesson.done=0; lesson.fast=false; lesson.fastEv=false;
@@ -265,28 +266,28 @@ $('resetBtn').onclick = ()=>{ stopDemo(); Object.assign(S,{engineOn:false,cranki
 let demo = null;
 const DEMOS = {
   manual: [
-    {at:0.0, say:'1. On enfonce l\'embrayage à fond : le moteur sera séparé des roues.', run:()=>{ if(S.engineOn) S.engineOn=false; anim.gas={to:0,rate:3}; anim.brake={to:0,rate:3}; anim.clutch={to:1,rate:2.5}; followAction('clutch',2); }},
-    {at:1.8, say:'2. On tourne la clé : le démarreur lance le moteur.', run:()=>pressStart()},
-    {at:4.0, say:'3. Embrayage enfoncé, on passe la 1re : regarde le baladeur bleu glisser.', run:()=>selectGear('1')},
-    {at:6.5, say:'4. Un peu d\'accélérateur, et on relâche l\'embrayage doucement… la voiture avance !', run:()=>{ anim.gas={to:0.3,rate:1}; anim.clutch={to:0,rate:0.35}; }},
-    {at:11.5, say:'5. Pour passer la 2e : on lâche l\'accélérateur, on débraye…', run:()=>{ anim.gas={to:0,rate:3}; anim.clutch={to:1,rate:4}; }},
-    {at:12.4, say:'…on passe la 2e…', run:()=>selectGear('2')},
-    {at:13.2, say:'…et on rembraye en remettant du gaz. Le compte-tours redescend : le moteur tourne moins vite pour la même vitesse.', run:()=>{ anim.clutch={to:0,rate:0.8}; anim.gas={to:0.35,rate:1}; }},
-    {at:18.0, say:'À toi de jouer !', end:true},
+    {at:0.0, say:tr('1. On enfonce l\'embrayage à fond : le moteur sera séparé des roues.','1. Press the clutch all the way down: the engine is separated from the wheels.'), run:()=>{ if(S.engineOn) S.engineOn=false; anim.gas={to:0,rate:3}; anim.brake={to:0,rate:3}; anim.clutch={to:1,rate:2.5}; followAction('clutch',2); }},
+    {at:1.8, say:tr('2. On tourne la clé : le démarreur lance le moteur.','2. Turn the key: the starter cranks the engine.'), run:()=>pressStart()},
+    {at:4.0, say:tr('3. Embrayage enfoncé, on passe la 1re : regarde le baladeur bleu glisser.','3. Clutch down, select 1st: watch the blue selector collar slide.'), run:()=>selectGear('1')},
+    {at:6.5, say:tr('4. Un peu d\'accélérateur, et on relâche l\'embrayage doucement… la voiture avance !','4. A little gas, and release the clutch gently… the car moves!'), run:()=>{ anim.gas={to:0.3,rate:1}; anim.clutch={to:0,rate:0.35}; }},
+    {at:11.5, say:tr('5. Pour passer la 2e : on lâche l\'accélérateur, on débraye…','5. To shift to 2nd: lift off the gas, press the clutch…'), run:()=>{ anim.gas={to:0,rate:3}; anim.clutch={to:1,rate:4}; }},
+    {at:12.4, say:tr('…on passe la 2e…','…select 2nd…'), run:()=>selectGear('2')},
+    {at:13.2, say:tr('…et on rembraye en remettant du gaz. Le compte-tours redescend : le moteur tourne moins vite pour la même vitesse.','…and release the clutch while giving gas again. The rev counter drops: the engine turns slower for the same speed.'), run:()=>{ anim.clutch={to:0,rate:0.8}; anim.gas={to:0.35,rate:1}; }},
+    {at:18.0, say:tr('À toi de jouer !','Your turn!'), end:true},
   ],
   auto: [
-    {at:0.0, say:'1. Pied sur le frein.', run:()=>{ if(S.engineOn) S.engineOn=false; anim.gas={to:0,rate:3}; anim.brake={to:1,rate:3}; if(S.sel!=='P'){ S.sel='P'; document.querySelectorAll('#selector .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.s==='P')); } }},
-    {at:1.2, say:'2. On démarre, le levier est sur P.', run:()=>pressStart()},
-    {at:3.5, say:'3. On passe en D : les éléments K1 et B2 se serrent pour la 1re.', run:()=>selectAuto('D')},
-    {at:6.0, say:'4. On relâche le frein : le convertisseur pousse doucement, la voiture avance toute seule.', run:()=>{ anim.brake={to:0,rate:2}; }},
-    {at:9.5, say:'5. On accélère : regarde le tableau, la boîte passe les vitesses toute seule.', run:()=>{ anim.gas={to:0.45,rate:1}; }},
-    {at:19.0, say:'6. On lâche l\'accélérateur et on freine.', run:()=>{ anim.gas={to:0,rate:3}; anim.brake={to:0.5,rate:2}; }},
-    {at:27.0, say:'À l\'arrêt, on remet sur P. À toi de jouer !', run:()=>{ anim.brake={to:1,rate:2}; if(Math.abs(S.v)<0.8) selectAuto('P'); }},
+    {at:0.0, say:tr('1. Pied sur le frein.','1. Foot on the brake.'), run:()=>{ if(S.engineOn) S.engineOn=false; anim.gas={to:0,rate:3}; anim.brake={to:1,rate:3}; if(S.sel!=='P'){ S.sel='P'; document.querySelectorAll('#selector .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.s==='P')); } }},
+    {at:1.2, say:tr('2. On démarre, le levier est sur P.','2. Start the engine, the lever is in P.'), run:()=>pressStart()},
+    {at:3.5, say:tr('3. On passe en D : les éléments K1 et B2 se serrent pour la 1re.','3. Select D: elements K1 and B2 are applied for 1st.'), run:()=>selectAuto('D')},
+    {at:6.0, say:tr('4. On relâche le frein : le convertisseur pousse doucement, la voiture avance toute seule.','4. Release the brake: the converter pushes gently, the car creeps forward on its own.'), run:()=>{ anim.brake={to:0,rate:2}; }},
+    {at:9.5, say:tr('5. On accélère : regarde le tableau, la boîte passe les vitesses toute seule.','5. Accelerate: watch the table, the gearbox shifts on its own.'), run:()=>{ anim.gas={to:0.45,rate:1}; }},
+    {at:19.0, say:tr('6. On lâche l\'accélérateur et on freine.','6. Lift off the gas and brake.'), run:()=>{ anim.gas={to:0,rate:3}; anim.brake={to:0.5,rate:2}; }},
+    {at:27.0, say:tr('À l\'arrêt, on remet sur P. À toi de jouer !','Once stopped, put it back in P. Your turn!'), run:()=>{ anim.brake={to:1,rate:2}; if(Math.abs(S.v)<0.8) selectAuto('P'); }},
     {at:28.0, end:true},
   ],
 };
-function startDemo(){ stopTour(); goView('car'); demo={t:0,i:0,list:DEMOS[S.mode]}; $('demoBtn').classList.add('running'); $('demoBtn').textContent='■ Arrêter la démo'; }
-function stopDemo(){ if(!demo) return; demo=null; $('demoBtn').classList.remove('running'); $('demoBtn').textContent='▶ Montre-moi'; }
+function startDemo(){ stopTour(); goView('car'); demo={t:0,i:0,list:DEMOS[S.mode]}; $('demoBtn').classList.add('running'); $('demoBtn').textContent=tr('■ Arrêter la démo','■ Stop the demo'); }
+function stopDemo(){ if(!demo) return; demo=null; $('demoBtn').classList.remove('running'); $('demoBtn').textContent=tr('▶ Montre-moi','▶ Show me'); }
 $('demoBtn').onclick = ()=>{ ensureAudio(); demo ? stopDemo() : startDemo(); };
 function runDemo(dt){ if(!demo) return; demo.t += dt;
   while(demo && demo.i < demo.list.length && demo.t >= demo.list[demo.i].at){ const s=demo.list[demo.i++]; if(s.say) say(s.say,6); if(s.end){ stopDemo(); return; } s.run(); } }

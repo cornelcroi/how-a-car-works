@@ -117,6 +117,7 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
 .steps li.now::before{border-color:var(--power);color:var(--power)}
 .steps li.done{color:var(--ok)} .steps li.done::before{content:"✓";background:var(--ok);border-color:var(--ok);color:#fff}
 .linkbtn{appearance:none;border:0;background:none;color:var(--steel);font:inherit;font-size:13px;cursor:pointer;padding:0;text-decoration:underline}
+.panel header{position:relative}.panel header h1{padding-right:64px}.lang{position:absolute;top:2px;right:0}
 
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
 .seg button{appearance:none;border:0;background:var(--card);color:var(--ink);font-family:var(--f-display);font-weight:700;font-size:13px;padding:6px 10px;cursor:pointer}
@@ -197,69 +198,70 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
 
 <div class="app">
   <div class="stage" id="stage">
-    <canvas id="c" aria-label="Modèle 3D d'une voiture : moteur, boîte de vitesses, transmission, roues et carrosserie"></canvas>
+    <canvas id="c" aria-label="Modèle 3D d'une voiture : moteur, boîte de vitesses, transmission, roues et carrosserie" data-en-label="3D model of a car: engine, gearbox, driveline, wheels and body"></canvas>
     <div class="tags" id="tags"></div>
     <div class="bar views" id="views">
-      <button class="view simple" id="simpleBtn" aria-pressed="false">✨ Vue simple</button>
-      <button class="view act" data-v="car">Voiture</button>
-      <button class="view" data-v="engine">Moteur</button>
-      <button class="view" data-v="timing" id="vTiming">Distribution</button>
-      <button class="view" data-v="pack" id="vPack" hidden>Batterie</button>
-      <button class="view" data-v="clutch" id="vClutch">Embrayage</button>
-      <button class="view" data-v="gearbox">Boîte</button>
-      <button class="view" data-v="diff">Différentiel</button>
-      <button class="view" data-v="wheel">Roue et frein</button>
-      <button class="view" data-v="cabin">Habitacle</button>
-      <button class="view" data-v="below">Dessous</button>
+      <button class="view simple" id="simpleBtn" aria-pressed="false" data-en="✨ Simple view">✨ Vue simple</button>
+      <button class="view act" data-v="car" data-en="Car">Voiture</button>
+      <button class="view" data-v="engine" data-en="Engine">Moteur</button>
+      <button class="view" data-v="timing" id="vTiming" data-en="Timing">Distribution</button>
+      <button class="view" data-v="pack" id="vPack" hidden data-en="Battery">Batterie</button>
+      <button class="view" data-v="clutch" id="vClutch" data-en="Clutch">Embrayage</button>
+      <button class="view" data-v="gearbox" data-en="Gearbox">Boîte</button>
+      <button class="view" data-v="diff" data-en="Differential">Différentiel</button>
+      <button class="view" data-v="wheel" data-en="Wheel and brake">Roue et frein</button>
+      <button class="view" data-v="cabin" data-en="Cabin">Habitacle</button>
+      <button class="view" data-v="below" data-en="Underneath">Dessous</button>
     </div>
     <div class="bar parts" id="parts">
-      <span class="bar-l">Afficher</span>
-      <button class="part" data-p="casing" aria-pressed="true">Carter moteur</button>
-      <button class="part" data-p="internals" aria-pressed="true">Pistons et distribution</button>
-      <button class="part" data-p="clutch" aria-pressed="true" id="pClutchCat">Embrayage</button>
-      <button class="part" data-p="gearbox" aria-pressed="true">Boîte</button>
-      <button class="part" data-p="drive" aria-pressed="true">Transmission</button>
-      <button class="part" data-p="wheels" aria-pressed="true">Roues et freins</button>
-      <button class="part" data-p="ev" aria-pressed="true" id="pEvCat" hidden>Électrique</button>
-      <button class="part" data-p="chassis" aria-pressed="true">Châssis</button>
-      <button class="part" data-p="cabin" aria-pressed="true">Habitacle</button>
-      <button class="part" data-p="body" aria-pressed="true">Carrosserie</button>
-      <button class="part" data-p="road" aria-pressed="true">Route</button>
+      <span class="bar-l" data-en="Show">Afficher</span>
+      <button class="part" data-p="casing" aria-pressed="true" data-en="Engine casing">Carter moteur</button>
+      <button class="part" data-p="internals" aria-pressed="true" data-en="Pistons and timing">Pistons et distribution</button>
+      <button class="part" data-p="clutch" aria-pressed="true" id="pClutchCat" data-en="Clutch">Embrayage</button>
+      <button class="part" data-p="gearbox" aria-pressed="true" data-en="Gearbox">Boîte</button>
+      <button class="part" data-p="drive" aria-pressed="true" data-en="Driveline">Transmission</button>
+      <button class="part" data-p="wheels" aria-pressed="true" data-en="Wheels and brakes">Roues et freins</button>
+      <button class="part" data-p="ev" aria-pressed="true" id="pEvCat" hidden data-en="Electric">Électrique</button>
+      <button class="part" data-p="chassis" aria-pressed="true" data-en="Chassis">Châssis</button>
+      <button class="part" data-p="cabin" aria-pressed="true" data-en="Cabin">Habitacle</button>
+      <button class="part" data-p="body" aria-pressed="true" data-en="Body">Carrosserie</button>
+      <button class="part" data-p="road" aria-pressed="true" data-en="Road">Route</button>
     </div>
     <div class="isobar" id="isobar" hidden>
       <span class="lbl" id="isoLbl"></span>
-      <button class="btn alt" id="explodeBtn" hidden>Écarter les pièces</button>
-      <button class="btn" id="isoAll">Tout voir</button>
+      <button class="btn alt" id="explodeBtn" hidden data-en="Spread the parts">Écarter les pièces</button>
+      <button class="btn" id="isoAll" data-en="Show all">Tout voir</button>
     </div>
     <div class="reel" id="reel" hidden>
       <div class="reel-bars" id="reelBars"></div>
       <svg class="reel-ptr" aria-hidden="true"><line id="ptrLine"/><circle id="ptrRing"/></svg>
       <div class="reel-tag" id="reelTag"></div>
       <div class="reel-cap" id="reelCap" aria-live="polite"></div>
-      <div class="reel-ctl"><button id="reelPause" aria-label="Pause">❚❚</button><button id="reelClose" aria-label="Fermer la vidéo">✕</button></div>
+      <div class="reel-ctl"><button id="reelPause" aria-label="Pause">❚❚</button><button id="reelClose" aria-label="Fermer la vidéo" data-en-label="Close the video">✕</button></div>
     </div>
-    <div class="hint">Glisse pour tourner · molette ou pincement pour zoomer · clic droit pour déplacer · touche une pièce pour la découvrir · double-clic pour centrer</div>
+    <div class="hint" data-en="Drag to rotate · scroll or pinch to zoom · right-click to pan · tap a part to learn about it · double-click to centre">Glisse pour tourner · molette ou pincement pour zoomer · clic droit pour déplacer · touche une pièce pour la découvrir · double-clic pour centrer</div>
     <div class="info" id="info" hidden>
-      <button class="x" id="infoX" aria-label="Fermer">×</button>
+      <button class="x" id="infoX" aria-label="Fermer" data-en-label="Close">×</button>
       <h3 id="infoH"></h3>
       <p id="infoP"></p>
       <p class="state" id="infoState" hidden></p>
       <div class="row">
-        <button class="btn" id="infoIso">Voir seule</button>
-        <button class="btn warn" id="infoRepair" hidden>Réparer cette pièce</button>
+        <button class="btn" id="infoIso" data-en="Show alone">Voir seule</button>
+        <button class="btn warn" id="infoRepair" hidden data-en="Repair this part">Réparer cette pièce</button>
       </div>
     </div>
   </div>
 
   <aside class="panel">
     <header>
-      <h1>Comment marche une voiture</h1>
+      <h1 data-en="How a car works">Comment marche une voiture</h1>
+      <button class="linkbtn lang" id="langBtn" aria-label="Langue / Language"></button>
       <p class="sub" id="subTxt"></p>
     </header>
 
     <div class="row">
-      <div class="seg big modeseg" id="modeSeg" role="group" aria-label="Type de voiture">
-        <button data-m="manual" class="act">⛽ Thermique<small>boîte manuelle</small></button><button data-m="auto">⛽ Thermique<small>boîte auto</small></button><button data-m="ev">⚡ Électrique<small>sans boîte</small></button>
+      <div class="seg big modeseg" id="modeSeg" role="group" aria-label="Type de voiture" data-en-label="Car type">
+        <button data-m="manual" class="act" data-en="⛽ Petrol&lt;small&gt;manual gearbox&lt;/small&gt;">⛽ Thermique<small>boîte manuelle</small></button><button data-m="auto" data-en="⛽ Petrol&lt;small&gt;automatic&lt;/small&gt;">⛽ Thermique<small>boîte auto</small></button><button data-m="ev" data-en="⚡ Electric&lt;small&gt;no gearbox&lt;/small&gt;">⚡ Électrique<small>sans boîte</small></button>
       </div>
     </div>
 
@@ -274,111 +276,111 @@ table.elems{border-collapse:collapse;width:100%;font-family:var(--f-display);fon
       <p id="alert" hidden></p>
       <p id="say"></p>
       <div class="row">
-        <button class="btn" id="demoBtn" hidden>▶ Montre-moi</button>
-        <button class="btn warn" id="garageBtn">🔧 Jeu : Garage</button>
+        <button class="btn" id="demoBtn" hidden data-en="▶ Show me">▶ Montre-moi</button>
+        <button class="btn warn" id="garageBtn" data-en="🔧 Game: Garage">🔧 Jeu : Garage</button>
       </div>
     </section>
 
     <section>
-      <h2 class="sec-h">🎬 Montre-moi</h2>
+      <h2 class="sec-h" data-en="🎬 Show me">🎬 Montre-moi</h2>
       <div class="sclist" id="scList"></div>
-      <p class="note">Des petites vidéos automatiques, chacune sur une idée. La voiture conduit toute seule pendant la vidéo.</p>
+      <p class="note" data-en="Short automatic videos, one idea each. The car drives itself during the video.">Des petites vidéos automatiques, chacune sur une idée. La voiture conduit toute seule pendant la vidéo.</p>
     </section>
 
     <section>
       <div class="gauges">
-        <svg id="tach" viewBox="0 0 120 112" role="img" aria-label="Régime moteur"></svg>
-        <div class="gearbig" id="gearBig">N<small>RAPPORT</small></div>
-        <svg id="speedo" viewBox="0 0 120 112" role="img" aria-label="Vitesse de la voiture"></svg>
+        <svg id="tach" viewBox="0 0 120 112" role="img" aria-label="Régime moteur" data-en-label="Engine speed"></svg>
+        <div class="gearbig" id="gearBig" data-en="N&lt;small&gt;GEAR&lt;/small&gt;">N<small>RAPPORT</small></div>
+        <svg id="speedo" viewBox="0 0 120 112" role="img" aria-label="Vitesse de la voiture" data-en-label="Car speed"></svg>
       </div>
       <div class="evread" id="evRead" hidden><div class="soc"><i id="socBar"></i></div><span id="socTxt"></span><span id="pwrTxt"></span></div>
       <div class="warnlights">
-        <span class="wl" id="wlBat">BATTERIE</span>
-        <span class="wl" id="wlEng">MOTEUR</span>
-        <span class="wl" id="wlBrk">FREINS</span>
+        <span class="wl" id="wlBat" data-en="BATTERY">BATTERIE</span>
+        <span class="wl" id="wlEng" data-en="ENGINE">MOTEUR</span>
+        <span class="wl" id="wlBrk" data-en="BRAKES">FREINS</span>
         <span class="wl" id="wlReady" hidden>READY</span>
       </div>
     </section>
 
     <section>
-      <h2 class="sec-h">Conduite</h2>
+      <h2 class="sec-h" data-en="Driving">Conduite</h2>
       <div class="controls">
-        <button class="key" id="startBtn"><span>DÉMARRER<small>TOUCHE K</small></span></button>
+        <button class="key" id="startBtn"><span data-en="START&lt;small&gt;KEY K&lt;/small&gt;">DÉMARRER<small>TOUCHE K</small></span></button>
         <div class="pedals" id="pedals">
-          <div class="pedalw" id="clutchW" style="--pc:var(--steel)"><div class="pedal" id="pClutch" tabindex="0" role="slider" aria-label="Pédale d'embrayage" aria-valuemin="0" aria-valuemax="100"><div class="fill"></div><div class="pad"></div></div><span class="plabel">Embrayage</span><span class="kbd"><kbd>C</kbd></span></div>
-          <div class="pedalw" style="--pc:var(--brake)"><div class="pedal" id="pBrake" tabindex="0" role="slider" aria-label="Pédale de frein" aria-valuemin="0" aria-valuemax="100"><div class="fill"></div><div class="pad"></div></div><span class="plabel">Frein</span><span class="kbd"><kbd>F</kbd> ou <kbd>↓</kbd></span></div>
-          <div class="pedalw" style="--pc:var(--ok)"><div class="pedal" id="pGas" tabindex="0" role="slider" aria-label="Pédale d'accélérateur" aria-valuemin="0" aria-valuemax="100"><div class="fill"></div><div class="pad"></div></div><span class="plabel">Accélér.</span><span class="kbd"><kbd>A</kbd> ou <kbd>↑</kbd></span></div>
+          <div class="pedalw" id="clutchW" style="--pc:var(--steel)"><div class="pedal" id="pClutch" tabindex="0" role="slider" aria-label="Pédale d'embrayage" data-en-label="Clutch pedal" aria-valuemin="0" aria-valuemax="100"><div class="fill"></div><div class="pad"></div></div><span class="plabel" data-en="Clutch">Embrayage</span><span class="kbd"><kbd>C</kbd></span></div>
+          <div class="pedalw" style="--pc:var(--brake)"><div class="pedal" id="pBrake" tabindex="0" role="slider" aria-label="Pédale de frein" data-en-label="Brake pedal" aria-valuemin="0" aria-valuemax="100"><div class="fill"></div><div class="pad"></div></div><span class="plabel" data-en="Brake">Frein</span><span class="kbd" data-en="&lt;kbd&gt;F&lt;/kbd&gt; or &lt;kbd&gt;↓&lt;/kbd&gt;"><kbd>F</kbd> ou <kbd>↓</kbd></span></div>
+          <div class="pedalw" style="--pc:var(--ok)"><div class="pedal" id="pGas" tabindex="0" role="slider" aria-label="Pédale d'accélérateur" data-en-label="Accelerator pedal" aria-valuemin="0" aria-valuemax="100"><div class="fill"></div><div class="pad"></div></div><span class="plabel" data-en="Accel.">Accélér.</span><span class="kbd" data-en="&lt;kbd&gt;A&lt;/kbd&gt; or &lt;kbd&gt;↑&lt;/kbd&gt;"><kbd>A</kbd> ou <kbd>↑</kbd></span></div>
         </div>
       </div>
-      <div class="row" style="margin-top:10px" id="handRow"><button class="btn alt" id="handBtn">✋ Tourner le moteur à la main (maintenir)</button></div>
-      <p class="note">Touche une pédale pour l'enfoncer, touche-la encore pour la relâcher. Tu peux aussi la faire glisser pour doser.</p>
+      <div class="row" style="margin-top:10px" id="handRow"><button class="btn alt" id="handBtn" data-en="✋ Turn the engine by hand (hold)">✋ Tourner le moteur à la main (maintenir)</button></div>
+      <p class="note" data-en="Tap a pedal to press it, tap it again to release it. You can also drag it to dose it.">Touche une pédale pour l'enfoncer, touche-la encore pour la relâcher. Tu peux aussi la faire glisser pour doser.</p>
     </section>
 
     <section id="manualBox">
-      <h2 class="sec-h">Levier de vitesses</h2>
-      <svg id="gate" class="gate" viewBox="0 0 200 104" role="img" aria-label="Grille du levier de vitesses">
+      <h2 class="sec-h" data-en="Gear lever">Levier de vitesses</h2>
+      <svg id="gate" class="gate" viewBox="0 0 200 104" role="img" aria-label="Grille du levier de vitesses" data-en-label="Gear lever gate">
         <path class="gate-slot" d="M25 52 H175 M25 52 V16 M75 16 V88 M125 16 V88 M175 16 V88"/>
         <g class="gate-lbl"><text x="25" y="11">R</text><text x="75" y="11">1</text><text x="125" y="11">3</text><text x="175" y="11">5</text><text x="75" y="102">2</text><text x="125" y="102">4</text><text x="175" y="102">6</text></g>
         <circle id="knob" class="gate-knob" cx="125" cy="52" r="10"/>
       </svg>
       <div class="shifter" id="shifter">
         <button class="gbtn" data-g="R">R</button><button class="gbtn" data-g="1">1</button><button class="gbtn" data-g="3">3</button><button class="gbtn" data-g="5">5</button>
-        <button class="gbtn n act" data-g="N">POINT MORT</button>
+        <button class="gbtn n act" data-g="N" data-en="NEUTRAL">POINT MORT</button>
         <span class="gbtn blank"></span><button class="gbtn" data-g="2">2</button><button class="gbtn" data-g="4">4</button><button class="gbtn" data-g="6">6</button>
       </div>
-      <p class="note">Touches <kbd>1</kbd> à <kbd>6</kbd>, <kbd>R</kbd>, <kbd>N</kbd>. Embrayage enfoncé d'abord, sinon ça craque !</p>
+      <p class="note" data-en="Keys &lt;kbd&gt;1&lt;/kbd&gt; to &lt;kbd&gt;6&lt;/kbd&gt;, &lt;kbd&gt;R&lt;/kbd&gt;, &lt;kbd&gt;N&lt;/kbd&gt;. Clutch down first, or it grinds!">Touches <kbd>1</kbd> à <kbd>6</kbd>, <kbd>R</kbd>, <kbd>N</kbd>. Embrayage enfoncé d'abord, sinon ça craque !</p>
     </section>
 
     <section id="autoBox" hidden>
-      <h2 class="sec-h">Sélecteur</h2>
+      <h2 class="sec-h" data-en="Selector">Sélecteur</h2>
       <div class="autosel">
         <div class="pr" id="selector">
           <button class="gbtn act" data-s="P">P</button><button class="gbtn" data-s="R">R</button><button class="gbtn" data-s="N">N</button><button class="gbtn" data-s="D">D</button>
         </div>
         <div id="elemsWrap">
-          <table class="elems" id="elems" aria-label="Embrayages et freins serrés pour chaque rapport"></table>
-          <p class="note">En vert : les embrayages (K) et freins (B) serrés. Deux éléments serrés suffisent pour chaque rapport.</p>
+          <table class="elems" id="elems" aria-label="Embrayages et freins serrés pour chaque rapport" data-en-label="Clutches and brakes applied for each gear"></table>
+          <p class="note" data-en="In green: the clutches (K) and brakes (B) that are applied. Two applied elements are enough for each gear.">En vert : les embrayages (K) et freins (B) serrés. Deux éléments serrés suffisent pour chaque rapport.</p>
         </div>
       </div>
-      <p class="note" id="evSelNote" hidden>Pas de boîte de vitesses : en D, le moteur électrique pousse de 0 à 150 km/h avec un seul rapport. En R, il tourne simplement à l'envers.</p>
-      <p class="note">Touches <kbd>P</kbd> <kbd>R</kbd> <kbd>N</kbd> <kbd>D</kbd>. Pour quitter P, garde le pied sur le frein.</p>
+      <p class="note" id="evSelNote" hidden data-en="No gearbox: in D, the electric motor pushes from 0 to 150 km/h with a single ratio. In R, it simply spins backwards.">Pas de boîte de vitesses : en D, le moteur électrique pousse de 0 à 150 km/h avec un seul rapport. En R, il tourne simplement à l'envers.</p>
+      <p class="note" data-en="Keys &lt;kbd&gt;P&lt;/kbd&gt; &lt;kbd&gt;R&lt;/kbd&gt; &lt;kbd&gt;N&lt;/kbd&gt; &lt;kbd&gt;D&lt;/kbd&gt;. To leave P, keep your foot on the brake.">Touches <kbd>P</kbd> <kbd>R</kbd> <kbd>N</kbd> <kbd>D</kbd>. Pour quitter P, garde le pied sur le frein.</p>
     </section>
 
     <section>
-      <h2 class="sec-h">À toi de jouer</h2>
+      <h2 class="sec-h" data-en="Your turn">À toi de jouer</h2>
       <ol class="steps" id="steps"></ol>
-      <p class="note"><button class="linkbtn" id="resetBtn">Recommencer</button></p>
+      <p class="note"><button class="linkbtn" id="resetBtn" data-en="Start again">Recommencer</button></p>
     </section>
 
     <section>
-      <h2 class="sec-h">Affichage</h2>
+      <h2 class="sec-h" data-en="Display">Affichage</h2>
       <div class="opts">
-        <div class="seg" id="slow" role="group" aria-label="Ralenti">
-          <button data-s="0.2">Ralenti ÷5</button><button data-s="0.05" class="act">÷20</button><button data-s="0.0167">÷60</button>
+        <div class="seg" id="slow" role="group" aria-label="Ralenti" data-en-label="Slow motion">
+          <button data-s="0.2" data-en="Slow-mo ÷5">Ralenti ÷5</button><button data-s="0.05" class="act">÷20</button><button data-s="0.0167">÷60</button>
         </div>
       </div>
       <div class="opts" style="margin-top:10px">
-        <span class="sec-h" style="margin:0">Carrosserie</span>
-        <div class="seg" id="bodySeg"><button data-b="ghost" class="act">Transparente</button><button data-b="solid">Pleine</button><button data-b="off">Masquée</button></div>
+        <span class="sec-h" style="margin:0" data-en="Body">Carrosserie</span>
+        <div class="seg" id="bodySeg"><button data-b="ghost" class="act" data-en="See-through">Transparente</button><button data-b="solid" data-en="Solid">Pleine</button><button data-b="off" data-en="Hidden">Masquée</button></div>
       </div>
       <div class="opts" style="margin-top:10px">
-        <div class="swatches" id="swatches" aria-label="Couleur">
-          <button class="sw act" style="--c:#2b5d9e" data-c="2b5d9e" aria-label="Bleu"></button>
-          <button class="sw" style="--c:#b3262a" data-c="b3262a" aria-label="Rouge"></button>
-          <button class="sw" style="--c:#e9ecec" data-c="e9ecec" aria-label="Blanc"></button>
-          <button class="sw" style="--c:#8d969c" data-c="8d969c" aria-label="Gris"></button>
-          <button class="sw" style="--c:#1c2023" data-c="1c2023" aria-label="Noir"></button>
+        <div class="swatches" id="swatches" aria-label="Couleur" data-en-label="Colour">
+          <button class="sw act" style="--c:#2b5d9e" data-c="2b5d9e" aria-label="Bleu" data-en-label="Blue"></button>
+          <button class="sw" style="--c:#b3262a" data-c="b3262a" aria-label="Rouge" data-en-label="Red"></button>
+          <button class="sw" style="--c:#e9ecec" data-c="e9ecec" aria-label="Blanc" data-en-label="White"></button>
+          <button class="sw" style="--c:#8d969c" data-c="8d969c" aria-label="Gris" data-en-label="Grey"></button>
+          <button class="sw" style="--c:#1c2023" data-c="1c2023" aria-label="Noir" data-en-label="Black"></button>
         </div>
-        <label class="tog"><input type="checkbox" id="optFollow" checked> Caméra qui suit l'action</label>
-        <label class="tog"><input type="checkbox" id="optLights"> Phares</label>
-        <label class="tog"><input type="checkbox" id="optTags" checked> Étiquettes</label>
-        <label class="tog"><input type="checkbox" id="optSound" checked> Bruit du moteur</label>
+        <label class="tog"><input type="checkbox" id="optFollow" checked> <span data-en="Camera follows the action">Caméra qui suit l'action</span></label>
+        <label class="tog"><input type="checkbox" id="optLights"> <span data-en="Headlights">Phares</span></label>
+        <label class="tog"><input type="checkbox" id="optTags" checked> <span data-en="Labels">Étiquettes</span></label>
+        <label class="tog"><input type="checkbox" id="optSound" checked> <span data-en="Engine sound">Bruit du moteur</span></label>
       </div>
-      <p class="note">Un vrai moteur tourne bien trop vite pour qu'on le voie : les pièces bougent au ralenti. Les cadrans, eux, montrent les vraies vitesses.</p>
+      <p class="note" data-en="A real engine spins far too fast to see: the parts move in slow motion. The dials, though, show the real speeds.">Un vrai moteur tourne bien trop vite pour qu'on le voie : les pièces bougent au ralenti. Les cadrans, eux, montrent les vraies vitesses.</p>
     </section>
 
     <section>
-      <h2 class="sec-h">Fiche technique</h2>
+      <h2 class="sec-h" data-en="Spec sheet">Fiche technique</h2>
       <table class="spec" id="spec"></table>
       <p class="note" id="specNote"></p>
     </section>

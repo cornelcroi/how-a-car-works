@@ -69,20 +69,20 @@ window.addEventListener('blur', ()=>{ for(const p in held) if(held[p]){ held[p]=
 let nudgeClutchT = 0;
 function pressStart(){
   ensureAudio();
-  if(S.engineOn){ S.engineOn=false; say(S.mode==='ev'?'Voiture éteinte.':'Moteur coupé.',2.5); return; }
+  if(S.engineOn){ S.engineOn=false; say(S.mode==='ev'?tr('Voiture éteinte.','Car switched off.'):tr('Moteur coupé.','Engine off.'),2.5); return; }
   if(S.cranking>0) return;
   if(S.mode==='ev'){
-    if(!(S.sel==='P'||S.sel==='N')){ say('Mets le levier sur P pour allumer la voiture.',4); return; }
+    if(!(S.sel==='P'||S.sel==='N')){ say(tr('Mets le levier sur P pour allumer la voiture.','Put the lever in P to switch the car on.'),4); return; }
     gameOnStart();
-    if(FAULT.active && FAULT.kind==='ev12v'){ say('Rien ne s\'allume… La petite batterie 12 V est vide : c\'est elle qui réveille l\'ordinateur de la voiture.',5); return; }
-    if(S.brake<0.3){ say('Pour allumer une voiture électrique, garde le pied sur le frein en appuyant sur Démarrer.',4.5); return; }
-    S.engineOn=true; S.runTime=0; say('READY ! La voiture est prête… et complètement silencieuse.',4); followAction('engine',3); return;
+    if(FAULT.active && FAULT.kind==='ev12v'){ say(tr('Rien ne s\'allume… La petite batterie 12 V est vide : c\'est elle qui réveille l\'ordinateur de la voiture.','Nothing lights up… The small 12 V battery is flat: it\'s the one that wakes up the car\'s computer.'),5); return; }
+    if(S.brake<0.3){ say(tr('Pour allumer une voiture électrique, garde le pied sur le frein en appuyant sur Démarrer.','To switch on an electric car, keep your foot on the brake while you press Start.'),4.5); return; }
+    S.engineOn=true; S.runTime=0; say(tr('READY ! La voiture est prête… et complètement silencieuse.','READY! The car is ready… and completely silent.'),4); followAction('engine',3); return;
   }
-  if(S.mode==='manual' && S.gear!=='N' && S.clutch < 0.6){ say('Enfonce d\'abord la pédale d\'embrayage à fond (ou mets le point mort). Sinon la voiture ferait un bond au démarrage !',5); nudgeClutchT=4; return; }
-  if(S.mode==='auto' && !(S.sel==='P' || S.sel==='N')){ say('Une boîte automatique ne démarre que sur P ou N. Mets le levier sur P.',4.5); return; }
+  if(S.mode==='manual' && S.gear!=='N' && S.clutch < 0.6){ say(tr('Enfonce d\'abord la pédale d\'embrayage à fond (ou mets le point mort). Sinon la voiture ferait un bond au démarrage !','First press the clutch pedal all the way down (or select neutral). Otherwise the car would jump forward when it starts!'),5); nudgeClutchT=4; return; }
+  if(S.mode==='auto' && !(S.sel==='P' || S.sel==='N')){ say(tr('Une boîte automatique ne démarre que sur P ou N. Mets le levier sur P.','An automatic only starts in P or N. Put the lever in P.'),4.5); return; }
   gameOnStart();
-  if(FAULT.active && FAULT.kind==='battery'){ say('Clic… La batterie est vide : elle n\'a plus assez d\'électricité pour faire tourner le démarreur.',4); return; }
-  if(FAULT.active && FAULT.kind==='starter'){ say('Rien ne tourne… Les phares marchent, donc ce n\'est pas la batterie.',4); return; }
+  if(FAULT.active && FAULT.kind==='battery'){ say(tr('Clic… La batterie est vide : elle n\'a plus assez d\'électricité pour faire tourner le démarreur.','Click… The battery is flat: it no longer has enough electricity to turn the starter motor.'),4); return; }
+  if(FAULT.active && FAULT.kind==='starter'){ say(tr('Rien ne tourne… Les phares marchent, donc ce n\'est pas la batterie.','Nothing turns… The headlights work, so it\'s not the battery.'),4); return; }
   S.cranking = 1.1; followAction('engine', 3);
 }
 $('startBtn').onclick = ()=>{ stopDemo(); pressStart(); };
@@ -104,10 +104,10 @@ function updateLever(dt){
 }
 function selectGear(g){
   if(g===(LEV.pending||S.gear)) return;
-  if(g!=='N' && S.engineOn && S.clutch < 0.85){ say('Crrrrr ! Ça craque : les pignons tournent à des vitesses différentes. Enfonce l\'embrayage à fond, puis passe la vitesse.',4.5); nudgeClutchT=4; flashEl($('shifter')); return; }
-  if(g==='3' && FAULT.kind==='synchro'){ gameTrigger(); if(FAULT.active){ say('Crrrrr ! Impossible de passer la 3e, même avec l\'embrayage enfoncé.',4); flashEl($('shifter')); return; } }
-  if(g==='R' && S.v > 0.8){ say('Arrête la voiture avant de passer la marche arrière.',3.5); return; }
-  if(g!=='N' && g!=='R' && S.v < -0.8){ say('Arrête la voiture avant de passer une vitesse pour avancer.',3.5); return; }
+  if(g!=='N' && S.engineOn && S.clutch < 0.85){ say(tr('Crrrrr ! Ça craque : les pignons tournent à des vitesses différentes. Enfonce l\'embrayage à fond, puis passe la vitesse.','Crrrrr! It grinds: the gears are spinning at different speeds. Press the clutch all the way down, then change gear.'),4.5); nudgeClutchT=4; flashEl($('shifter')); return; }
+  if(g==='3' && FAULT.kind==='synchro'){ gameTrigger(); if(FAULT.active){ say(tr('Crrrrr ! Impossible de passer la 3e, même avec l\'embrayage enfoncé.','Crrrrr! You can\'t get into 3rd, even with the clutch down.'),4); flashEl($('shifter')); return; } }
+  if(g==='R' && S.v > 0.8){ say(tr('Arrête la voiture avant de passer la marche arrière.','Stop the car before you select reverse.'),3.5); return; }
+  if(g!=='N' && g!=='R' && S.v < -0.8){ say(tr('Arrête la voiture avant de passer une vitesse pour avancer.','Stop the car before you select a forward gear.'),3.5); return; }
   if(S.gear!=='N') S.win = (S.v/WH.r)*RATIO_M[S.gear]*FD;
   S.gear = 'N'; leverTo(g);                 // le levier quitte la vitesse, passe par le point mort, puis entre dans la nouvelle
   document.querySelectorAll('#shifter .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.g===g));
@@ -115,9 +115,9 @@ function selectGear(g){
 }
 function selectAuto(s){
   if(s===S.sel) return;
-  if(S.sel==='P' && S.brake < 0.3 && S.engineOn){ say('Pour quitter P, garde le pied sur le frein (sécurité).',3.5); flashEl($('selector')); return; }
-  if((s==='P' || s==='R') && S.v > 0.8){ say('Arrête la voiture avant de passer sur '+s+'.',3.5); return; }
-  if(s==='D' && S.v < -0.8){ say('Arrête la voiture avant de passer en D.',3.5); return; }
+  if(S.sel==='P' && S.brake < 0.3 && S.engineOn){ say(tr('Pour quitter P, garde le pied sur le frein (sécurité).','To leave P, keep your foot on the brake (safety).'),3.5); flashEl($('selector')); return; }
+  if((s==='P' || s==='R') && S.v > 0.8){ say(tr('Arrête la voiture avant de passer sur '+s+'.','Stop the car before you select '+s+'.'),3.5); return; }
+  if(s==='D' && S.v < -0.8){ say(tr('Arrête la voiture avant de passer en D.','Stop the car before you select D.'),3.5); return; }
   if(s==='D' && S.sel!=='D') S.agear = 1;
   S.sel = s; S.shiftT = 0.6;
   document.querySelectorAll('#selector .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.s===s));
@@ -127,7 +127,7 @@ function flashEl(s){ if(s.animate) s.animate([{transform:'translateX(0)'},{trans
 document.querySelectorAll('#shifter .gbtn[data-g]').forEach(b=> b.onclick = ()=>{ ensureAudio(); stopDemo(); selectGear(b.dataset.g); });
 document.querySelectorAll('#selector .gbtn').forEach(b=> b.onclick = ()=>{ ensureAudio(); stopDemo(); selectAuto(b.dataset.s); });
 const handBtn = $('handBtn');
-['pointerdown'].forEach(ev=>handBtn.addEventListener(ev, e=>{ handBtn.setPointerCapture(e.pointerId); if(S.engineOn){ say('Coupe d\'abord le moteur pour le tourner à la main.',3); return; } S.hand=true; }));
+['pointerdown'].forEach(ev=>handBtn.addEventListener(ev, e=>{ handBtn.setPointerCapture(e.pointerId); if(S.engineOn){ say(tr('Coupe d\'abord le moteur pour le tourner à la main.','Switch the engine off first to turn it by hand.'),3); return; } S.hand=true; }));
 ['pointerup','pointercancel','pointerleave'].forEach(ev=>handBtn.addEventListener(ev, ()=>{ S.hand=false; }));
 
 function setMode(m){
@@ -143,8 +143,8 @@ function setMode(m){
   ['casing','internals','clutch'].forEach(k=>{ document.querySelector(`.part[data-p="${k}"]`).hidden = ev; });
   setTach(); renderSpec();
   $('clutchW').hidden = m!=='manual'; $('pedals').classList.toggle('two', m!=='manual');
-  $('vClutch').textContent = m==='manual' ? 'Embrayage' : 'Convertisseur';
-  $('pClutchCat').textContent = m==='manual' ? 'Embrayage' : 'Convertisseur';
+  $('vClutch').textContent = m==='manual' ? tr('Embrayage','Clutch') : tr('Convertisseur','Converter');
+  $('pClutchCat').textContent = m==='manual' ? tr('Embrayage','Clutch') : tr('Convertisseur','Converter');
   document.querySelectorAll('#shifter .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.g==='N'));
   document.querySelectorAll('#selector .gbtn').forEach(b=>b.classList.toggle('act', b.dataset.s==='P'));
   if(iso && isoKey && INFO[isoKey].mode && INFO[isoKey].mode!==m) unIsolate();
@@ -187,7 +187,7 @@ function simulate(dt){
   for(const k in anim){ const a=anim[k]; if(!a) continue; const d=a.to-S[k], st=a.rate*dt; if(Math.abs(d)<=st){ S[k]=a.to; anim[k]=null; } else S[k]+=Math.sign(d)*st; }
   if(S.mode==='auto') S.clutch = 0;
   if(S.cranking>0){ S.cranking -= dt; if(S.cranking<=0){ S.cranking=0;
-      if(beltBroken()) say('Le démarreur fait tourner le moteur… mais il ne démarre pas. Regarde bien ce qui tourne et ce qui ne tourne pas.',5);
+      if(beltBroken()) say(tr('Le démarreur fait tourner le moteur… mais il ne démarre pas. Regarde bien ce qui tourne et ce qui ne tourne pas.','The starter turns the engine… but it doesn\'t start. Look closely at what turns and what doesn\'t.'),5);
       else { S.engineOn=true; S.runTime=0; } } }
   if(S.engineOn) S.runTime += dt;
   const n = Math.max(20, Math.ceil(dt/0.0004)), h = dt/n; let slipAcc = 0;
@@ -208,7 +208,7 @@ function simulate(dt){
     }
     S.slipLast = slipAcc/n;
     outFree = cvBroken() && ratio ? S.win/ratio : (S.v/WH.r)*FD;
-    if(S.engineOn && S.runTime > 0.6 && S.we*RPM < 350){ S.engineOn=false; say(ratio && e>0 ? 'Le moteur a calé ! L\'embrayage est remonté trop vite. Enfonce l\'embrayage, redémarre, puis relâche-le doucement avec un peu d\'accélérateur.' : 'Le moteur a calé.', 6); }
+    if(S.engineOn && S.runTime > 0.6 && S.we*RPM < 350){ S.engineOn=false; say(ratio && e>0 ? tr('Le moteur a calé ! L\'embrayage est remonté trop vite. Enfonce l\'embrayage, redémarre, puis relâche-le doucement avec un peu d\'accélérateur.','The engine stalled! The clutch came up too fast. Press the clutch, restart, then let it up gently with a bit of accelerator.') : tr('Le moteur a calé.','The engine stalled.'), 6); }
   } else {
     autoShiftLogic(dt);
     const drive = (S.sel==='D' || S.sel==='R') && !cvBroken();
@@ -226,7 +226,7 @@ function simulate(dt){
       else { const Tfi = Math.abs(S.win)>0.5 ? 0.6*Math.sign(S.win)+0.012*S.win : S.win*0.8; S.win += (Tt - Tfi)/IIN*h; S.v = carStep(S.v, 0, h); }
     }
     outFree = cvBroken() && ratio ? S.win/ratio : (S.v/WH.r)*FD;
-    if(S.engineOn && S.runTime > 0.6 && S.we*RPM < 300){ S.engineOn=false; say('Le moteur s\'est arrêté.',4); }
+    if(S.engineOn && S.runTime > 0.6 && S.we*RPM < 300){ S.engineOn=false; say(tr('Le moteur s\'est arrêté.','The engine stopped.'),4); }
   }
   if(beltBroken() && S.engineOn){ S.engineOn=false; }
   if(S.msgT>0) S.msgT -= dt;
@@ -269,4 +269,4 @@ function autoShiftLogic(dt){
   } else S.lock = false;
 }
 function onAutoShift(){ const now=performance.now(); if(now-lastAutoShift>6000) followAction('gearbox',3); lastAutoShift=now;
-  say(`La boîte passe la ${S.agear}${S.agear===1?'re':'e'} toute seule : ${SHIFT_EL[S.agear].join(' et ')} se serrent.`, 3); }
+  say(tr(`La boîte passe la ${S.agear}${S.agear===1?'re':'e'} toute seule : ${SHIFT_EL[S.agear].join(' et ')} se serrent.`, `The gearbox shifts into ${S.agear}${['','st','nd','rd'][S.agear]||'th'} gear by itself: ${SHIFT_EL[S.agear].join(' and ')} apply.`), 3); }

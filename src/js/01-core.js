@@ -4,7 +4,30 @@ const $ = id => document.getElementById(id);
 const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
 const lerp = (a,b,t)=>a+(b-a)*t;
 const TAU = Math.PI*2, RPM = 60/TAU, DEG = Math.PI/180;
-const fr = (x,d=1)=> x.toFixed(d).replace('.',',');
+
+/* ================= Langue (fr par défaut, en) ================= */
+// ?lang=en|fr > choix mémorisé > langue du navigateur. Changer de langue recharge la page.
+const LANG = (()=>{
+  const q = new URLSearchParams(location.search).get('lang');
+  if(q==='fr'||q==='en') return q;
+  try{ const s = localStorage.getItem('lang'); if(s==='fr'||s==='en') return s; }catch(e){}
+  return /^fr\b/i.test(navigator.language||'fr') ? 'fr' : 'en';
+})();
+const IS_EN = LANG==='en';
+const tr = (frText, enText)=> IS_EN ? enText : frText;
+const fr = (x,d=1)=> IS_EN ? x.toFixed(d) : x.toFixed(d).replace('.',',');   // nombre formaté selon la langue
+if(IS_EN){
+  document.documentElement.lang = 'en';
+  document.title = 'How a car works';
+  document.querySelectorAll('[data-en]').forEach(el=>{ el.innerHTML = el.dataset.en; });
+  document.querySelectorAll('[data-en-label]').forEach(el=>{ el.setAttribute('aria-label', el.dataset.enLabel); });
+}
+$('langBtn').textContent = IS_EN ? 'Français' : 'English';
+$('langBtn').addEventListener('click', ()=>{
+  const next = IS_EN ? 'fr' : 'en';
+  try{ localStorage.setItem('lang', next); }catch(e){}
+  const u = new URL(location.href); u.searchParams.set('lang', next); location.href = u.href;
+});
 
 /* ================= Scène ================= */
 const canvas = $('c'), stage = $('stage');

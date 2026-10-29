@@ -1,3 +1,5 @@
 node_modules/
 .DS_Store
 *.log
+docs/media/linkedin.mp4
+docs/media/.tmp/
