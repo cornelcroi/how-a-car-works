@@ -299,6 +299,7 @@ function startTour(shotList, title){
   nextShot();
 }
 function stopTour(){
+  document.querySelectorAll('.sc.act').forEach(x=>x.classList.remove('act'));
   if(!tour) return; const sv = tour.saved; tour=null;
   S.slow = sv.slow; bodyMode = sv.body; Object.assign(catOn, sv.cats); simple = sv.simple; applyBodyMode();
   controls.enabled = true; stage.classList.remove('reeling'); reelEl.hidden=true; explodeTarget=0;
@@ -481,7 +482,8 @@ function renderScenarios(){
   const card = sc => `<button class="sc" data-sc="${sc.id}"><b>▶ ${sc.t}</b><span>${sc.d}</span></button>`, all = SCENARIOS[S.mode];
   $('scList').innerHTML = all.filter(sc=>!DRIVE_VIDEOS.includes(sc.id)).map(card).join('');
   $('parkList').innerHTML = all.filter(sc=>DRIVE_VIDEOS.includes(sc.id)).map(card).join('');
-  document.querySelectorAll('#scList .sc, #parkList .sc').forEach(b=> b.onclick = ()=>{ const sc = all.find(x=>x.id===b.dataset.sc); startTour(sc.shots(), sc.t); });
+  document.querySelectorAll('#scList .sc, #parkList .sc').forEach(b=> b.onclick = ()=>{ const sc = all.find(x=>x.id===b.dataset.sc); startTour(sc.shots(), sc.t);
+    document.querySelectorAll('.sc').forEach(x=>x.classList.toggle('act', x===b)); });   // after startTour: it clears the previous one
 }
 
 /* ======================================================================
