@@ -108,6 +108,7 @@ When adding one:
 ## Ideas / roadmap
 
 0. More driving videos (stopping distance, cyclist overtaking, lorry blind spots, yield to the right). A crossroads in street mode: stop sign, yield to the right, pedestrian crossing, scored by simple rules on position and speed (no model).
+0b. Engine from a spec sheet: move `EN`, `PH`, `FIRE` (02) and the torque curve (06) into one engine object (bore, stroke, cylinders, firing order, power, torque), so a real engine can be rebuilt from its published figures. A different cylinder count changes the crank, the firing order and the block layout. Brand names stay out unless the owner decides otherwise.
 1. Move `SCENARIOS` to plain JSON files (`scenarios/*.json`) with the actions as named commands. AI agents could then write videos without touching JS.
 2. Expose the director as a small command API (`focus`, `isolate`, `zoom`, `caption`, `action`), then as an **MCP server**, so an assistant can drive the page live (« montre-moi l'embrayage »).
 3. More learner-driver videos: see the list at the end of `docs/SCENARIOS.md`.

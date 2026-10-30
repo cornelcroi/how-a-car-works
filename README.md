@@ -144,6 +144,7 @@ Built in conversation with **Claude** (Anthropic) through Claude Code: I directe
 1. More driving videos: stopping distance and the 2-second rule, overtaking a cyclist, a lorry's blind spots, yield to the right.
 2. Videos as plain JSON (`scenarios/*.json`), then a small command API and an MCP server, so an assistant can direct the page live.
 3. A "type a fault code" mode on the generic car.
+4. An engine built from a spec sheet. The engine is already drawn from the published figures of a real 2.0 four-cylinder (bore 82.5 mm, stroke 92.8 mm, firing order 1-3-4-2). Move those figures into one file, and any engine with public specs could be rebuilt: same bore and stroke, same firing order, same torque curve. Other cylinder counts (a 3-cylinder, a V6) mean real work on the crankshaft and the layout.
 
 ## Licence
 
